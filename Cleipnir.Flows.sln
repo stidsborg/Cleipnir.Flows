@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows", "Cleipnir.Flows\Cleipnir.Flows.csproj", "{08B6671B-854A-4B1D-A921-824B2992DEDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.PostgresSql", "Cleipnir.Flows.PostgresSql\Cleipnir.Flows.PostgresSql.csproj", "{0C6B8FE3-7540-4E25-AAAD-40EB03764069}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.SourceGenerator", "Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj", "{CC2EAEE0-8556-41DD-9936-0A9A694AC78A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.Sample.AspNet", "Samples\Cleipnir.Flows.Sample.AspNet\Cleipnir.Flows.Sample.AspNet.csproj", "{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.Sample.Console", "Samples\Cleipnir.Flows.Samples.Console\Cleipnir.Flows.Sample.Console.csproj", "{DBF10B5A-8F03-43E9-B408-538766620DA6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EAD350F1-8EF2-48AC-98EE-A5E739F15787}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08B6671B-854A-4B1D-A921-824B2992DEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B6671B-854A-4B1D-A921-824B2992DEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B6671B-854A-4B1D-A921-824B2992DEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B6671B-854A-4B1D-A921-824B2992DEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C6B8FE3-7540-4E25-AAAD-40EB03764069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C6B8FE3-7540-4E25-AAAD-40EB03764069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C6B8FE3-7540-4E25-AAAD-40EB03764069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C6B8FE3-7540-4E25-AAAD-40EB03764069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC2EAEE0-8556-41DD-9936-0A9A694AC78A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC2EAEE0-8556-41DD-9936-0A9A694AC78A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC2EAEE0-8556-41DD-9936-0A9A694AC78A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC2EAEE0-8556-41DD-9936-0A9A694AC78A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBF10B5A-8F03-43E9-B408-538766620DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBF10B5A-8F03-43E9-B408-538766620DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBF10B5A-8F03-43E9-B408-538766620DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBF10B5A-8F03-43E9-B408-538766620DA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD} = {EAD350F1-8EF2-48AC-98EE-A5E739F15787}
+		{DBF10B5A-8F03-43E9-B408-538766620DA6} = {EAD350F1-8EF2-48AC-98EE-A5E739F15787}
+	EndGlobalSection
+EndGlobal
