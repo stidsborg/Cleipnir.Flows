@@ -18,7 +18,7 @@ internal static class Program
         var updateVersion = args[0] == "all" || args[0] == "update_version";
         var pack = args[0] == "all" || args[0] == "pack";
 
-        var root = Path.GetFullPath(@"C:\Repos\Cleipnir.ResilientFunctions");
+        var root = Path.GetFullPath(@"C:\Repos\Cleipnir.Flows");
         var output = Path.GetFullPath(@".\nugets");
 
         if (Directory.Exists(output))
@@ -77,7 +77,7 @@ internal static class Program
         versionArray[^1]++;
         var newVersionString = string.Join(".", versionArray);
 
-        var newProjectFileContent = projectFileContent.Replace(currentVersionString, newVersionString);
+        var newProjectFileContent = projectFileContent.Replace(">" + currentVersionString, ">" + newVersionString);
         return newProjectFileContent;
     }
 
