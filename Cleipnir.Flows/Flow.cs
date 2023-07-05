@@ -12,8 +12,8 @@ namespace Cleipnir.Flows;
 public abstract class Flow<TParam, TScrapbook> where TParam : notnull where TScrapbook : RScrapbook, new()
 {
     public Context Context { get; init; } = null!;
-    public Utilities Utilities { get; init; } = null!;
-    public EventSource EventSource { get; init; } = null!;
+    public Utilities Utilities => Context.Utilities;
+    public Task<EventSource> EventSource => Context.EventSource;
     public TScrapbook Scrapbook { get; init; } = default!;
 
     public abstract Task Run(TParam param);
@@ -39,8 +39,8 @@ public abstract class Flow<TParam, TScrapbook> where TParam : notnull where TScr
 public abstract class Flow<TParam, TScrapbook, TResult> where TParam : notnull where TScrapbook : RScrapbook, new()
 {
     public Context Context { get; init; } = null!;
-    public Utilities Utilities { get; init; } = null!;
-    public EventSource EventSource { get; init; } = null!;
+    public Utilities Utilities => Context.Utilities;
+    public Task<EventSource> EventSource => Context.EventSource;
     public TScrapbook Scrapbook { get; init; } = default!;
 
     public abstract Task<TResult> Run(TParam param);

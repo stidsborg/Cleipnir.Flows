@@ -12,13 +12,13 @@ namespace Cleipnir.Flows;
 
 public class FlowsContainer : IDisposable
 {
-    internal readonly IServiceProvider _serviceProvider;
-    internal readonly RFunctions _rFunctions;
-    internal readonly List<IMiddleware> _middlewares;
+    internal readonly IServiceProvider ServiceProvider;
+    internal readonly RFunctions RFunctions;
+    internal readonly List<IMiddleware> Middlewares;
 
     public FlowsContainer(IFlowStore flowStore, IServiceProvider serviceProvider, Options? options = null)
     {
-        _serviceProvider = serviceProvider;
+        ServiceProvider = serviceProvider;
         if (options != null && options.UnhandledExceptionHandler == null && serviceProvider.GetService<ILogger>() != null)
         {
             var logger = serviceProvider.GetRequiredService<ILogger>();
@@ -35,8 +35,8 @@ public class FlowsContainer : IDisposable
                 );
         }
              
-        _rFunctions = new RFunctions(flowStore, options?.MapToRFunctionsSettings());
-        _middlewares = options?.Middlewares
+        RFunctions = new RFunctions(flowStore, options?.MapToRFunctionsSettings());
+        Middlewares = options?.Middlewares
             .Select(m => m switch
             {
                 MiddlewareInstance middlewareInstance => middlewareInstance.Middleware,
@@ -46,16 +46,7 @@ public class FlowsContainer : IDisposable
             .ToList() ?? new List<IMiddleware>();
     }
 
-    public Flows<TFlow, TParam, TScrapbook> RegisterFlow<TFlow, TParam, TScrapbook>(string flowName, TFlow flow)
-    where TFlow : Flow<TParam, TScrapbook>
-    where TParam : notnull
-    where TScrapbook : RScrapbook, new()
-    {
-        var flowRegistration = new Flows<TFlow, TParam, TScrapbook>(flowName, flowsContainer: this);
-        return flowRegistration;
-    }
-
-    public Flows<TFlow, TParam, TScrapbook> RegisterFlow<TFlow, TParam, TScrapbook>(string flowName, Func<(TFlow, IDisposable)> flowResolver)
+    public Flows<TFlow, TParam, TScrapbook> CreateFlows<TFlow, TParam, TScrapbook>(string flowName)
         where TFlow : Flow<TParam, TScrapbook>
         where TParam : notnull
         where TScrapbook : RScrapbook, new()
@@ -64,25 +55,7 @@ public class FlowsContainer : IDisposable
         return flowRegistration;
     }
     
-    public Flows<TFlow, TParam, TScrapbook> RegisterFlow<TFlow, TParam, TScrapbook>(string flowName, Func<TFlow> flowResolver)
-        where TFlow : Flow<TParam, TScrapbook>
-        where TParam : notnull
-        where TScrapbook : RScrapbook, new()
-    {
-        var flowRegistration = new Flows<TFlow, TParam, TScrapbook>(flowName, flowsContainer: this);
-        return flowRegistration;
-    }
-    
-    public Flows<TFlow, TParam, TScrapbook> RegisterFlow<TFlow, TParam, TScrapbook>(string flowName)
-        where TFlow : Flow<TParam, TScrapbook>
-        where TParam : notnull
-        where TScrapbook : RScrapbook, new()
-    {
-        var flowRegistration = new Flows<TFlow, TParam, TScrapbook>(flowName, flowsContainer: this);
-        return flowRegistration;
-    }
-    
-    public Flows<TFlow, TParam, TScrapbook, TResult> RegisterFlow<TFlow, TParam, TScrapbook, TResult>(string flowName)
+    public Flows<TFlow, TParam, TScrapbook, TResult> CreateFlows<TFlow, TParam, TScrapbook, TResult>(string flowName)
         where TFlow : Flow<TParam, TScrapbook, TResult>
         where TParam : notnull
         where TScrapbook : RScrapbook, new()
@@ -91,7 +64,7 @@ public class FlowsContainer : IDisposable
         return flowRegistration;
     }
 
-    public void Dispose() => _rFunctions.Dispose();
+    public void Dispose() => RFunctions.Dispose();
 
-    public Task ShutdownGracefully(TimeSpan? maxWait = null) => _rFunctions.ShutdownGracefully(maxWait);
+    public Task ShutdownGracefully(TimeSpan? maxWait = null) => RFunctions.ShutdownGracefully(maxWait);
 }
