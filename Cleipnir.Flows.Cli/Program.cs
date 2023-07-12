@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace Cleipnir.Flows.Cli;
 
@@ -6,18 +8,6 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
-        args = args.Select(arg => arg.ToLowerInvariant()).ToArray();
-        if (args.Length == 0 || (args[0] != "all" && args[0] != "update_version" && args[0] != "pack"))
-        {
-            Console.WriteLine("Usage: dotnet run all");
-            Console.WriteLine("       dotnet run update_version");
-            Console.WriteLine("       dotnet run pack");
-            return 1;
-        }
-
-        var updateVersion = args[0] == "all" || args[0] == "update_version";
-        var pack = args[0] == "all" || args[0] == "pack";
-
         var root = Path.GetFullPath(@"C:\Repos\Cleipnir.Flows");
         var output = Path.GetFullPath(@".\nugets");
 
@@ -30,21 +20,34 @@ internal static class Program
         Console.WriteLine($"Output path: {output}");
         
         Console.WriteLine("Processing projects: ");
-        if (updateVersion)
-            foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
-            {
-                Console.WriteLine("Updating package version: " + LeafFolderName(projectPath));
-                Console.WriteLine("Project path: " + Path.GetDirectoryName(projectPath)!);
-                UpdatePackageVersion(projectPath);
-            }
         
-        if (pack)
-            foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
-            {
-                Console.WriteLine("Packing nuget package: " + LeafFolderName(projectPath));
-                Console.WriteLine("Project path: " + Path.GetDirectoryName(projectPath)!);
-                PackProject(Path.GetDirectoryName(projectPath)!, output);
-            }
+        //update version
+        foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
+        {
+            Console.WriteLine("Updating package version: " + LeafFolderName(projectPath));
+            Console.WriteLine("Project path: " + Path.GetDirectoryName(projectPath)!);
+            UpdatePackageVersion(projectPath);
+        }
+
+        //compile & publish source generator
+        PublishSourceGenerator(@$"{root}\Cleipnir.Flows.SourceGenerator", output);
+        
+        //pack
+        foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
+        {
+            Console.WriteLine("Packing nuget package: " + LeafFolderName(projectPath));
+            Console.WriteLine("Project path: " + Path.GetDirectoryName(projectPath)!);
+            PackProject(Path.GetDirectoryName(projectPath)!, output);
+        }
+
+        //add source generator to core flow nuget packages
+        var nugetPackages = Directory.GetFiles(output, "*.nupkg");
+        foreach (var nugetPackage in nugetPackages)
+            if (Regex.IsMatch(nugetPackage, @"Cleipnir.Flows.\d*.\d*.\d*.nupkg"))
+                AddSourceGeneratorToNugetPackage(
+                    nugetPackage,
+                    @$"{output}\Cleipnir.Flows.SourceGenerator.dll"
+                );
 
         return 0;
     }
@@ -98,7 +101,40 @@ internal static class Program
 
         p.WaitForExit();
     }
+    
+    private static void PublishSourceGenerator(string sourceGeneratorProjectPath, string outputPath)
+    {
+        //dotnet publish -c Release -o Output
+        var p = new Process();
+        p.StartInfo.RedirectStandardInput = true;
+        p.StartInfo.RedirectStandardOutput = true;
+        p.StartInfo.RedirectStandardError = true;
+        p.StartInfo.UseShellExecute = false;
+        p.StartInfo.FileName = @"C:\Program Files\dotnet\dotnet.exe";
+        p.StartInfo.WorkingDirectory = sourceGeneratorProjectPath;
+        p.StartInfo.Arguments = $"dotnet publish -c Release -o {outputPath}";
+        p.Start();
+
+        while (!p.StandardOutput.EndOfStream)
+            Console.WriteLine(p.StandardOutput.ReadLine());
+
+        p.WaitForExit();
+    }
 
     private static string LeafFolderName(string path)
         => Path.GetDirectoryName(path)!.Split('\\').Last();
+
+    private static void Unzip(string zipFilePath, string unzipPath) 
+        => ZipFile.ExtractToDirectory(zipFilePath, unzipPath);
+
+    private static void Zip(string folderPath, string zipPath) 
+        => ZipFile.CreateFromDirectory(folderPath, zipPath);
+
+    private static void AddSourceGeneratorToNugetPackage(string nugetPath, string sourceGeneratorDllPath)
+    {
+        using var zipArchive = ZipFile.Open(nugetPath, ZipArchiveMode.Update);
+
+        var fileInfo = new FileInfo(sourceGeneratorDllPath);
+        zipArchive.CreateEntryFromFile(sourceGeneratorDllPath, @$"analyzers\dotnet\cs\{fileInfo.Name}");
+    }
 }
