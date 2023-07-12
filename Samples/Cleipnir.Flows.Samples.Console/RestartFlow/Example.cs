@@ -21,7 +21,7 @@ public static class Example
         {
             await flows.Run(flowId, ""); //invalid parameter    
         }
-        catch (Exception exception)
+        catch (Exception)
         {
             // ignored
         }
