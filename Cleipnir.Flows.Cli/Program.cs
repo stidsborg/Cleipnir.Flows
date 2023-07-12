@@ -42,12 +42,12 @@ internal static class Program
 
         //add source generator to core flow nuget packages
         var nugetPackages = Directory.GetFiles(output, "*.nupkg");
-        foreach (var nugetPackage in nugetPackages)
-            if (Regex.IsMatch(nugetPackage, @"Cleipnir.Flows.\d*.\d*.\d*.nupkg"))
-                AddSourceGeneratorToNugetPackage(
-                    nugetPackage,
-                    @$"{output}\Cleipnir.Flows.SourceGenerator.dll"
-                );
+        var coreProjectNugetPackage = nugetPackages
+            .Single(nugetPackage => Regex.IsMatch(nugetPackage, @"Cleipnir.Flows.\d*.\d*.\d*.nupkg"));
+        AddSourceGeneratorToNugetPackage(
+            coreProjectNugetPackage,
+            @$"{output}\Cleipnir.Flows.SourceGenerator.dll"
+        );
 
         return 0;
     }
