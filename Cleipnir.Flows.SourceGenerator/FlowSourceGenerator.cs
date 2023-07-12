@@ -113,37 +113,10 @@ namespace Cleipnir.Flows.SourceGenerator
         private void GenerateCode(GeneratorExecutionContext context, List<FlowInformation> flowInformations)
         {
             foreach (var implementationType in flowInformations)
-                AddFlowsWrapper2(context, implementationType);
+                AddFlowsWrapper(context, implementationType);
         }
 
-        private void AddFlows(GeneratorExecutionContext context, List<FlowInformation> flowInformations)
-        {
-            var flowsProperties = flowInformations
-                .Select(implementationType =>
-                {
-                    var fqName = GetFullyQualifiedName(implementationType.FlowTypeSymbol);
-                    return Spaces(8) + "public " + fqName + "s " + implementationType.FlowTypeSymbol.Name + "s { get; } = new();";
-                }).Aggregate(seed: new StringBuilder(), (builder, str) => builder.AppendLine(str));
-            /*
-            var flowsInitialization = flowInformations
-                .Select(implementationType =>
-                {
-                    var fqName = GetFullyQualifiedName(implementationType.FlowTypeSymbol);
-                    return Spaces(12) + implementationType.FlowTypeSymbol.Name + "s = new();";
-                }).Aggregate(seed: new StringBuilder(), (builder, str) => builder.AppendLine(str));
-            */
-            string generatedCode = 
-@"namespace Cleipnir.Flows
-{
-    public partial class Flows
-    {
-" + flowsProperties + @"   
-    }
-}";
-            context.AddSource("Flows.g.cs", SourceText.From(generatedCode, Encoding.UTF8));
-        }
-
-        private void AddFlowsWrapper2(GeneratorExecutionContext context, FlowInformation flowInformation)
+        private void AddFlowsWrapper(GeneratorExecutionContext context, FlowInformation flowInformation)
         {
             var flowsName = $"{flowInformation.FlowTypeSymbol.Name}s";
             var flowsNamespace = GetNamespace(flowInformation.FlowTypeSymbol);
