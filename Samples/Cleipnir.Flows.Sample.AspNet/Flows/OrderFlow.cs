@@ -27,7 +27,7 @@ public class OrderFlow : Flow<Order, OrderScrapbook>
         await _paymentProviderClient.Reserve(order.CustomerId, Scrapbook.TransactionId, order.TotalPrice);
 
         await DoAtMostOnce(
-            s => s.ProductsShipped,
+            workStatus: scrapbook => scrapbook.ProductsShipped,
             () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
         );
 
