@@ -10,6 +10,7 @@ namespace Cleipnir.Flows.SourceGenerator
     [Generator]
     public class FlowSourceGenerator : ISourceGenerator
     {
+        private const string ScrapbooklessType = "Cleipnir.Flows.Flow`1";
         private const string UnitFlowType = "Cleipnir.Flows.Flow`2";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`3";
 
@@ -25,6 +26,13 @@ namespace Cleipnir.Flows.SourceGenerator
             if (syntaxReceiver == null)
             {
                 AddSourceGenerationOutput(context, "no syntax receiver found");
+                return;
+            }
+            
+            var scrapbooklessType = context.Compilation.GetTypeByMetadataName(ScrapbooklessType);
+            if (scrapbooklessType == null)
+            {
+                AddSourceGenerationOutput(context, "unable to locate abstract flow");
                 return;
             }
 
@@ -49,14 +57,17 @@ namespace Cleipnir.Flows.SourceGenerator
                 var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
                 var flowType = (INamedTypeSymbol) semanticModel.GetDeclaredSymbol(classDeclaration);
 
-                if (!InheritsFromFlowType(flowType, unitFlowType) && !InheritsFromFlowType(flowType, resultFlowType))
-                    continue;
+                if (
+                    !InheritsFromFlowType(flowType, unitFlowType) && 
+                    !InheritsFromFlowType(flowType, resultFlowType) &&
+                    !InheritsFromFlowType(flowType, scrapbooklessType)
+                ) continue;
 
                 var baseType = flowType.BaseType;
                 var baseTypeTypeArguments = baseType.TypeArguments;
 
                 var paramType = baseTypeTypeArguments[0];
-                var scrapbookType = baseTypeTypeArguments[1];
+                var scrapbookType =  baseTypeTypeArguments.Length == 1 ? null : baseTypeTypeArguments[1];
                 var resultType = baseTypeTypeArguments.Length == 3 ? baseTypeTypeArguments[2] : null;
                 
                 var runMethod = flowType.GetMembers()
@@ -101,8 +112,6 @@ namespace Cleipnir.Flows.SourceGenerator
 
         private void GenerateCode(GeneratorExecutionContext context, List<FlowInformation> flowInformations)
         {
-            //AddFlows(context, flowInformations);
-
             foreach (var implementationType in flowInformations)
                 AddFlowsWrapper2(context, implementationType);
         }
@@ -142,15 +151,28 @@ namespace Cleipnir.Flows.SourceGenerator
             var flowName = flowInformation.FlowTypeSymbol.Name;
             var paramType = GetFullyQualifiedName(flowInformation.ParamTypeSymbol);
             var paramName = CamelCase(flowInformation.ParameterName);
-            var scrapbookName = CamelCase(flowInformation.ScrapbookTypeSymbol.Name);
-            var scrapbookType = GetFullyQualifiedName(flowInformation.ScrapbookTypeSymbol);
+            var scrapbookType = flowInformation.ScrapbookTypeSymbol == null ? null : GetFullyQualifiedName(flowInformation.ScrapbookTypeSymbol);
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
 
-            var generatedCode = resultType == null
-                ?
-@"namespace " + flowsNamespace + @"
+            string generatedCode;
+            if (scrapbookType == null)
+            {
+                generatedCode = @"namespace " + flowsNamespace + @"
+{
+    [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
+    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + @", Cleipnir.ResilientFunctions.Domain.RScrapbook>
+    {
+        public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
+            : base(" + $@"""{flowName}""" + @", flowsContainer) { }
+    }
+}";
+            }
+            else
+            {
+                generatedCode = resultType == null
+                    ? @"namespace " + flowsNamespace + @"
 {
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + @">
@@ -158,8 +180,7 @@ namespace Cleipnir.Flows.SourceGenerator
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(" + $@"""{flowName}""" + @", flowsContainer) { }
     }
-}" :
-@"namespace " + flowsNamespace + @"
+}" : @"namespace " + flowsNamespace + @"
 {
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + ", " + resultType + @">
@@ -168,6 +189,7 @@ namespace Cleipnir.Flows.SourceGenerator
             : base(" + $@"""{flowName}"""+ @", flowsContainer) { }
     }
 }";
+            }
 
             // Add the generated code to the compilation
             context.AddSource(flowsName + ".g.cs", SourceText.From(generatedCode, Encoding.UTF8));

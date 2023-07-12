@@ -9,6 +9,7 @@ public static class Program
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<OrderFlow>();
+        serviceCollection.AddTransient<ScrapbooklessFlow>();
 
         var flows = new FlowsContainer(
             new InMemoryFlowStore(),
@@ -18,5 +19,8 @@ public static class Program
         
         var orderFlows = new OrderFlows(flows);
         await orderFlows.Run(instanceId: "MK-12345", param: "MK-12345");
+
+        var scrapbooklessFlows = new ScrapbooklessFlows(flows);
+        await scrapbooklessFlows.Run("hello world", "hello world");
     }
 }

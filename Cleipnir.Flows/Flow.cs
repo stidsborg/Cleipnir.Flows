@@ -8,7 +8,7 @@ using Cleipnir.ResilientFunctions.Messaging;
 
 namespace Cleipnir.Flows;
 
-//public abstract class Flow<TParam> : Flow<TParam, RScrapbook> {}
+public abstract class Flow<TParam> : Flow<TParam, RScrapbook> where TParam : notnull {}
 public abstract class Flow<TParam, TScrapbook> where TParam : notnull where TScrapbook : RScrapbook, new()
 {
     public Context Context { get; init; } = null!;
