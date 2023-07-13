@@ -62,6 +62,11 @@ public class OrderController : ControllerBase
 
 Congrats, any non-completed Order flows are now automatically restarted by the framework.
 
+However, the real benefit of the framework comes from:
+* Simplifying how code will be executed after a crash/restart - using the AtMostOnce and AtLeastOnce helper-methods
+* Awaiting external messages in declaratively using Reactive Programming
+* Simple testability
+
 ## Examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
 
@@ -88,7 +93,7 @@ public class AtLeastOnceFlowScrapbook : RScrapbook
 }
 ```
 
-2: Ensure flow step is **executed at-most-once**:
+2: Ensure a flow step is **executed at-most-once**:
 ```csharp
 public class AtMostOnceFlow : Flow<string>
 {
@@ -104,14 +109,14 @@ public class AtMostOnceFlow : Flow<string>
 }
 ```
 
-3: Wait for 2 external messages before continuing flow:
+3: Wait for 2 external messages before continuing flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages)):
 ```csharp
 public class WaitForMessagesFlow : Flow<string>
 {
   public override async Task Run(string param)
   {
     await EventSource
-      .OfTypes<FundsReserved, InventoryLocker>()
+      .OfTypes<FundsReserved, InventoryLocked>()
       .Take(2)
       .ToList();
 
@@ -127,20 +132,20 @@ await EventSource
   .SuspendUntilNext();
 ```
 
-4: Add event/message to Flow's event-source:
+4: Add event/message to Flow's event-source ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/a4ada3e734634278a81ca8fd25a39e058b628d50/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages/Example.cs#L26)):
 ```csharp
 var eventSourceWriter = flows.EventSourceWriter(orderId);
 await eventSourceWriter.AppendEvent(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
 ```
 
-5: Restart a failed flow:
+5: Restart a failed flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/RestartFlow):
 ```csharp
 var controlPanel = await flows.ControlPanel(flowId);
 controlPanel!.Param = "valid parameter";
 await controlPanel.RunAgain();
 ```
 
-6: Postpone a running flow (without taking in-memory resources):
+6: Postpone a running flow (without taking in-memory resources) ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/Postpone):
 ```csharp
 public class PostponeFlow : Flow<string>
 {
@@ -156,7 +161,7 @@ public class PostponeFlow : Flow<string>
 }
 ```
 
-7: Add metrics middleware:
+7: Add metrics middleware ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/Middleware)):
 ```csharp
 public class MetricsMiddleware : IMiddleware
 {

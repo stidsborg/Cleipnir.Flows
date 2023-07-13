@@ -54,8 +54,6 @@ public class Options
         Middlewares.Add(new MiddlewareInstance(middleware));
         return this;
     }
-    
-    //todo use middleware from func?
 
     internal Settings MapToRFunctionsSettings()
         => new(
