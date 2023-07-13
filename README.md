@@ -138,14 +138,14 @@ var eventSourceWriter = flows.EventSourceWriter(orderId);
 await eventSourceWriter.AppendEvent(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
 ```
 
-5: Restart a failed flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/RestartFlow):
+5: Restart a failed flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/RestartFlow)):
 ```csharp
 var controlPanel = await flows.ControlPanel(flowId);
 controlPanel!.Param = "valid parameter";
 await controlPanel.RunAgain();
 ```
 
-6: Postpone a running flow (without taking in-memory resources) ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/Postpone):
+6: Postpone a running flow (without taking in-memory resources) ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/Postpone)):
 ```csharp
 public class PostponeFlow : Flow<string>
 {
