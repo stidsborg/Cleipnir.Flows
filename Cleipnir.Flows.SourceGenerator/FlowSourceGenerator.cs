@@ -112,11 +112,12 @@ namespace Cleipnir.Flows.SourceGenerator
 
         private void GenerateCode(GeneratorExecutionContext context, List<FlowInformation> flowInformations)
         {
+            var flowNames = new Dictionary<string, int>();
             foreach (var implementationType in flowInformations)
-                AddFlowsWrapper(context, implementationType);
+                AddFlowsWrapper(context, implementationType, flowNames);
         }
 
-        private void AddFlowsWrapper(GeneratorExecutionContext context, FlowInformation flowInformation)
+        private void AddFlowsWrapper(GeneratorExecutionContext context, FlowInformation flowInformation, Dictionary<string, int> flowNames)
         {
             var flowsName = $"{flowInformation.FlowTypeSymbol.Name}s";
             var flowsNamespace = GetNamespace(flowInformation.FlowTypeSymbol);
@@ -163,9 +164,18 @@ namespace Cleipnir.Flows.SourceGenerator
     }
 }";
             }
-
+            
             // Add the generated code to the compilation
-            context.AddSource(flowsName + ".g.cs", SourceText.From(generatedCode, Encoding.UTF8));
+            var fileName =
+                !flowNames.ContainsKey(flowName)
+                    ? flowsName + ".g.cs"
+                    : flowsName + $"{flowNames[flowName]}.g.cs";
+            if (flowNames.ContainsKey(flowName))
+                flowNames[flowName] += 1;
+            else
+                flowNames[flowName] = 1;
+            
+            context.AddSource(fileName, SourceText.From(generatedCode, Encoding.UTF8));
         }
 
         private string CamelCase(string str)
