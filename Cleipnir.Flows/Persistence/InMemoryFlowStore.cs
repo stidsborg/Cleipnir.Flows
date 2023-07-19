@@ -16,8 +16,8 @@ namespace Cleipnir.Flows.Persistence
 
         public Utilities Utilities => _functionStore.Utilities;
 
-        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook, long crashedCheckFrequency)
-            => _functionStore.CreateFunction(functionId, param, storedScrapbook, crashedCheckFrequency);
+        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook,  long signOfLifeFrequency, long initialSignOfLife)
+            => _functionStore.CreateFunction(functionId, param, storedScrapbook, signOfLifeFrequency, initialSignOfLife);
 
         public Task<bool> DeleteFunction(FunctionId functionId, int? expectedEpoch = null)
             => _functionStore.DeleteFunction(functionId, expectedEpoch);    
@@ -43,8 +43,8 @@ namespace Cleipnir.Flows.Persistence
         public Task<bool> PostponeFunction(FunctionId functionId, long postponeUntil, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.PostponeFunction(functionId, postponeUntil, scrapbookJson, expectedEpoch, complementaryState);
 
-        public Task<bool> RestartExecution(FunctionId functionId, int expectedEpoch, long crashedCheckFrequency)
-            => _functionStore.RestartExecution(functionId, expectedEpoch, crashedCheckFrequency);
+        public Task<bool> RestartExecution(FunctionId functionId, int expectedEpoch, long signOfLifeFrequency, long signOfLife)
+            => _functionStore.RestartExecution(functionId, expectedEpoch, signOfLifeFrequency, signOfLife);
 
         public Task<bool> SaveScrapbookForExecutingFunction(FunctionId functionId, string scrapbookJson, int expectedEpoch, ComplimentaryState.SaveScrapbookForExecutingFunction complimentaryState)
             => _functionStore.SaveScrapbookForExecutingFunction(functionId, scrapbookJson, expectedEpoch, complimentaryState);
@@ -61,7 +61,7 @@ namespace Cleipnir.Flows.Persistence
         public Task<SuspensionResult> SuspendFunction(FunctionId functionId, int expectedEventCount, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.SuspendFunction(functionId, expectedEventCount, scrapbookJson, expectedEpoch, complementaryState);
 
-        public Task<bool> UpdateSignOfLife(FunctionId functionId, int expectedEpoch, int newSignOfLife, ComplimentaryState.UpdateSignOfLife complementaryState)
+        public Task<bool> UpdateSignOfLife(FunctionId functionId, int expectedEpoch, long newSignOfLife, ComplimentaryState.UpdateSignOfLife complementaryState)
             => _functionStore.UpdateSignOfLife(functionId, expectedEpoch, newSignOfLife, complementaryState);
     }
 }

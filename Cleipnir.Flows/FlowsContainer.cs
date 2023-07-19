@@ -27,7 +27,6 @@ public class FlowsContainer : IDisposable
                     options.CrashedCheckFrequency, 
                     options.PostponedCheckFrequency, 
                     options.TimeoutCheckFrequency,
-                    options.SuspensionCheckFrequency,
                     options.EventSourcePullFrequency,
                     options.DelayStartup, 
                     options.MaxParallelRetryInvocations, 
