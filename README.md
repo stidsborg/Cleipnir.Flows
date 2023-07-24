@@ -17,7 +17,7 @@ Install-Package Cleipnir.Flows.Postgres
 
 Secondly, add the following to the setup in `Program.cs`:
 ```csharp
-builder.Services.AddFlows(connectionString);
+builder.Services.UseFlows(connectionString);
 ```
 
 Finally, implement your flow:
