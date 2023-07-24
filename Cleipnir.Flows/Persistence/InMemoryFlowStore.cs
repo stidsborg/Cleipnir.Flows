@@ -15,36 +15,40 @@ namespace Cleipnir.Flows.Persistence
         public ITimeoutStore TimeoutStore => _functionStore.TimeoutStore;
 
         public Utilities Utilities => _functionStore.Utilities;
-
-        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook,  long signOfLifeFrequency, long initialSignOfLife)
-            => _functionStore.CreateFunction(functionId, param, storedScrapbook, signOfLifeFrequency, initialSignOfLife);
-
+        
+        
+        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook, long leaseExpiration)
+            => _functionStore.CreateFunction(functionId, param, storedScrapbook, leaseExpiration);
+        
         public Task<bool> DeleteFunction(FunctionId functionId, int? expectedEpoch = null)
             => _functionStore.DeleteFunction(functionId, expectedEpoch);    
 
         public Task<bool> FailFunction(FunctionId functionId, StoredException storedException, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.FailFunction(functionId, storedException, scrapbookJson, expectedEpoch, complementaryState);
 
-        public Task<IEnumerable<StoredExecutingFunction>> GetExecutingFunctions(FunctionTypeId functionTypeId)
-            => _functionStore.GetExecutingFunctions(functionTypeId);
-
         public Task<StoredFunction?> GetFunction(FunctionId functionId)
-            => _functionStore.GetFunction(functionId);  
+            => _functionStore.GetFunction(functionId);
 
+        public Task<IEnumerable<StoredExecutingFunction>> GetCrashedFunctions(FunctionTypeId functionTypeId, long leaseExpiresBefore)
+            => _functionStore.GetCrashedFunctions(functionTypeId, leaseExpiresBefore);
+        
         public Task<IEnumerable<StoredPostponedFunction>> GetPostponedFunctions(FunctionTypeId functionTypeId, long expiresBefore)
             => _functionStore.GetPostponedFunctions(functionTypeId, expiresBefore);
 
         public Task<bool> IncrementAlreadyPostponedFunctionEpoch(FunctionId functionId, int expectedEpoch)
             => _functionStore.IncrementAlreadyPostponedFunctionEpoch(functionId, expectedEpoch);
 
+        public Task<bool> RestartExecution(FunctionId functionId, int expectedEpoch, long leaseExpiration)
+            => _functionStore.RestartExecution(functionId, expectedEpoch, leaseExpiration);
+
+        public Task<bool> RenewLease(FunctionId functionId, int expectedEpoch, long leaseExpiration)
+            => _functionStore.RenewLease(functionId, expectedEpoch, leaseExpiration);
+
         public Task Initialize()
             => _functionStore.Initialize();
 
         public Task<bool> PostponeFunction(FunctionId functionId, long postponeUntil, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.PostponeFunction(functionId, postponeUntil, scrapbookJson, expectedEpoch, complementaryState);
-
-        public Task<bool> RestartExecution(FunctionId functionId, int expectedEpoch, long signOfLifeFrequency, long signOfLife)
-            => _functionStore.RestartExecution(functionId, expectedEpoch, signOfLifeFrequency, signOfLife);
 
         public Task<bool> SaveScrapbookForExecutingFunction(FunctionId functionId, string scrapbookJson, int expectedEpoch, ComplimentaryState.SaveScrapbookForExecutingFunction complimentaryState)
             => _functionStore.SaveScrapbookForExecutingFunction(functionId, scrapbookJson, expectedEpoch, complimentaryState);
@@ -60,8 +64,5 @@ namespace Cleipnir.Flows.Persistence
 
         public Task<SuspensionResult> SuspendFunction(FunctionId functionId, int expectedEventCount, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.SuspendFunction(functionId, expectedEventCount, scrapbookJson, expectedEpoch, complementaryState);
-
-        public Task<bool> UpdateSignOfLife(FunctionId functionId, int expectedEpoch, long newSignOfLife, ComplimentaryState.UpdateSignOfLife complementaryState)
-            => _functionStore.UpdateSignOfLife(functionId, expectedEpoch, newSignOfLife, complementaryState);
     }
 }

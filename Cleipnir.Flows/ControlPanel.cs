@@ -19,7 +19,7 @@ public class ControlPanel<TParam, TScrapbook> where TParam : notnull where TScra
 
     public int Epoch => _controlPanel.Epoch;
     public long SignOfLifeFrequency => _controlPanel.SignOfLifeFrequency;
-    public DateTime LastSignOfLife => _controlPanel.LastSignOfLife;
+    public DateTime LeaseExpiration => _controlPanel.LeaseExpiration;
 
     public Task<ExistingEvents> Events => _controlPanel.Events;
 
@@ -70,7 +70,7 @@ public class ControlPanel<TParam, TScrapbook, TReturn> where TParam : notnull wh
 
     public int Epoch => _controlPanel.Epoch;
     public long SignOfLifeFrequency => _controlPanel.SignOfLifeFrequency;
-    public DateTime LastSignOfLife => _controlPanel.LastSignOfLife;
+    public DateTime LeaseExpiration => _controlPanel.LeaseExpiration;
 
     public Task<ExistingEvents> Events => _controlPanel.Events;
 
