@@ -124,19 +124,17 @@ public static class Linq
         => await (await s).SuspendUntilNextOfType<T>();
     public static async Task<T> SuspendUntilNextOfType<T>(this Task<IReactiveChain<object>> s, TimeSpan waitBeforeSuspension)
         => await (await s).SuspendUntilNextOfType<T>(waitBeforeSuspension);
-    public static async Task<T> SuspendUntilNextOfTypeOrTimeoutEventFired<T>(this Task<IReactiveChain<object>> s, string timeoutId, TimeSpan expiresIn)
-        => await (await s).SuspendUntilNextOfTypeOrTimeoutEventFired<T>(timeoutId, expiresIn);
-    public static async Task<T> SuspendUntilNextOfTypeOrTimeoutEventFired<T>(this Task<IReactiveChain<object>> s, string timeoutId, DateTime expiresAt)
-        => await (await s).SuspendUntilNextOfTypeOrTimeoutEventFired<T>(timeoutId, expiresAt);
-    public static async Task<T> SuspendUntilNextOrTimeoutEventFired<T>(this Task<IReactiveChain<T>> s, string timeoutId, TimeSpan expiresIn)
-        => await (await s).SuspendUntilNextOrTimeoutEventFired(timeoutId, expiresIn);
-    public static async Task<T> SuspendUntilNextOrTimeoutEventFired<T>(this Task<IReactiveChain<T>> s, string timeoutId, DateTime expiresAt)
-        => await (await s).SuspendUntilNextOrTimeoutEventFired<T>(timeoutId, expiresAt);
+    public static async Task<T> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, TimeSpan expiresIn)
+        => await (await s).SuspendUntilNext(timeoutEventId, expiresIn);
+    public static async Task<T> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, DateTime expiresAt)
+        => await (await s).SuspendUntilNext<T>(timeoutEventId, expiresAt);
     
     // ** EventSource extensions ** //
+    public static async Task SuspendUntil(this Task<EventSource> s, string timeoutId, DateTime resumeAt)
+        => await (await s).SuspendUntil(timeoutId, resumeAt);
     
-    public static async Task SuspendUntil(this Task<EventSource> s, DateTime resumeAt, string timeoutId)
-        => await (await s).SuspendUntil(resumeAt, timeoutId);
+    public static async Task SuspendFor(this Task<EventSource> s, string timeoutId, TimeSpan resumeAfter)
+        => await (await s).SuspendFor(timeoutId, resumeAfter);
     
     public static async Task<List<object>> PullExisting(this Task<EventSource> s)
         => (await s).PullExisting();
@@ -174,14 +172,10 @@ public static class Linq
         => await (await s).SuspendUntilNextOfType<T>();
     public static async Task<T> SuspendUntilNextOfType<T>(this Task<EventSource> s, TimeSpan waitBeforeSuspension)
         => await (await s).SuspendUntilNextOfType<T>(waitBeforeSuspension);
-    public static async Task<T> SuspendUntilNextOfTypeOrTimeoutEventFired<T>(this Task<EventSource> s, string timeoutId, TimeSpan expiresIn)
-        => await (await s).SuspendUntilNextOfTypeOrTimeoutEventFired<T>(timeoutId, expiresIn);
-    public static async Task<T> SuspendUntilNextOfTypeOrTimeoutEventFired<T>(this Task<EventSource> s, string timeoutId, DateTime expiresAt)
-        => await (await s).SuspendUntilNextOfTypeOrTimeoutEventFired<T>(timeoutId, expiresAt);
-    public static async Task<object> SuspendUntilNextOrTimeoutEventFired(this Task<EventSource> s, string timeoutId, TimeSpan expiresIn)
-        => await (await s).SuspendUntilNextOrTimeoutEventFired(timeoutId, expiresIn);
-    public static async Task<object> SuspendUntilNextOrTimeoutEventFired(this Task<EventSource> s, string timeoutId, DateTime expiresAt)
-        => await (await s).SuspendUntilNextOrTimeoutEventFired(timeoutId, expiresAt);
+    public static async Task<object> SuspendUntilNext(this Task<EventSource> s, string timeoutEventId, TimeSpan expiresIn)
+        => await (await s).SuspendUntilNext(timeoutEventId, expiresIn);
+    public static async Task<object> SuspendUntilNext(this Task<EventSource> s, string timeoutId, DateTime expiresAt)
+        => await (await s).SuspendUntilNext(timeoutId, expiresAt);
 
     public record struct Option<T>(bool HasValue, T? Value, int TotalEventSourceCount);
 
