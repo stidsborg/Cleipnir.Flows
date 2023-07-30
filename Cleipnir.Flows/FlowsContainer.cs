@@ -19,7 +19,9 @@ public class FlowsContainer : IDisposable
     public FlowsContainer(IFlowStore flowStore, IServiceProvider serviceProvider, Options? options = null)
     {
         ServiceProvider = serviceProvider;
-        if (options != null && options.UnhandledExceptionHandler == null && serviceProvider.GetService<ILogger>() != null)
+        options ??= new Options();
+        
+        if (options.UnhandledExceptionHandler == null && serviceProvider.GetService<ILogger>() != null)
         {
             var logger = serviceProvider.GetRequiredService<ILogger>();
             options = new Options(
