@@ -9,7 +9,7 @@ public class EngagementFlow : Flow<string>
         await DoAtLeastOnce(
             workId: "InitialCorrespondence",
             SendEngagementInitialCorrespondence,
-            persistTo: PersistencyMethods.EventSource
+            persistTo: PersistencyMedium.EventSource
         );
 
         for (var i = 0; i < 10; i++)
@@ -30,7 +30,7 @@ public class EngagementFlow : Flow<string>
                     await DoAtLeastOnce(
                         workId: "NotifyHR", 
                         work: () => NotifyHR(candidateEmail),
-                        persistTo: PersistencyMethods.EventSource
+                        persistTo: PersistencyMedium.EventSource
                     );
                     return true;
                 },
@@ -43,7 +43,7 @@ public class EngagementFlow : Flow<string>
             await DoAtLeastOnce(
                 workId: $"Reminder#{i}",
                 SendEngagementReminder,
-                persistTo: PersistencyMethods.EventSource
+                persistTo: PersistencyMedium.EventSource
             );
         }
 

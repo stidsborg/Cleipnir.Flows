@@ -22,19 +22,19 @@ public abstract class Flow<TParam, TScrapbook> where TParam : notnull where TScr
     public void Postpone(TimeSpan delay) => throw new PostponeInvocationException(delay);
     public void Postpone(DateTime until) => throw new PostponeInvocationException(until);
     
-    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtMostOnce(workId, work);
     public Task DoAtMostOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus, Func<Task> work) 
         => Scrapbook.DoAtMostOnce(workStatus: workStatus, work);
     public Task DoAtMostOnce<TResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TResult>>> workStatus, Func<Task<TResult>> work) =>
         Scrapbook.DoAtMostOnce(workStatus, work);
 
-    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtLeastOnce(workId, work);
     public Task DoAtLeastOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus,  Func<Task> work) => Scrapbook.DoAtLeastOnce(workStatus, work);
-    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtLeastOnce(workId, work);
     public Task<TResult> DoAtLeastOnce<TResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TResult>>> workStatus, Func<Task<TResult>> work)
         => Scrapbook.DoAtLeastOnce(workStatus, work);
@@ -53,25 +53,25 @@ public abstract class Flow<TParam, TScrapbook, TResult> where TParam : notnull w
     public void Postpone(TimeSpan delay) => throw new PostponeInvocationException(delay);
     public void Postpone(DateTime until) => throw new PostponeInvocationException(until);
     
-    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtMostOnce(workId, work);
     public Task DoAtMostOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus, Func<Task> work) 
         => Scrapbook.DoAtMostOnce(workStatus: workStatus, work);
     public Task DoAtMostOnce<TWorkResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TWorkResult>>> workStatus, Func<Task<TWorkResult>> work) =>
         Scrapbook.DoAtMostOnce(workStatus, work);
 
-    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtLeastOnce(workId, work);
     public Task DoAtLeastOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus,  Func<Task> work) => Scrapbook.DoAtLeastOnce(workStatus, work);
-    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMethods persistTo = PersistencyMethods.Scrapbook) 
+    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
         => Scrapbook.DoAtLeastOnce(workId, work);
     public Task<TWorkResult> DoAtLeastOnce<TWorkResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TWorkResult>>> workStatus, Func<Task<TWorkResult>> work)
         => Scrapbook.DoAtLeastOnce(workStatus, work);
 }
 
-public enum PersistencyMethods
+public enum PersistencyMedium
 {
     Scrapbook, EventSource
 }
