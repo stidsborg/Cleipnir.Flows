@@ -124,9 +124,9 @@ public static class Linq
         => await (await s).SuspendUntilNextOfType<T>();
     public static async Task<T> SuspendUntilNextOfType<T>(this Task<IReactiveChain<object>> s, TimeSpan waitBeforeSuspension)
         => await (await s).SuspendUntilNextOfType<T>(waitBeforeSuspension);
-    public static async Task<T> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, TimeSpan expiresIn)
+    public static async Task<TimeoutOption<T>> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, TimeSpan expiresIn)
         => await (await s).SuspendUntilNext(timeoutEventId, expiresIn);
-    public static async Task<T> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, DateTime expiresAt)
+    public static async Task<TimeoutOption<T>> SuspendUntilNext<T>(this Task<IReactiveChain<T>> s, string timeoutEventId, DateTime expiresAt)
         => await (await s).SuspendUntilNext<T>(timeoutEventId, expiresAt);
     
     // ** EventSource extensions ** //

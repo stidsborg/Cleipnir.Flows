@@ -6,15 +6,14 @@ public class EngagementFlow : Flow<string>
 {
     public override async Task Run(string candidateEmail)
     {
-        await DoAtLeastOnce(
+        await EventSource.DoAtLeastOnce(
             workId: "InitialCorrespondence",
-            SendEngagementInitialCorrespondence,
-            persistTo: PersistencyMedium.EventSource
+            SendEngagementInitialCorrespondence
         );
-
+        
         for (var i = 0; i < 10; i++)
         {
-            var either = await EventSource
+            var timeoutOption = await EventSource
                 .OfTypes<EngagementAccepted, EngagementRejected>()
                 .Where(either =>
                     either.Match(
@@ -24,21 +23,15 @@ public class EngagementFlow : Flow<string>
                 )
                 .SuspendUntilNext(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromHours(1));
 
-            var flowCompleted = await either.Match(
-                first: async a =>
-                {
-                    await DoAtLeastOnce(
-                        workId: "NotifyHR", 
-                        work: () => NotifyHR(candidateEmail),
-                        persistTo: PersistencyMedium.EventSource
-                    );
-                    return true;
-                },
-                second: r => Task.FromResult(false)
-            );
-
-            if (flowCompleted)
+            if (!timeoutOption.TimedOut && timeoutOption.Value!.AsObject() is EngagementAccepted)
+            {
+                await DoAtLeastOnce(
+                    workId: "NotifyHR", 
+                    work: () => NotifyHR(candidateEmail),
+                    persistTo: PersistencyMedium.EventSource
+                );
                 return;
+            }
             
             await DoAtLeastOnce(
                 workId: $"Reminder#{i}",
