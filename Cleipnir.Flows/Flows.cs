@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
@@ -68,11 +69,11 @@ public class Flows<TFlow, TParam, TScrapbook, TResult>
     public EventSourceWriter EventSourceWriter(string instanceId) 
         => _registration.EventSourceWriters.For(instanceId);
 
-    public Task<TResult> Run(string instanceId, TParam param, TScrapbook? scrapbook = null) 
-        => _registration.Invoke(instanceId, param, scrapbook);
+    public Task<TResult> Run(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null) 
+        => _registration.Invoke(instanceId, param, scrapbook, events);
 
-    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null)
-        => _registration.Schedule(instanceId, param, scrapbook);
+    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
+        => _registration.Schedule(instanceId, param, scrapbook, events);
     
     private async Task<Result<TResult>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
         => await _next(param, scrapbook, context);
@@ -174,11 +175,11 @@ public class Flows<TFlow, TParam, TScrapbook>
     public EventSourceWriter EventSourceWriter(string instanceId) 
         => _registration.EventSourceWriters.For(instanceId);
 
-    public Task Run(string instanceId, TParam param, TScrapbook? scrapbook = null) 
-        => _registration.Invoke(instanceId, param, scrapbook);
+    public Task Run(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null) 
+        => _registration.Invoke(instanceId, param, scrapbook, events);
 
-    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null)
-        => _registration.Schedule(instanceId, param, scrapbook);
+    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
+        => _registration.Schedule(instanceId, param, scrapbook, events);
     
     private async Task<Result<Unit>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
         => await _next(param, scrapbook, context);
