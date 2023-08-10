@@ -16,9 +16,8 @@ namespace Cleipnir.Flows.Persistence
 
         public Utilities Utilities => _functionStore.Utilities;
         
-        
-        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook, IEnumerable<StoredEvent>? storedEvents, long leaseExpiration)
-            => _functionStore.CreateFunction(functionId, param, storedScrapbook, storedEvents, leaseExpiration);
+        public Task<bool> CreateFunction(FunctionId functionId, StoredParameter param, StoredScrapbook storedScrapbook, IEnumerable<StoredEvent>? storedEvents, long leaseExpiration, long? postponeUntil)
+            => _functionStore.CreateFunction(functionId, param, storedScrapbook, storedEvents, leaseExpiration, postponeUntil);
         
         public Task<bool> DeleteFunction(FunctionId functionId, int? expectedEpoch = null)
             => _functionStore.DeleteFunction(functionId, expectedEpoch);    
