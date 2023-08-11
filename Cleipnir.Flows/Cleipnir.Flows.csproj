@@ -18,7 +18,7 @@
 			It ensures that your code executes reliably, even in the face of failures, restarts, deployments, versioning, and other challenges.
 			While similar to Azure Durable Functions, Cleipnir Flows is specifically tailored for ASP.NET Core.
 		</Description>
-		<RepositoryUrl>https://github.com/stidsborg/Cleipnir.ResilientFunctions</RepositoryUrl>
+		<RepositoryUrl>https://github.com/stidsborg/Cleipnir.Flows</RepositoryUrl>
 		<PackageTags>workflow-as-code, saga, process-manager, resilient flows, resiliency, micro service, fault-tolerant, distributed systems, cloud independent</PackageTags>
 	</PropertyGroup>
 
