@@ -74,6 +74,21 @@ public class Flows<TFlow, TParam, TScrapbook, TResult>
 
     public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
         => _registration.Schedule(instanceId, param, scrapbook, events);
+
+    public Task ScheduleAt(
+        string instanceId,
+        TParam param,
+        DateTime delayUntil,
+        TScrapbook? scrapbook = null,
+        IEnumerable<EventAndIdempotencyKey>? events = null
+    ) => _registration.ScheduleAt(instanceId, param, delayUntil, scrapbook, events);
+
+    public Task ScheduleIn(string functionInstanceId,
+        TParam param,
+        TimeSpan delay,
+        TScrapbook? scrapbook = null,
+        IEnumerable<EventAndIdempotencyKey>? events = null
+    ) => _registration.ScheduleIn(functionInstanceId, param, delay, scrapbook, events);
     
     private async Task<Result<TResult>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
         => await _next(param, scrapbook, context);
@@ -180,6 +195,21 @@ public class Flows<TFlow, TParam, TScrapbook>
 
     public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
         => _registration.Schedule(instanceId, param, scrapbook, events);
+    
+    public Task ScheduleAt(
+        string instanceId,
+        TParam param,
+        DateTime delayUntil,
+        TScrapbook? scrapbook = null,
+        IEnumerable<EventAndIdempotencyKey>? events = null
+    ) => _registration.ScheduleAt(instanceId, param, delayUntil, scrapbook, events);
+
+    public Task ScheduleIn(string functionInstanceId,
+        TParam param,
+        TimeSpan delay,
+        TScrapbook? scrapbook = null,
+        IEnumerable<EventAndIdempotencyKey>? events = null
+    ) => _registration.ScheduleIn(functionInstanceId, param, delay, scrapbook, events);
     
     private async Task<Result<Unit>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
         => await _next(param, scrapbook, context);
