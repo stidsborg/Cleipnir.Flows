@@ -65,7 +65,7 @@ Congrats, any non-completed Order flows are now automatically restarted by the f
 However, the real benefit of the framework comes from:
 * Simplifying how code will be executed after a crash/restart - using the AtMostOnce and AtLeastOnce helper-methods
 * Awaiting external messages declaratively using Reactive Programming
-* Simple testability
+* Simple testability & versioning
 
 ## Examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
