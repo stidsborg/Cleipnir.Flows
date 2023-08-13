@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cleipnir.ResilientFunctions.CoreRuntime;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 
@@ -18,10 +19,10 @@ public class ControlPanel<TParam, TScrapbook> where TParam : notnull where TScra
     public Status Status => _controlPanel.Status;
 
     public int Epoch => _controlPanel.Epoch;
-    public long SignOfLifeFrequency => _controlPanel.SignOfLifeFrequency;
     public DateTime LeaseExpiration => _controlPanel.LeaseExpiration;
 
     public Task<ExistingEvents> Events => _controlPanel.Events;
+    public ITimeoutProvider TimeoutProvider => _controlPanel.TimeoutProvider;
 
     public TParam Param
     {
@@ -69,10 +70,10 @@ public class ControlPanel<TParam, TScrapbook, TReturn> where TParam : notnull wh
     public Status Status => _controlPanel.Status;
 
     public int Epoch => _controlPanel.Epoch;
-    public long SignOfLifeFrequency => _controlPanel.SignOfLifeFrequency;
     public DateTime LeaseExpiration => _controlPanel.LeaseExpiration;
 
     public Task<ExistingEvents> Events => _controlPanel.Events;
+    public ITimeoutProvider TimeoutProvider => _controlPanel.TimeoutProvider;
 
     public TParam Param
     {
