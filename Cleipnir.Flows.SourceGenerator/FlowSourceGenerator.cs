@@ -139,7 +139,7 @@ namespace Cleipnir.Flows.SourceGenerator
     public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + @", Cleipnir.ResilientFunctions.Domain.RScrapbook>
     {
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(" + $@"""{flowName}""" + @", flowsContainer) { }
+            : base(flowName: " + $@"""{flowName}""" + @", flowsContainer) { }
     }
 }";
             }
@@ -152,7 +152,7 @@ namespace Cleipnir.Flows.SourceGenerator
     public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + @">
     {
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(" + $@"""{flowName}""" + @", flowsContainer) { }
+            : base(flowName: " + $@"""{flowName}""" + @", flowsContainer) { }
     }
 }" : @"namespace " + flowsNamespace + @"
 {
@@ -160,7 +160,7 @@ namespace Cleipnir.Flows.SourceGenerator
     public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + ", " + resultType + @">
     {
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(" + $@"""{flowName}"""+ @", flowsContainer) { }
+            : base(flowName: " + $@"""{flowName}"""+ @", flowsContainer) { }
     }
 }";
             }
