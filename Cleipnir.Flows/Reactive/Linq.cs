@@ -8,6 +8,18 @@ namespace Cleipnir.Flows.Reactive;
 
 public static class Linq
 {
+    #region EventSource properties
+
+    public static async Task RegisterTimeout(this Task<EventSource> eventSource, string timeoutId, TimeSpan expiresIn) 
+        => await (await eventSource).RegisterTimeoutEvent(timeoutId, expiresIn);
+    
+    public static async Task RegisterTimeout(this Task<EventSource> eventSource, string timeoutId, DateTime expiresAt) 
+        => await (await eventSource).RegisterTimeoutEvent(timeoutId, expiresAt);
+    
+    public static async Task CancelTimeout(this Task<EventSource> eventSource, string timeoutId) 
+        => await (await eventSource).CancelTimeoutEvent(timeoutId);
+
+    #endregion
     #region Non leaf operators
 
     public static async Task<IReactiveChain<TOut>> Select<TIn, TOut>(this Task<IReactiveChain<TIn>> s, Func<TIn, TOut> mapper)
