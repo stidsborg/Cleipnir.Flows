@@ -15,8 +15,4 @@
         <PackageReference Include="MailKit" Version="3.5.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="B_BankTransfer\" />
-    </ItemGroup>
 </Project>

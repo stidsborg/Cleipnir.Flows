@@ -3,7 +3,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 
-namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
+namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender.Solution;
 
 public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbook>
 {
@@ -13,7 +13,7 @@ public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbo
         using var client = new SmtpClient();
         await client.ConnectAsync("mail.smtpbucket.com", 8025);
         
-        for (var atRecipient = 0; atRecipient < recipients.Count; atRecipient++)
+        for (var atRecipient = Scrapbook.AtRecipient; atRecipient < mailAndRecipients.Recipients.Count; atRecipient++)
         {
             var recipient = recipients[atRecipient];
             var message = new MimeMessage();
@@ -23,12 +23,15 @@ public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbo
             message.Subject = subject;
             message.Body = new TextPart(TextFormat.Html) { Text = content };
             await client.SendAsync(message);
+
+            Scrapbook.AtRecipient = atRecipient;
+            await Scrapbook.Save();
         }
     }
     
     public class FlowScrapbook : RScrapbook
     {
-       
+        public int AtRecipient { get; set; }
     }
 }
 
