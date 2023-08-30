@@ -25,6 +25,9 @@ namespace Cleipnir.Flows.Persistence
         public Task<bool> FailFunction(FunctionId functionId, StoredException storedException, string scrapbookJson, int expectedEpoch, ComplimentaryState.SetResult complementaryState)
             => _functionStore.FailFunction(functionId, storedException, scrapbookJson, expectedEpoch, complementaryState);
 
+        public Task<StatusAndEpoch?> GetFunctionStatus(FunctionId functionId)
+            => _functionStore.GetFunctionStatus(functionId);
+
         public Task<StoredFunction?> GetFunction(FunctionId functionId)
             => _functionStore.GetFunction(functionId);
 

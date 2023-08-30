@@ -53,7 +53,7 @@ public class ControlPanel<TParam, TScrapbook> where TParam : notnull where TScra
 
     public Task Refresh() => _controlPanel.Refresh();
 
-    public Task WaitForCompletion() => _controlPanel.WaitForCompletion();
+    public Task WaitForCompletion(bool allowPostponeAndSuspended = false) => _controlPanel.WaitForCompletion(allowPostponeAndSuspended);
 
 }
 
@@ -105,5 +105,5 @@ public class ControlPanel<TParam, TScrapbook, TReturn> where TParam : notnull wh
 
     public Task Refresh() => _controlPanel.Refresh();
 
-    public Task<TReturn> WaitForCompletion() => _controlPanel.WaitForCompletion();
+    public Task<TReturn> WaitForCompletion(bool allowPostponeAndSuspended = false) => _controlPanel.WaitForCompletion(allowPostponeAndSuspended);
 }

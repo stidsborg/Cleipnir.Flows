@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cleipnir.ResilientFunctions.MySQL" Version="1.0.14" />
+        <PackageReference Include="Cleipnir.ResilientFunctions.MySQL" Version="1.0.15" />
     </ItemGroup>
 
     <ItemGroup>
