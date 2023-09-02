@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>1.0.15</Version>
-        <AssemblyVersion>1.0.15.0</AssemblyVersion>
-        <FileVersion>1.0.15.0</FileVersion>
-        <InformationalVersion>1.0.15.0</InformationalVersion>
-        <PackageVersion>1.0.15</PackageVersion>
+        <Version>1.0.16</Version>
+        <AssemblyVersion>1.0.16.0</AssemblyVersion>
+        <FileVersion>1.0.16.0</FileVersion>
+        <InformationalVersion>1.0.16.0</InformationalVersion>
+        <PackageVersion>1.0.16</PackageVersion>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <PackageReadmeFile>README.md</PackageReadmeFile>
