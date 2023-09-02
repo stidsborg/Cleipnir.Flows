@@ -9,15 +9,12 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
     {
         var (supportTicketId, customerSupportAgents) = request;
 
-        for (var i = 0;; i += 1 % customerSupportAgents.Length)
+        for (var i = 0;; i++)
         {
+            var customerSupportAgent = customerSupportAgents[i % customerSupportAgents.Length]; 
             await Scrapbook.DoAtLeastOnce(
                 workId: $"RequestSupportForTicket{i}",
-                work: () => RequestSupportForTicket(
-                    supportTicketId, 
-                    supporterEmail: customerSupportAgents[i % customerSupportAgents.Length], 
-                    iteration: i
-                )
+                work: () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
             );
 
             var option = await EventSource
