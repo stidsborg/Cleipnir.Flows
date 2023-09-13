@@ -1,7 +1,7 @@
 ﻿using Cleipnir.Flows.Reactive;
 using Cleipnir.ResilientFunctions.Domain;
 
-namespace Cleipnir.Flows.Sample.Presentation.C_SupportTicket;
+namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket.Solution;
 
 public class SupportTicketFlow : Flow<SupportTicketRequest>
 {
@@ -27,5 +27,6 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
         }
     }
 
-    private Task RequestSupportForTicket(Guid supportTicketId, string supporterEmail, int iteration) => throw new NotImplementedException();
+    private Task RequestSupportForTicket(Guid supportTicketId, string customerSupportAgent, int iteration)
+        => MessageBroker.Send(new TakeSupportTicket(supportTicketId, customerSupportAgent, iteration));
 }
