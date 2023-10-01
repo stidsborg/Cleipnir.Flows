@@ -2,7 +2,7 @@
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc;
+namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc.Solution;
 
 public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
 {
@@ -23,18 +23,23 @@ public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
     {
         Logger.Information($"Processing of order '{order.OrderId}' started");
 
-        /*
-         Clients:
-         - PaymentProviderClient
-         - LogisticsClient
-         - EmailClient
-         */
+        await _paymentProviderClient.Reserve(order.CustomerId, Scrapbook.TransactionId, order.TotalPrice);
 
-        await Task.CompletedTask;
+        await Scrapbook.DoAtMostOnce(
+            workStatus: s => s.ProductsShippedStatus,
+            work: () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
+        );
+
+        await _paymentProviderClient.Capture(Scrapbook.TransactionId);
+
+        await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
 
     public class OrderScrapbook : RScrapbook
     {
+        public Guid TransactionId { get; set; } = Guid.NewGuid();
+        public WorkStatus ProductsShippedStatus { get; set; }
     }
 }

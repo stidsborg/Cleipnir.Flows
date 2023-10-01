@@ -12,5 +12,7 @@ public sealed class TransferFlow : Flow<Transfer>
         
         //withdraw funds from sender account
         //add funds to receiver account
+        
+        await Task.CompletedTask;
     }
 }
