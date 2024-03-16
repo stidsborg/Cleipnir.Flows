@@ -10,6 +10,10 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "Generators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "./Cleipnir.Flows.Sample.AspNet.csproj"
     }
   }
 }
