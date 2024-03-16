@@ -16,7 +16,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.17" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
     </ItemGroup>
 
     <ItemGroup>
