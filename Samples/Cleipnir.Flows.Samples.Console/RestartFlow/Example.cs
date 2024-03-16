@@ -28,6 +28,6 @@ public static class Example
         
         var controlPanel = await flows.ControlPanel(flowId);
         controlPanel!.Param = "valid parameter";
-        await controlPanel.RunAgain();
+        await controlPanel.ReInvoke();
     }
 }

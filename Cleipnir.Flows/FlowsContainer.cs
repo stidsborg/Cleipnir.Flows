@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
 using Cleipnir.ResilientFunctions;
-using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

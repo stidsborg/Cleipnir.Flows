@@ -24,7 +24,7 @@ internal static class Program
         
         const string connectionString = "Server=localhost;Port=5432;Userid=postgres;Password=Pa55word!;Database=flows;";
         
-        await DatabaseHelper.RecreateDatabase(connectionString); //use to create db initially or clean existing state in database
+        //await DatabaseHelper.RecreateDatabase(connectionString); //use to create db initially or clean existing state in database
         builder.Services.UseFlows(connectionString, options: _ => new Options(crashedCheckFrequency: TimeSpan.FromSeconds(5)));
         
         // Add services to the container.

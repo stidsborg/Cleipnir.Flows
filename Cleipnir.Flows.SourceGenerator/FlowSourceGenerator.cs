@@ -10,9 +10,8 @@ namespace Cleipnir.Flows.SourceGenerator
     [Generator]
     public class FlowSourceGenerator : ISourceGenerator
     {
-        private const string ScrapbooklessType = "Cleipnir.Flows.Flow`1";
-        private const string UnitFlowType = "Cleipnir.Flows.Flow`2";
-        private const string ResultFlowType = "Cleipnir.Flows.Flow`3";
+        private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
+        private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -26,13 +25,6 @@ namespace Cleipnir.Flows.SourceGenerator
             if (syntaxReceiver == null)
             {
                 AddSourceGenerationOutput(context, "no syntax receiver found");
-                return;
-            }
-            
-            var scrapbooklessType = context.Compilation.GetTypeByMetadataName(ScrapbooklessType);
-            if (scrapbooklessType == null)
-            {
-                AddSourceGenerationOutput(context, "unable to locate abstract flow");
                 return;
             }
 
@@ -59,16 +51,14 @@ namespace Cleipnir.Flows.SourceGenerator
 
                 if (
                     !InheritsFromFlowType(flowType, unitFlowType) && 
-                    !InheritsFromFlowType(flowType, resultFlowType) &&
-                    !InheritsFromFlowType(flowType, scrapbooklessType)
+                    !InheritsFromFlowType(flowType, resultFlowType)
                 ) continue;
 
                 var baseType = flowType.BaseType;
                 var baseTypeTypeArguments = baseType.TypeArguments;
 
                 var paramType = baseTypeTypeArguments[0];
-                var scrapbookType =  baseTypeTypeArguments.Length == 1 ? null : baseTypeTypeArguments[1];
-                var resultType = baseTypeTypeArguments.Length == 3 ? baseTypeTypeArguments[2] : null;
+                var resultType = baseTypeTypeArguments.Length == 2 ? baseTypeTypeArguments[1] : null;
                 
                 var runMethod = flowType.GetMembers()
                     .OfType<IMethodSymbol>()
@@ -76,7 +66,7 @@ namespace Cleipnir.Flows.SourceGenerator
                 var parameterName = runMethod.Parameters.Single().Name;
 
                 foundFlows.Add(GetFullyQualifiedName(flowType));
-                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, scrapbookType, resultType));
+                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType));
             }
 
             AddSourceGenerationOutput(context, $"Found flows: {string.Join(", ", foundFlows)}");
@@ -125,18 +115,17 @@ namespace Cleipnir.Flows.SourceGenerator
             var flowName = flowInformation.FlowTypeSymbol.Name;
             var paramType = GetFullyQualifiedName(flowInformation.ParamTypeSymbol);
             var paramName = CamelCase(flowInformation.ParameterName);
-            var scrapbookType = flowInformation.ScrapbookTypeSymbol == null ? null : GetFullyQualifiedName(flowInformation.ScrapbookTypeSymbol);
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
 
             string generatedCode;
-            if (scrapbookType == null)
+            if (resultType == null)
             {
                 generatedCode = @"namespace " + flowsNamespace + @"
 {
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + @", Cleipnir.ResilientFunctions.Domain.RScrapbook>
+    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + @">
     {
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(flowName: " + $@"""{flowName}""" + @", flowsContainer) { }
@@ -145,19 +134,10 @@ namespace Cleipnir.Flows.SourceGenerator
             }
             else
             {
-                generatedCode = resultType == null
-                    ? @"namespace " + flowsNamespace + @"
+                generatedCode = @"namespace " + flowsNamespace + @"
 {
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + @">
-    {
-        public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: " + $@"""{flowName}""" + @", flowsContainer) { }
-    }
-}" : @"namespace " + flowsNamespace + @"
-{
-    [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + scrapbookType + ", " + resultType + @">
+    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + resultType + @">
     {
         public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(flowName: " + $@"""{flowName}"""+ @", flowsContainer) { }

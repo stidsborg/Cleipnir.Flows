@@ -21,12 +21,12 @@ public static class Example
 
         await Task.Delay(2_000);
         System.Console.WriteLine("Emitting: " + nameof(FundsReserved));
-        var eventSourceWriter = flows.EventSourceWriter(orderId);
-        await eventSourceWriter.AppendEvent(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
+        var messageWriter = flows.MessageWriter(orderId);
+        await messageWriter.AppendMessage(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
 
         await Task.Delay(2_000);
         System.Console.WriteLine("Emitting: " + nameof(InventoryLocked));
-        await eventSourceWriter.AppendEvent(new InventoryLocked(orderId), idempotencyKey: nameof(InventoryLocked));
+        await messageWriter.AppendMessage(new InventoryLocked(orderId), idempotencyKey: nameof(InventoryLocked));
 
         var controlPanel = await flows.ControlPanel(orderId);
         await controlPanel!.WaitForCompletion();
