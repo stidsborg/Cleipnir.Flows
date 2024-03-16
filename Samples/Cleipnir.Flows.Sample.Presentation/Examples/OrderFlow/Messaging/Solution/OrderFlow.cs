@@ -21,7 +21,12 @@ public class OrderFlow : Flow<Order>
         await Messages.FirstOfType<FundsReserved>();
 
         await _messageBroker.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
-        await Messages.FirstOfType<ProductsShipped>();
+        var either = await Messages.OfTypes<ProductsShipped, ProductsShipmentFailed>().First();
+        if (either.HasSecond)
+        {
+            await _messageBroker.Send(new CancelFundsReservation(order.OrderId, transactionId));
+            return;
+        }
 
         await _messageBroker.Send(new CaptureFunds(order.OrderId, order.CustomerId, transactionId));
         await Messages.FirstOfType<FundsCaptured>();

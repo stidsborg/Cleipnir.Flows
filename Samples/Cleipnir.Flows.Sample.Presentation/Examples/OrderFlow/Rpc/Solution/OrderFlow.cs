@@ -1,5 +1,4 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
-using Serilog;
+﻿using Serilog;
 using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc.Solution;
@@ -23,23 +22,26 @@ public class OrderFlow : Flow<Order>
     {
         Logger.Information($"Processing of order '{order.OrderId}' started");
 
-        var state = await Effect.CreateOrGet<OrderState>("State");
-        await _paymentProviderClient.Reserve(order.CustomerId, state.TransactionId, order.TotalPrice);
+        var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
+        await _paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
 
-        await Effect.Capture(
-            "ShipProducts",
-            work: () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
-        );
+        try
+        {
+            await Effect.Capture(
+                "ShipProducts",
+                work: () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
+            );
+        }
+        catch (Exception)
+        {
+            await _paymentProviderClient.CancelReservation(transactionId);
+            throw;
+        }
 
-        await _paymentProviderClient.Capture(state.TransactionId);
+        await _paymentProviderClient.Capture(transactionId);
 
         await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
 
         Logger.Information($"Processing of order '{order.OrderId}' completed");
-    }
-
-    public class OrderState : WorkflowState
-    {
-        public Guid TransactionId { get; set; } = Guid.NewGuid();
     }
 }
