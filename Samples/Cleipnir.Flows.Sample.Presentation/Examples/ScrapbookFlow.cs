@@ -2,20 +2,21 @@
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples;
 
-public class ScrapbookFlow : Flow<string, ScrapbookFlow.FlowScrapbook>
+public class ScrapbookFlow : Flow<string>
 {
     public override async Task Run(string param)
     {
-        if (Scrapbook.Started == null)
+        var state = await Effect.CreateOrGet<State>("State");
+        if (state.Started == null)
         {
-            Scrapbook.Started = DateTime.Now;
-            await Scrapbook.Save();
+            state.Started = DateTime.Now;
+            await state.Save();
         }
 
-        Console.WriteLine("Flow was initially started: " + Scrapbook.Started);
+        Console.WriteLine("Flow was initially started: " + state.Started);
     }
 
-    public class FlowScrapbook : RScrapbook
+    public class State : WorkflowState
     {
         public DateTime? Started { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Cleipnir.ResilientFunctions.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.SqlServer;
@@ -15,7 +16,7 @@ public static class FlowsModule
         bool initializeDatabase = true
     )
     {
-        var flowStore = new SqlServerFlowStore(connectionString);
+        var flowStore = new SqlServerFunctionStore(connectionString);
         
         return AspNet.FlowsModule.UseFlows(
             services,

@@ -1,4 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Console.AtMostOnce;
+﻿using Cleipnir.ResilientFunctions.Domain;
+
+namespace Cleipnir.Flows.Sample.Console.AtMostOnce;
 
 public class AtMostOnceFlow : Flow<string>
 {
@@ -6,9 +8,10 @@ public class AtMostOnceFlow : Flow<string>
     
     public override async Task Run(string rocketId)
     {
-        await DoAtMostOnce(
-            workId: "FireRocket",
-            _rocketSender.FireRocket
+        await Effect.Capture(
+            id: "FireRocket",
+            _rocketSender.FireRocket,
+            ResiliencyLevel.AtMostOnce
         );
     }
 }

@@ -18,16 +18,18 @@ public class MetricsMiddleware : IMiddleware
         IncrementRestartedFlowsCounter = incrementRestartedFlowsCounter;
     }
 
-    public async Task<Result<TResult>> Run<TFlow, TParam, TScrapbook, TResult>(
+    public async Task<Result<TResult>> Run<TFlow, TParam, TResult>(
         TParam param, 
-        TScrapbook scrapbook, 
-        Context context, 
-        Next<TFlow, TParam, TScrapbook, TResult> next) where TParam : notnull where TScrapbook : RScrapbook, new()
+        Workflow workflow, 
+        Next<TFlow, TParam, TResult> next) where TParam : notnull
     {
-        if (context.InvocationMode == InvocationMode.Retry)
+        var started = workflow.Effect.TryGet<bool>(id: "Started", out _);
+        if (started)
             IncrementRestartedFlowsCounter();
+        else
+            await workflow.Effect.Upsert("Started", true);
         
-        var result = await next(param, scrapbook, context);
+        var result = await next(param, workflow);
         if (result.Outcome == Outcome.Fail)
             IncrementFailedFlowsCounter();
         else if (result.Outcome == Outcome.Succeed)

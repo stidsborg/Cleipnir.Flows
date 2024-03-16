@@ -5,15 +5,17 @@ using MimeKit.Text;
 
 namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender.Solution;
 
-public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbook>
+public class NewsletterFlow : Flow<MailAndRecipients>
 {
     public override async Task Run(MailAndRecipients mailAndRecipients)
     {
         var (recipients, subject, content) = mailAndRecipients;
         using var client = new SmtpClient();
         await client.ConnectAsync("mail.smtpbucket.com", 8025);
+
+        var state = await Effect.CreateOrGet<State>(nameof(State));
         
-        for (var atRecipient = Scrapbook.AtRecipient; atRecipient < mailAndRecipients.Recipients.Count; atRecipient++)
+        for (var atRecipient = state.AtRecipient; atRecipient < mailAndRecipients.Recipients.Count; atRecipient++)
         {
             var recipient = recipients[atRecipient];
             var message = new MimeMessage();
@@ -24,12 +26,12 @@ public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbo
             message.Body = new TextPart(TextFormat.Html) { Text = content };
             await client.SendAsync(message);
 
-            Scrapbook.AtRecipient = atRecipient;
-            await Scrapbook.Save();
+            state.AtRecipient = atRecipient;
+            await state.Save();
         }
     }
     
-    public class FlowScrapbook : RScrapbook
+    private class State : WorkflowState
     {
         public int AtRecipient { get; set; }
     }

@@ -1,4 +1,5 @@
 ﻿using Cleipnir.Flows.PostgresSql;
+using Cleipnir.ResilientFunctions.PostgreSQL;
 
 namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
 
@@ -7,7 +8,7 @@ public static class Example
     public static async Task Perform()
     {
         var connStr = "Server=localhost;Database=flows;User Id=postgres;Password=Pa55word!; Include Error Detail=true;";
-        var flowStore = new PostgresFlowStore(connStr);
+        var flowStore = new PostgreSqlFunctionStore(connStr);
         await flowStore.DropIfExists();
         await flowStore.Initialize();
         

@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Reactive;
+﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.C_LoanApplication.Solution;
 
@@ -8,11 +8,11 @@ public class LoanApplicationFlow : Flow<LoanApplication>
     {
         await MessageBroker.Send(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
 
-        await EventSource.RegisterTimeout(timeoutId: "Timeout", expiresIn: TimeSpan.FromMinutes(15));
-        
-        var outcomesAndTimeout = await EventSource
+        await Messages.TimeoutProvider.RegisterTimeout(timeoutId: "Timeout", expiresIn: TimeSpan.FromMinutes(15));
+
+        var outcomesAndTimeout = await Messages
             .Chunk(3)
-            .SuspendUntilNext();
+            .SuspendUntilFirst();
 
         var outcomes = outcomesAndTimeout
             .TakeWhile(e => e is CreditCheckOutcome)

@@ -8,70 +8,40 @@ using Cleipnir.ResilientFunctions.Messaging;
 
 namespace Cleipnir.Flows;
 
-public abstract class Flow<TParam> : Flow<TParam, RScrapbook> where TParam : notnull {}
-public abstract class Flow<TParam, TScrapbook> where TParam : notnull where TScrapbook : RScrapbook, new()
+public abstract class Flow<TParam> where TParam : notnull 
 {
-    public Context Context { get; init; } = null!;
-    public Utilities Utilities => Context.Utilities;
-    public Task<EventSource> EventSource => Context.EventSource;
-    public TScrapbook Scrapbook { get; init; } = default!;
+    public Workflow Workflow { get; init; } = null!;
+    public Utilities Utilities => Workflow.Utilities;
+    public Messages Messages => Workflow.Messages;
+    public Effect Effect => Workflow.Effect;
 
     public abstract Task Run(TParam param);
     
-    public void Suspend(int whileEventCount) => throw new SuspendInvocationException(whileEventCount);
-    public void Postpone(TimeSpan delay) => throw new PostponeInvocationException(delay);
-    public void Postpone(DateTime until) => throw new PostponeInvocationException(until);
-    
-    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus, Func<Task> work) 
-        => Scrapbook.DoAtMostOnce(workStatus: workStatus, work);
-    public Task DoAtMostOnce<TResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TResult>>> workStatus, Func<Task<TResult>> work) =>
-        Scrapbook.DoAtMostOnce(workStatus, work);
-
-    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtLeastOnce(workId, work);
-    public Task DoAtLeastOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus,  Func<Task> work) => Scrapbook.DoAtLeastOnce(workStatus, work);
-    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtLeastOnce(workId, work);
-    public Task<TResult> DoAtLeastOnce<TResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TResult>>> workStatus, Func<Task<TResult>> work)
-        => Scrapbook.DoAtLeastOnce(workStatus, work);
+    public Task<T> Capture<T>(string id, Func<Task<T>> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task<T> Capture<T>(string id, Func<T> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task Capture(string id, Func<Task> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task Capture(string id, Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
 }
 
-public abstract class Flow<TParam, TScrapbook, TResult> where TParam : notnull where TScrapbook : RScrapbook, new()
+public abstract class Flow<TParam, TResult> where TParam : notnull
 {
-    public Context Context { get; init; } = null!;
-    public Utilities Utilities => Context.Utilities;
-    public Task<EventSource> EventSource => Context.EventSource;
-    public TScrapbook Scrapbook { get; init; } = default!;
+    public Workflow Workflow { get; init; } = null!;
+    public Utilities Utilities => Workflow.Utilities;
+    public Messages Messages => Workflow.Messages;
+    public Effect Effect => Workflow.Effect;
 
     public abstract Task<TResult> Run(TParam param);
     
-    public void Suspend(int whileEventCount) => throw new SuspendInvocationException(whileEventCount);
-    public void Postpone(TimeSpan delay) => throw new PostponeInvocationException(delay);
-    public void Postpone(DateTime until) => throw new PostponeInvocationException(until);
-    
-    public Task<string> DoAtMostOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtMostOnce(workId, work);
-    public Task DoAtMostOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus, Func<Task> work) 
-        => Scrapbook.DoAtMostOnce(workStatus: workStatus, work);
-    public Task DoAtMostOnce<TWorkResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TWorkResult>>> workStatus, Func<Task<TWorkResult>> work) =>
-        Scrapbook.DoAtMostOnce(workStatus, work);
-
-    public Task DoAtLeastOnce(string workId, Func<Task> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtLeastOnce(workId, work);
-    public Task DoAtLeastOnce(Expression<Func<TScrapbook, WorkStatus>> workStatus,  Func<Task> work) => Scrapbook.DoAtLeastOnce(workStatus, work);
-    public Task<string> DoAtLeastOnce(string workId, Func<Task<string>> work, PersistencyMedium persistTo = PersistencyMedium.Scrapbook) 
-        => Scrapbook.DoAtLeastOnce(workId, work);
-    public Task<TWorkResult> DoAtLeastOnce<TWorkResult>(Expression<Func<TScrapbook, WorkStatusAndResult<TWorkResult>>> workStatus, Func<Task<TWorkResult>> work)
-        => Scrapbook.DoAtLeastOnce(workStatus, work);
-}
-
-public enum PersistencyMedium
-{
-    Scrapbook, EventSource
+    public Task<T> Capture<T>(string id, Func<Task<T>> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task<T> Capture<T>(string id, Func<T> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task Capture(string id, Func<Task> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
+    public Task Capture(string id, Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(id, work, resiliencyLevel);
 }

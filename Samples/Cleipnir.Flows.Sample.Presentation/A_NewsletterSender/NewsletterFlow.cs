@@ -1,11 +1,10 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 
 namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
 
-public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbook>
+public class NewsletterFlow : Flow<MailAndRecipients>
 {
     public override async Task Run(MailAndRecipients mailAndRecipients)
     {
@@ -24,11 +23,6 @@ public class NewsletterFlow : Flow<MailAndRecipients, NewsletterFlow.FlowScrapbo
             message.Body = new TextPart(TextFormat.Html) { Text = content };
             await client.SendAsync(message);
         }
-    }
-    
-    public class FlowScrapbook : RScrapbook
-    {
-       
     }
 }
 

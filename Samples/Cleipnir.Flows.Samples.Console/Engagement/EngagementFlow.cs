@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Reactive;
+﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Console.Engagement;
 
@@ -6,14 +6,14 @@ public class EngagementFlow : Flow<string>
 {
     public override async Task Run(string candidateEmail)
     {
-        await EventSource.DoAtLeastOnce(
-            workId: "InitialCorrespondence",
+        await Effect.Capture(
+            id: "InitialCorrespondence",
             SendEngagementInitialCorrespondence
         );
         
         for (var i = 0; i < 10; i++)
         {
-            var timeoutOption = await EventSource
+            var either = await Messages
                 .OfTypes<EngagementAccepted, EngagementRejected>()
                 .Where(either =>
                     either.Match(
@@ -21,22 +21,21 @@ public class EngagementFlow : Flow<string>
                         second: r => r.Iteration == i
                     )
                 )
-                .SuspendUntilNext(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromHours(1));
+                .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromHours(1))
+                .SuspendUntilFirstOrDefault();
 
-            if (!timeoutOption.TimedOut && timeoutOption.Value!.AsObject() is EngagementAccepted)
+            if (either?.AsObject() is EngagementAccepted)
             {
-                await DoAtLeastOnce(
-                    workId: "NotifyHR", 
-                    work: () => NotifyHR(candidateEmail),
-                    persistTo: PersistencyMedium.EventSource
+                await Effect.Capture(
+                    id: "NotifyHR", 
+                    work: () => NotifyHR(candidateEmail)
                 );
                 return;
             }
             
-            await DoAtLeastOnce(
-                workId: $"Reminder#{i}",
-                SendEngagementReminder,
-                persistTo: PersistencyMedium.EventSource
+            await Effect.Capture(
+                id: $"Reminder#{i}",
+                SendEngagementReminder
             );
         }
 

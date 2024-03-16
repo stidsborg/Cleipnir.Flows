@@ -1,5 +1,5 @@
-﻿using Cleipnir.Flows.Persistence;
-using Cleipnir.ResilientFunctions.Domain;
+﻿using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,7 +40,7 @@ public class IntegrationTest
     {
         var builder = WebApplication.CreateBuilder();
         bindings(builder.Services);
-        Cleipnir.Flows.AspNet.FlowsModule.UseFlows(builder.Services, new InMemoryFlowStore());
+        Cleipnir.Flows.AspNet.FlowsModule.UseFlows(builder.Services, new InMemoryFunctionStore());
 
         var app = builder.Build();
 

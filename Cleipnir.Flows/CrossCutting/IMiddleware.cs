@@ -4,18 +4,16 @@ using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.CrossCutting;
 
-public delegate Task<Result<TResult>> Next<TFlow, TParam, TScrapbook, TResult>(
+public delegate Task<Result<TResult>> Next<TFlow, TParam, TResult>(
     TParam param,
-    TScrapbook scrapbook,
-    Context context
+    Workflow workflow
 );
 
 public interface IMiddleware
 {
-    public Task<Result<TResult>> Run<TFlow, TParam, TScrapbook, TResult>(
+    public Task<Result<TResult>> Run<TFlow, TParam, TResult>(
         TParam param,
-        TScrapbook scrapbook,
-        Context context,
-        Next<TFlow, TParam, TScrapbook, TResult> next
-    ) where TParam : notnull where TScrapbook : RScrapbook, new();
+        Workflow workflow,
+        Next<TFlow, TParam, TResult> next
+    ) where TParam : notnull;
 }

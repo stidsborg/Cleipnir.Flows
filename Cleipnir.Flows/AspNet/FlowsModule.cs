@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Cleipnir.Flows.SourceGeneration;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.AspNet;
@@ -10,7 +11,7 @@ public static class FlowsModule
 {
     public static IServiceCollection UseFlows(
         IServiceCollection services,
-        IFlowStore flowStore,
+        IFunctionStore flowStore,
         Func<IServiceProvider, Options>? options = null,
         bool gracefulShutdown = false,
         Assembly? rootAssembly = null,        

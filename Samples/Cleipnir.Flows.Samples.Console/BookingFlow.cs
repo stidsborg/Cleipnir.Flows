@@ -1,8 +1,6 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
+﻿namespace Cleipnir.Flows.Sample.Console;
 
-namespace Cleipnir.Flows.Sample.Console;
-
-public class BookingFlow : Flow<string, RScrapbook, string>
+public class BookingFlow : Flow<string, string>
 {
     public override Task<string> Run(string @param)
     {

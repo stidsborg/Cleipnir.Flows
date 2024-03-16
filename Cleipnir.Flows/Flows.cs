@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
@@ -12,44 +11,40 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows;
 
-public class Flows<TFlow, TParam, TScrapbook, TResult> 
-    where TFlow : Flow<TParam, TScrapbook, TResult>
-    where TScrapbook : RScrapbook, new() 
+public class Flows<TFlow, TParam, TResult> 
+    where TFlow : Flow<TParam, TResult>
     where TParam : notnull
 {
     private readonly FlowsContainer _flowsContainer;
-    private readonly RFunc<TParam, TScrapbook, TResult> _registration;
+    private readonly FuncRegistration<TParam, TResult> _registration;
 
-    private readonly Next<TFlow, TParam, TScrapbook, TResult> _next;
+    private readonly Next<TFlow, TParam, TResult> _next;
     
-    private readonly Action<TFlow, TScrapbook> _scrapbookSetter;
-    private readonly Action<TFlow, Context> _contextSetter;
+    private readonly Action<TFlow, Workflow> _workflowSetter;
     
     public Flows(string flowName, FlowsContainer flowsContainer)
     {
         _flowsContainer = flowsContainer;
-        _scrapbookSetter = CreateScrapbookSetter();
-        _contextSetter = CreateContextSetter();
+        _workflowSetter = CreateWorkflowSetter();
         _next = CreateCallChain(flowsContainer.ServiceProvider);
         
-        _registration = flowsContainer.RFunctions.RegisterFunc<TParam, TScrapbook, TResult>(
+        _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
             flowName,
-            (param, scrapbook, context) => PrepareAndRunFlow(param, scrapbook, context)
+            (param, workflow) => PrepareAndRunFlow(param, workflow)
         );
     }
 
-    private Next<TFlow, TParam, TScrapbook, TResult> CreateCallChain(IServiceProvider serviceProvider)
+    private Next<TFlow, TParam, TResult> CreateCallChain(IServiceProvider serviceProvider)
     {
-        return CallChain.Create<TFlow, TParam, TScrapbook, TResult>(
+        return CallChain.Create<TFlow, TParam, TResult>(
             _flowsContainer.Middlewares,
-            runFlow: async (param, scrapbook, context) =>
+            runFlow: async (param, workflow) =>
             {
                 await using var scope = serviceProvider.CreateAsyncScope();
 
                 var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
-
-                _scrapbookSetter(flow, scrapbook);
-                _contextSetter(flow, context);
+                
+                _workflowSetter(flow, workflow);
                 
                 var result = await flow.Run(param);
                 return result;
@@ -57,72 +52,42 @@ public class Flows<TFlow, TParam, TScrapbook, TResult>
         );
     }
 
-    public async Task<ControlPanel<TParam, TScrapbook, TResult>?> ControlPanel(string instanceId)
-    {
-        var controlPanel = await _registration.ControlPanel.For(instanceId);
-        if (controlPanel == null)
-            return null;
+    public Task<ControlPanel<TParam, WorkflowState, TResult>?> ControlPanel(string instanceId) 
+        => _registration.ControlPanel(instanceId);
 
-        return new ControlPanel<TParam, TScrapbook, TResult>(controlPanel);
-    }
+    public MessageWriter MessageWriter(string instanceId) 
+        => _registration.MessageWriters.For(instanceId);
 
-    public EventSourceWriter EventSourceWriter(string instanceId) 
-        => _registration.EventSourceWriters.For(instanceId);
+    public Task<TResult> Run(string instanceId, TParam param) 
+        => _registration.Invoke(instanceId, param);
 
-    public Task<TResult> Run(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null) 
-        => _registration.Invoke(instanceId, param, scrapbook, events);
-
-    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
-        => _registration.Schedule(instanceId, param, scrapbook, events);
+    public Task Schedule(string instanceId, TParam param)
+        => _registration.Schedule(instanceId, param);
 
     public Task ScheduleAt(
         string instanceId,
         TParam param,
-        DateTime delayUntil,
-        TScrapbook? scrapbook = null,
-        IEnumerable<EventAndIdempotencyKey>? events = null
-    ) => _registration.ScheduleAt(instanceId, param, delayUntil, scrapbook, events);
+        DateTime delayUntil
+    ) => _registration.ScheduleAt(instanceId, param, delayUntil);
 
     public Task ScheduleIn(string functionInstanceId,
         TParam param,
-        TimeSpan delay,
-        TScrapbook? scrapbook = null,
-        IEnumerable<EventAndIdempotencyKey>? events = null
-    ) => _registration.ScheduleIn(functionInstanceId, param, delay, scrapbook, events);
+        TimeSpan delay
+    ) => _registration.ScheduleIn(functionInstanceId, param, delay);
     
-    private async Task<Result<TResult>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
-        => await _next(param, scrapbook, context);
+    private async Task<Result<TResult>> PrepareAndRunFlow(TParam param, Workflow workflow) 
+        => await _next(param, workflow);
     
-    private Action<TFlow, TScrapbook> CreateScrapbookSetter()
+    private Action<TFlow, Workflow> CreateWorkflowSetter()
     {
         ParameterExpression flowParam = Expression.Parameter(typeof(TFlow), "flow");
-        ParameterExpression scrapbookParam = Expression.Parameter(typeof(TScrapbook), "scrapbook");
-        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, TScrapbook, Unit>.Scrapbook));
-                
-        BinaryExpression assignExpr = Expression.Assign(propertyExpr, scrapbookParam);
-
-        // Create a lambda expression
-        Expression<Action<TFlow, TScrapbook>> lambdaExpr = Expression.Lambda<Action<TFlow, TScrapbook>>(
-            assignExpr,
-            flowParam,
-            scrapbookParam
-        );
-
-        // Compile and invoke the lambda expression
-        var setter = lambdaExpr.Compile();
-        return setter;
-    }
-    
-    private Action<TFlow, Context> CreateContextSetter()
-    {
-        ParameterExpression flowParam = Expression.Parameter(typeof(TFlow), "flow");
-        ParameterExpression contextParam = Expression.Parameter(typeof(Context), "context");
-        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, TScrapbook, Unit>.Context));
+        ParameterExpression contextParam = Expression.Parameter(typeof(Workflow), "workflow");
+        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, Unit>.Workflow));
                 
         BinaryExpression assignExpr = Expression.Assign(propertyExpr, contextParam);
 
         // Create a lambda expression
-        Expression<Action<TFlow, Context>> lambdaExpr = Expression.Lambda<Action<TFlow, Context>>(
+        Expression<Action<TFlow, Workflow>> lambdaExpr = Expression.Lambda<Action<TFlow, Workflow>>(
             assignExpr,
             flowParam,
             contextParam
@@ -134,42 +99,38 @@ public class Flows<TFlow, TParam, TScrapbook, TResult>
     }
 }
 
-public class Flows<TFlow, TParam, TScrapbook> 
-    where TFlow : Flow<TParam, TScrapbook>
-    where TScrapbook : RScrapbook, new() 
+public class Flows<TFlow, TParam> 
+    where TFlow : Flow<TParam>
     where TParam : notnull
 {
     private readonly FlowsContainer _flowsContainer;
-    private readonly RFunc<TParam, TScrapbook, Unit> _registration;
+    private readonly FuncRegistration<TParam, Unit> _registration;
 
-    private readonly Next<TFlow, TParam, TScrapbook, Unit> _next;
-    private readonly Action<TFlow, TScrapbook> _scrapbookSetter;
-    private readonly Action<TFlow, Context> _contextSetter;
+    private readonly Next<TFlow, TParam, Unit> _next;
+    private readonly Action<TFlow, Workflow> _workflowSetter;
     
     public Flows(string flowName, FlowsContainer flowsContainer)
     {
         _flowsContainer = flowsContainer;
-        _scrapbookSetter = CreateScrapbookSetter();
-        _contextSetter = CreateContextSetter();
+        _workflowSetter = CreateWorkflowSetter();
         _next = CreateCallChain(flowsContainer.ServiceProvider);
         
-        _registration = flowsContainer.RFunctions.RegisterFunc<TParam, TScrapbook, Unit>(
+        _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, Unit>(
             flowName,
             PrepareAndRunFlow
         );
     }
 
-    private Next<TFlow, TParam, TScrapbook, Unit> CreateCallChain(IServiceProvider serviceProvider)
+    private Next<TFlow, TParam, Unit> CreateCallChain(IServiceProvider serviceProvider)
     {
-        return CallChain.Create<TFlow, TParam, TScrapbook, Unit>(
+        return CallChain.Create<TFlow, TParam, Unit>(
             _flowsContainer.Middlewares,
-            async (param, scrapbook, context) =>
+            async (param, workflow) =>
             {
                 await using var scope = serviceProvider.CreateAsyncScope();
 
                 var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
-                _scrapbookSetter(flow, scrapbook);
-                _contextSetter(flow, context);
+                _workflowSetter(flow, workflow);
                                 
                 await flow.Run(param);
                 
@@ -178,72 +139,45 @@ public class Flows<TFlow, TParam, TScrapbook>
         );
     }
 
-    public async Task<ControlPanel<TParam, TScrapbook>?> ControlPanel(string instanceId)
+    public async Task<ControlPanel<TParam, WorkflowState, Unit>?> ControlPanel(string instanceId)
     {
-        var controlPanel = await _registration.ControlPanel.For(instanceId);
-        if (controlPanel == null)
-            return null;
-
-        return new ControlPanel<TParam, TScrapbook>(controlPanel);
+        var controlPanel = await _registration.ControlPanel(instanceId);
+        return controlPanel;
     }
     
-    public EventSourceWriter EventSourceWriter(string instanceId) 
-        => _registration.EventSourceWriters.For(instanceId);
+    public MessageWriter MessageWriter(string instanceId) 
+        => _registration.MessageWriters.For(instanceId);
 
-    public Task Run(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null) 
-        => _registration.Invoke(instanceId, param, scrapbook, events);
+    public Task Run(string instanceId, TParam param) 
+        => _registration.Invoke(instanceId, param);
 
-    public Task Schedule(string instanceId, TParam param, TScrapbook? scrapbook = null, IEnumerable<EventAndIdempotencyKey>? events = null)
-        => _registration.Schedule(instanceId, param, scrapbook, events);
+    public Task Schedule(string instanceId, TParam param)
+        => _registration.Schedule(instanceId, param);
     
     public Task ScheduleAt(
         string instanceId,
         TParam param,
-        DateTime delayUntil,
-        TScrapbook? scrapbook = null,
-        IEnumerable<EventAndIdempotencyKey>? events = null
-    ) => _registration.ScheduleAt(instanceId, param, delayUntil, scrapbook, events);
+        DateTime delayUntil
+    ) => _registration.ScheduleAt(instanceId, param, delayUntil);
 
     public Task ScheduleIn(string functionInstanceId,
         TParam param,
-        TimeSpan delay,
-        TScrapbook? scrapbook = null,
-        IEnumerable<EventAndIdempotencyKey>? events = null
-    ) => _registration.ScheduleIn(functionInstanceId, param, delay, scrapbook, events);
+        TimeSpan delay
+    ) => _registration.ScheduleIn(functionInstanceId, param, delay);
     
-    private async Task<Result<Unit>> PrepareAndRunFlow(TParam param, TScrapbook scrapbook, Context context) 
-        => await _next(param, scrapbook, context);
-
-    private Action<TFlow, TScrapbook> CreateScrapbookSetter()
+    private async Task<Result<Unit>> PrepareAndRunFlow(TParam param, Workflow workflow) 
+        => await _next(param, workflow);
+    
+    private Action<TFlow, Workflow> CreateWorkflowSetter()
     {
         ParameterExpression flowParam = Expression.Parameter(typeof(TFlow), "flow");
-        ParameterExpression scrapbookParam = Expression.Parameter(typeof(TScrapbook), "scrapbook");
-        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, TScrapbook, Unit>.Scrapbook));
-                
-        BinaryExpression assignExpr = Expression.Assign(propertyExpr, scrapbookParam);
-
-        // Create a lambda expression
-        Expression<Action<TFlow, TScrapbook>> lambdaExpr = Expression.Lambda<Action<TFlow, TScrapbook>>(
-            assignExpr,
-            flowParam,
-            scrapbookParam
-        );
-
-        // Compile and invoke the lambda expression
-        var setter = lambdaExpr.Compile();
-        return setter;
-    }
-    
-    private Action<TFlow, Context> CreateContextSetter()
-    {
-        ParameterExpression flowParam = Expression.Parameter(typeof(TFlow), "flow");
-        ParameterExpression contextParam = Expression.Parameter(typeof(Context), "context");
-        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, TScrapbook, Unit>.Context));
+        ParameterExpression contextParam = Expression.Parameter(typeof(Workflow), "workflow");
+        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow<TParam, Unit>.Workflow));
                 
         BinaryExpression assignExpr = Expression.Assign(propertyExpr, contextParam);
 
         // Create a lambda expression
-        Expression<Action<TFlow, Context>> lambdaExpr = Expression.Lambda<Action<TFlow, Context>>(
+        Expression<Action<TFlow, Workflow>> lambdaExpr = Expression.Lambda<Action<TFlow, Workflow>>(
             assignExpr,
             flowParam,
             contextParam

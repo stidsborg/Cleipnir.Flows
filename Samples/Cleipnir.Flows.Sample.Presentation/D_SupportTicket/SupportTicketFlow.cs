@@ -1,6 +1,4 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
-
-namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket;
+﻿namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket;
 
 public class SupportTicketFlow : Flow<SupportTicketRequest>
 {
@@ -11,8 +9,8 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
         for (var i = 0;; i++)
         {
             var customerSupportAgent = customerSupportAgents[i % customerSupportAgents.Length]; 
-            await Scrapbook.DoAtLeastOnce(
-                workId: $"RequestSupportForTicket{i}",
+            await Effect.Capture(
+                id: $"RequestSupportForTicket{i}",
                 work: () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
             );
 

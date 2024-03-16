@@ -1,9 +1,8 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
-using Cleipnir.ResilientFunctions.Helpers;
+﻿using Cleipnir.ResilientFunctions.Helpers;
 
 namespace Cleipnir.Flows.Tests.AspNet;
 
-public class TestFlow : Flow<string, RScrapbook, string>
+public class TestFlow : Flow<string, string>
 {
     public override Task<string> Run(string param)
     {

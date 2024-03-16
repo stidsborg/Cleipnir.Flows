@@ -1,5 +1,4 @@
-﻿using Cleipnir.Flows.Reactive;
-using Cleipnir.ResilientFunctions.Domain;
+﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket.Solution;
 
@@ -12,17 +11,18 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
         for (var i = 0;; i++)
         {
             var customerSupportAgent = customerSupportAgents[i % customerSupportAgents.Length]; 
-            await Scrapbook.DoAtLeastOnce(
-                workId: $"RequestSupportForTicket{i}",
+            await Effect.Capture(
+                id: $"RequestSupportForTicket{i}",
                 work: () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
             );
 
-            var option = await EventSource
+            var option = await Messages
                 .OfTypes<SupportTicketTaken, SupportTicketRejected>()
                 .Where(e => e.Match(taken => taken.Iteration, rejected => rejected.Iteration) == i)
-                .SuspendUntilNext(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15));
+                .TakeUntilTimeout(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15))
+                .SuspendUntilFirstOrNone();
 
-            if (!option.TimedOut && option.Value!.AsObject() is SupportTicketTaken)
+            if (!option.HasValue && option.Value.AsObject() is SupportTicketTaken)
                 return; //ticket was taken in iteration i
         }
     }

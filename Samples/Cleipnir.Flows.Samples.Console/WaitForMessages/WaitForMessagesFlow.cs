@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Reactive;
+﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Console.WaitForMessages;
 
@@ -6,7 +6,7 @@ public class WaitForMessagesFlow : Flow<string>
 {
     public override async Task Run(string orderId)
     {
-        await EventSource
+        await Messages
             .OfTypes<FundsReserved, InventoryLocked>()
             .Take(2)
             .ToList();

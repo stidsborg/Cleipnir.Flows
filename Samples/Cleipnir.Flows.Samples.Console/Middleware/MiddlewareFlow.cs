@@ -1,4 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Console.Middleware;
+﻿using Cleipnir.ResilientFunctions.Domain.Exceptions;
+
+namespace Cleipnir.Flows.Sample.Console.Middleware;
 
 public class MiddlewareFlow : Flow<string>
 {
@@ -8,7 +10,7 @@ public class MiddlewareFlow : Flow<string>
         if (randomValue == 1)
             throw new TimeoutException();
         if (randomValue == 2)
-            Postpone(delay: TimeSpan.Zero);
+            throw new PostponeInvocationException(postponeForMs: 0);
 
         return Task.CompletedTask;
     }

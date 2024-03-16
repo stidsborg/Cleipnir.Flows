@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Persistence;
+﻿using Cleipnir.ResilientFunctions.Storage;
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc;
 
@@ -13,7 +13,7 @@ public static class Example
         serviceCollection.AddTransient<OrderFlow>();
 
         var flowsContainer = new FlowsContainer(
-            new InMemoryFlowStore(),
+            new InMemoryFunctionStore(),
             serviceCollection.BuildServiceProvider()
         );
 

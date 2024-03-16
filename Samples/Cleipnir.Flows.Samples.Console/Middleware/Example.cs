@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Persistence;
+﻿using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.Sample.Console.Middleware;
@@ -15,7 +15,7 @@ public static class Example
         serviceCollection.AddTransient<MiddlewareFlow>();
 
         var flowsContainer = new FlowsContainer(
-            new InMemoryFlowStore(),
+            new InMemoryFunctionStore(),
             serviceCollection.BuildServiceProvider(),
             new Options().UseMiddleware(
                 new MetricsMiddleware(

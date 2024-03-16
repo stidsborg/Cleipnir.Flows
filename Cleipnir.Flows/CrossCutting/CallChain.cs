@@ -9,22 +9,22 @@ namespace Cleipnir.Flows.CrossCutting;
 
 public static class CallChain
 {
-    public static Next<TFlow, TParam, TScrapbook, TResult> Create<TFlow, TParam, TScrapbook, TResult>(
+    public static Next<TFlow, TParam, TResult> Create<TFlow, TParam, TResult>(
         List<IMiddleware> middlewares, 
-        Func<TParam, TScrapbook, Context, Task<TResult>> runFlow) 
-        where TParam : notnull where TScrapbook : RScrapbook, new()
+        Func<TParam, Workflow, Task<TResult>> runFlow) 
+        where TParam : notnull
     {
-        Next<TFlow, TParam, TScrapbook, TResult> currNext =
-            async (p, s, c) =>
+        Next<TFlow, TParam, TResult> currNext =
+            async (p, w) =>
             {
                 try
                 {
-                    var result = await runFlow(p, s, c);
+                    var result = await runFlow(p, w);
                     return new Result<TResult>(result);
                 }
                 catch (SuspendInvocationException suspendInvocationException)
                 {
-                    return new Result<TResult>(Suspend.UntilAfter(suspendInvocationException.ExpectedEventCount));
+                    return new Result<TResult>(Suspend.While(suspendInvocationException.ExpectedInterruptCount.Value));
                 }
                 catch (PostponeInvocationException postponeInvocationException)
                 {
@@ -41,7 +41,7 @@ public static class CallChain
             var middleware = middlewares[i];
             var next = currNext;
 
-            currNext = (p, s, c) => middleware.Run(p, s, c, next);
+            currNext = (p, w) => middleware.Run(p, w, next);
         }
 
         return currNext;

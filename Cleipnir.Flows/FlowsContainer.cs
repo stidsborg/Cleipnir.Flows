@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
 using Cleipnir.ResilientFunctions;
 using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -13,10 +14,10 @@ namespace Cleipnir.Flows;
 public class FlowsContainer : IDisposable
 {
     internal readonly IServiceProvider ServiceProvider;
-    internal readonly RFunctions RFunctions;
+    internal readonly FunctionsRegistry FunctionRegistry;
     internal readonly List<IMiddleware> Middlewares;
 
-    public FlowsContainer(IFlowStore flowStore, IServiceProvider serviceProvider, Options? options = null)
+    public FlowsContainer(IFunctionStore flowStore, IServiceProvider serviceProvider, Options? options = null)
     {
         ServiceProvider = serviceProvider;
         options ??= new Options();
@@ -36,7 +37,7 @@ public class FlowsContainer : IDisposable
                 );
         }
              
-        RFunctions = new RFunctions(flowStore, options?.MapToRFunctionsSettings());
+        FunctionRegistry = new FunctionsRegistry(flowStore, options?.MapToRFunctionsSettings());
         Middlewares = options?.Middlewares
             .Select(m => m switch
             {
@@ -47,25 +48,23 @@ public class FlowsContainer : IDisposable
             .ToList() ?? new List<IMiddleware>();
     }
 
-    public Flows<TFlow, TParam, TScrapbook> CreateFlows<TFlow, TParam, TScrapbook>(string flowName)
-        where TFlow : Flow<TParam, TScrapbook>
+    public Flows<TFlow, TParam> CreateFlows<TFlow, TParam>(string flowName)
+        where TFlow : Flow<TParam>
         where TParam : notnull
-        where TScrapbook : RScrapbook, new()
     {
-        var flowRegistration = new Flows<TFlow, TParam, TScrapbook>(flowName, flowsContainer: this);
+        var flowRegistration = new Flows<TFlow, TParam>(flowName, flowsContainer: this);
         return flowRegistration;
     }
     
-    public Flows<TFlow, TParam, TScrapbook, TResult> CreateFlows<TFlow, TParam, TScrapbook, TResult>(string flowName)
-        where TFlow : Flow<TParam, TScrapbook, TResult>
+    public Flows<TFlow, TParam, TResult> CreateFlows<TFlow, TParam, TResult>(string flowName)
+        where TFlow : Flow<TParam, TResult>
         where TParam : notnull
-        where TScrapbook : RScrapbook, new()
     {
-        var flowRegistration = new Flows<TFlow, TParam, TScrapbook, TResult>(flowName, flowsContainer: this);
+        var flowRegistration = new Flows<TFlow, TParam, TResult>(flowName, flowsContainer: this);
         return flowRegistration;
     }
 
-    public void Dispose() => RFunctions.Dispose();
+    public void Dispose() => FunctionRegistry.Dispose();
 
-    public Task ShutdownGracefully(TimeSpan? maxWait = null) => RFunctions.ShutdownGracefully(maxWait);
+    public Task ShutdownGracefully(TimeSpan? maxWait = null) => FunctionRegistry.ShutdownGracefully(maxWait);
 }

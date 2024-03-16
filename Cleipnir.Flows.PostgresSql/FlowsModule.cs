@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Cleipnir.ResilientFunctions.PostgreSQL;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.PostgresSql;
@@ -15,7 +16,7 @@ public static class FlowsModule
         bool initializeDatabase = true
     )
     {
-        var flowStore = new PostgresFlowStore(connectionString);
+        var flowStore = new PostgreSqlFunctionStore(connectionString);
         
         return AspNet.FlowsModule.UseFlows(
             services,

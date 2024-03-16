@@ -4,7 +4,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc.Solution;
 
-public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
+public class OrderFlow : Flow<Order>
 {
     private readonly IPaymentProviderClient _paymentProviderClient;
     private readonly IEmailClient _emailClient;
@@ -23,23 +23,23 @@ public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
     {
         Logger.Information($"Processing of order '{order.OrderId}' started");
 
-        await _paymentProviderClient.Reserve(order.CustomerId, Scrapbook.TransactionId, order.TotalPrice);
+        var state = await Effect.CreateOrGet<OrderState>("State");
+        await _paymentProviderClient.Reserve(order.CustomerId, state.TransactionId, order.TotalPrice);
 
-        await Scrapbook.DoAtMostOnce(
-            workStatus: s => s.ProductsShippedStatus,
+        await Effect.Capture(
+            "ShipProducts",
             work: () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
         );
 
-        await _paymentProviderClient.Capture(Scrapbook.TransactionId);
+        await _paymentProviderClient.Capture(state.TransactionId);
 
         await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
 
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
 
-    public class OrderScrapbook : RScrapbook
+    public class OrderState : WorkflowState
     {
         public Guid TransactionId { get; set; } = Guid.NewGuid();
-        public WorkStatus ProductsShippedStatus { get; set; }
     }
 }

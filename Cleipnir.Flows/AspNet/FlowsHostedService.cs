@@ -29,7 +29,7 @@ public class FlowsHostedService : IHostedService
             .Select(Assembly.Load)
             .Concat(new[] { _callingAssembly })
             .SelectMany(a => a.GetTypes())
-            .Where(t => t.IsSubclassOfRawGeneric(typeof(Flows<,,>)) || t.IsSubclassOfRawGeneric(typeof(Flows<,,,>)));
+            .Where(t => t.IsSubclassOfRawGeneric(typeof(Flows<,>)) || t.IsSubclassOfRawGeneric(typeof(Flows<,,>)));
 
         foreach (var iRegisterRFuncOnInstantiationType in flowTypes)
             _ = _services.GetService(iRegisterRFuncOnInstantiationType); //flow is registered with the flow container when resolved

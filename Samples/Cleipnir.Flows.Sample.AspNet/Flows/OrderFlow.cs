@@ -5,7 +5,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Flows;
 
-public class OrderFlow : Flow<Order, OrderScrapbook>
+public class OrderFlow : Flow<Order>
 {
     private readonly IPaymentProviderClient _paymentProviderClient;
     private readonly IEmailClient _emailClient;
@@ -23,15 +23,15 @@ public class OrderFlow : Flow<Order, OrderScrapbook>
     public override async Task Run(Order order)
     {
         _logger.Information($"ORDER_PROCESSOR: Processing of order '{order.OrderId}' started");
-        
-        await _paymentProviderClient.Reserve(order.CustomerId, Scrapbook.TransactionId, order.TotalPrice);
+        var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
+        await _paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
 
-        await DoAtMostOnce(
-            workStatus: scrapbook => scrapbook.ProductsShipped,
+        await Effect.Capture(
+            id: "ShipProducts",
             () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
         );
 
-        await _paymentProviderClient.Capture(Scrapbook.TransactionId);
+        await _paymentProviderClient.Capture(transactionId);
 
         await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
 
@@ -39,9 +39,4 @@ public class OrderFlow : Flow<Order, OrderScrapbook>
     }
 }
 
-public class OrderScrapbook : RScrapbook
-{
-    public Guid TransactionId { get; set; } = Guid.NewGuid();
-    public WorkStatus ProductsShipped { get; set; }
-}
 public record Order(string OrderId, Guid CustomerId, IEnumerable<Guid> ProductIds, decimal TotalPrice);

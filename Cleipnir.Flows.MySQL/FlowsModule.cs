@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Cleipnir.ResilientFunctions.MySQL;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.MySQL;
@@ -15,7 +16,7 @@ public static class FlowsModule
         bool initializeDatabase = true
     )
     {
-        var flowStore = new MySqlFlowStore(connectionString);
+        var flowStore = new MySqlFunctionStore(connectionString);
         
         return AspNet.FlowsModule.UseFlows(
             services,

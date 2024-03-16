@@ -1,6 +1,4 @@
-﻿using Cleipnir.Flows.Reactive;
-
-namespace Cleipnir.Flows.Sample.Presentation.C_LoanApplication;
+﻿namespace Cleipnir.Flows.Sample.Presentation.C_LoanApplication;
 
 public class LoanApplicationFlow : Flow<LoanApplication>
 {
@@ -8,7 +6,7 @@ public class LoanApplicationFlow : Flow<LoanApplication>
     {
         await MessageBroker.Send(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
 
-        await EventSource.RegisterTimeout(timeoutId: "Timeout", expiresIn: TimeSpan.FromMinutes(15));
+        await Messages.TimeoutProvider.RegisterTimeout(timeoutId: "Timeout", expiresIn: TimeSpan.FromMinutes(15));
         
         //replies are of type CreditCheckOutcome
     }

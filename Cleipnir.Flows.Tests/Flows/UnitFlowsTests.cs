@@ -1,6 +1,6 @@
-﻿using Cleipnir.Flows.Persistence;
-using Cleipnir.Flows.Reactive;
-using Cleipnir.ResilientFunctions.Domain;
+﻿using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Reactive.Extensions;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -15,13 +15,13 @@ public class UnitFlowsTests
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<SimpleFlow>();
 
-        var flowStore = new InMemoryFlowStore();
+        var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleFlow, string, RScrapbook>(nameof(SimpleFlow));
+        var flows = flowsContainer.CreateFlows<SimpleFlow, string>(nameof(SimpleFlow));
         await flows.Run("someInstanceId", "someParameter");
         
         SimpleFlow.InstanceId.ShouldBe("someInstanceId");
@@ -32,7 +32,7 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
-    private class SimpleFlow : Flow<string, RScrapbook>
+    private class SimpleFlow : Flow<string>
     {
         public static string? ExecutedWithParameter { get; set; }
         public static string? InstanceId { get; set; } 
@@ -41,7 +41,7 @@ public class UnitFlowsTests
         {
             await Task.Delay(1);
             ExecutedWithParameter = param;
-            InstanceId = Context.FunctionId.InstanceId.ToString();
+            InstanceId = Workflow.FunctionId.InstanceId.ToString();
         }
     }
     
@@ -51,13 +51,13 @@ public class UnitFlowsTests
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<EventDrivenFlow>();
 
-        var flowStore = new InMemoryFlowStore();
+        var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<EventDrivenFlow, string, RScrapbook>(nameof(EventDrivenFlow));
+        var flows = flowsContainer.CreateFlows<EventDrivenFlow, string>(nameof(EventDrivenFlow));
 
         await flows.Schedule("someInstanceId", "someParameter");
 
@@ -66,8 +66,8 @@ public class UnitFlowsTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Executing);
         
-        var eventSourceWriter = flows.EventSourceWriter("someInstanceId");
-        await eventSourceWriter.AppendEvent(2);
+        var eventSourceWriter = flows.MessageWriter("someInstanceId");
+        await eventSourceWriter.AppendMessage(2);
 
         await controlPanel.WaitForCompletion();
 
@@ -76,11 +76,11 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    private class EventDrivenFlow : Flow<string, RScrapbook>
+    private class EventDrivenFlow : Flow<string>
     {
         public override async Task Run(string param)
         {
-            await EventSource.NextOfType<int>();
+            await Messages.FirstOfType<int>();
         }
     }
 }

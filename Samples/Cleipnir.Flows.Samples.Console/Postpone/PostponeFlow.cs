@@ -1,4 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Console.Postpone;
+﻿using Cleipnir.ResilientFunctions.Domain.Exceptions;
+
+namespace Cleipnir.Flows.Sample.Console.Postpone;
 
 public class PostponeFlow : Flow<string>
 {
@@ -7,7 +9,7 @@ public class PostponeFlow : Flow<string>
     public override async Task Run(string orderId)
     {
         if (await _externalService.IsOverloaded())
-            Postpone(delay: TimeSpan.FromMinutes(10));
+            throw new PostponeInvocationException(postponeFor: TimeSpan.FromMinutes(10));
         
         //execute rest of the flow
     }

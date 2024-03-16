@@ -4,7 +4,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Rpc;
 
-public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
+public class OrderFlow : Flow<Order>
 {
     private readonly IPaymentProviderClient _paymentProviderClient;
     private readonly IEmailClient _emailClient;
@@ -34,7 +34,7 @@ public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
 
-    public class OrderScrapbook : RScrapbook
+    public class OrderScrapbook : WorkflowState
     {
     }
 }

@@ -1,21 +1,19 @@
-﻿using Cleipnir.Flows.Reactive;
-using Cleipnir.ResilientFunctions.Domain;
-using Serilog;
+﻿using Serilog;
 using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples.OrderFlow.Messaging;
 
-public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
+public class OrderFlow : Flow<Order>
 {
     private readonly MessageBroker _messageBroker;
     private ILogger Logger { get; } = Log.Logger.ForContext<OrderFlow>();
 
     public OrderFlow(MessageBroker messageBroker) => _messageBroker = messageBroker;
-
+    
     public override async Task Run(Order order)
     {
         Logger.Information($"Processing of order '{order.OrderId}' started");
- 
+        
         /*
          Command types:
          - ReserveFunds
@@ -32,10 +30,5 @@ public class OrderFlow : Flow<Order, OrderFlow.OrderScrapbook>
      
         await Task.CompletedTask;
         Logger.Information($"Processing of order '{order.OrderId}' completed");
-    }
-
-    public class OrderScrapbook : RScrapbook
-    {
-        
     }
 }

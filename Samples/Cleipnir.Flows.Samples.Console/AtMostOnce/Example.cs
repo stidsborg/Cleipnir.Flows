@@ -1,4 +1,4 @@
-﻿using Cleipnir.Flows.Persistence;
+﻿using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.Sample.Console.AtMostOnce;
@@ -11,7 +11,7 @@ public static class Example
         serviceCollection.AddTransient<AtMostOnceFlow>();
 
         var flowsContainer = new FlowsContainer(
-            new InMemoryFlowStore(),
+            new InMemoryFunctionStore(),
             serviceCollection.BuildServiceProvider()
         );
 

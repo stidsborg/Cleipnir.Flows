@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Cleipnir.ResilientFunctions.PostgreSQL" Version="1.0.16" />
+      <PackageReference Include="Cleipnir.ResilientFunctions.PostgreSQL" Version="2.0.1" />
     </ItemGroup>
 
     <ItemGroup>
