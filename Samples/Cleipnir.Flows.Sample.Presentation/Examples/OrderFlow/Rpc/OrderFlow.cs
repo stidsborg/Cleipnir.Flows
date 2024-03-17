@@ -23,14 +23,15 @@ public class OrderFlow : Flow<Order>
     {
         Logger.Information($"Processing of order '{order.OrderId}' started");
 
-        /*
-         Clients:
-         - PaymentProviderClient
-         - LogisticsClient
-         - EmailClient
-         */
+        var transactionId = Guid.NewGuid();
+        await _paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
 
-        await Task.CompletedTask;
+        await _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
+
+        await _paymentProviderClient.Capture(transactionId);
+
+        await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+        
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
 
