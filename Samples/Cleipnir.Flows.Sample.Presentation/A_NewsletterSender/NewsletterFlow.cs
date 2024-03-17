@@ -6,6 +6,12 @@ namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
 
 public class NewsletterFlow : Flow<MailAndRecipients>
 {
+    /*
+     * 1. How do we keep track of how far we have gotten - avoiding resending everything if crashing?
+     * 2. Can we make it more space-efficient?
+     * 3. Can we parallelize execution while still avoiding resending everything if crashing?
+     */
+    
     public override async Task Run(MailAndRecipients mailAndRecipients)
     {
         var (recipients, subject, content) = mailAndRecipients;

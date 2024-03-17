@@ -2,7 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples;
 
-public class ScrapbookFlow : Flow<string>
+public class StateFlow : Flow<string>
 {
     public override async Task Run(string param)
     {

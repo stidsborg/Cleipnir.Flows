@@ -1,4 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.C_LoanApplication;
+﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
+
+namespace Cleipnir.Flows.Sample.Presentation.C_LoanApplication;
 
 public class LoanApplicationFlow : Flow<LoanApplication>
 {
@@ -6,8 +8,11 @@ public class LoanApplicationFlow : Flow<LoanApplication>
     {
         await MessageBroker.Send(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
 
-        await Messages.TimeoutProvider.RegisterTimeout(timeoutId: "Timeout", expiresIn: TimeSpan.FromMinutes(15));
-        
         //replies are of type CreditCheckOutcome
+        
+        var outcomes = await Messages
+            .OfType<CreditCheckOutcome>()
+            .Take(3)
+            .SuspendUntilCompletion();
     }
 }
