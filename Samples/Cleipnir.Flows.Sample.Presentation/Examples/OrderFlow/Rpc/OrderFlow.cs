@@ -34,8 +34,4 @@ public class OrderFlow : Flow<Order>
         
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
-
-    public class OrderScrapbook : WorkflowState
-    {
-    }
 }
