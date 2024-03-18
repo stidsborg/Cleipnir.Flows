@@ -1,6 +1,15 @@
-# Cleipnir Flows
-**"Simply making fault tolerant code simple"**
+[![.NET](https://github.com/stidsborg/Cleipnir.Flows/actions/workflows/dotnet.yml/badge.svg)](https://github.com/stidsborg/Cleipnir.Flows/actions/workflows/dotnet.yml)
+[![NuGet](https://img.shields.io/nuget/dt/Cleipnir.Flows.svg)](https://www.nuget.org/packages/Cleipnir.Flows)
+[![NuGet](https://img.shields.io/nuget/vpre/Cleipnir.Flows.svg)](https://www.nuget.org/packages/Cleipnir.Flows)
 
+<p align="center">
+  <img src="cleipnir.png" alt="logo" width="120px" height="120px"/>
+  <br>
+  <em>Simply making fault tolerant code simple</em>
+  <br>
+</p>
+
+# Cleipnir Flows
 Cleipnir Flows is a simple and intuitive workflow-as-code .NET framework - ensuring your code completes despite: failures, restarts, deployments, versioning etc.
 
 It is similar to Azure Durable Functions - but simpler, less restrictive and tailored for ASP.NET services.
