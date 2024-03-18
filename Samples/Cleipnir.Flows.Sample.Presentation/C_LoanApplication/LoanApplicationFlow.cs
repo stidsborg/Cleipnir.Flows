@@ -13,6 +13,6 @@ public class LoanApplicationFlow : Flow<LoanApplication>
         var outcomes = await Messages
             .OfType<CreditCheckOutcome>()
             .Take(3)
-            .SuspendUntilCompletion();
+            .Completion();
     }
 }
