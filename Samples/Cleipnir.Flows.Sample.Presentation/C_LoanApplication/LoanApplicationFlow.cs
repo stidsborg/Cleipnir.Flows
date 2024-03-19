@@ -14,5 +14,11 @@ public class LoanApplicationFlow : Flow<LoanApplication>
             .OfType<CreditCheckOutcome>()
             .Take(3)
             .Completion();
+
+        CommandAndEvents decision = DateTime.Now.Ticks % 2 == 0
+            ? new LoanApplicationApproved(loanApplication)
+            : new LoanApplicationRejected(loanApplication);
+
+        await MessageBroker.Send(decision);
     }
 }
