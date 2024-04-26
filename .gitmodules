@@ -1,0 +1,3 @@
+[submodule "Cleipnir.ResilientFunctions"]
+	path = Cleipnir.ResilientFunctions
+	url = https://github.com/stidsborg/Cleipnir.ResilientFunctions.git
