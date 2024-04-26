@@ -120,7 +120,7 @@ public class WaitForMessagesFlow : Flow<string>
 {
   public override async Task Run(string param)
   {
-    await EventSource
+    await Messages
       .OfTypes<FundsReserved, InventoryLocked>()
       .Take(2)
       .Completion();
@@ -131,7 +131,7 @@ public class WaitForMessagesFlow : Flow<string>
 ```
 Alternatively, the flow can also be suspended to save resources:
 ```csharp
-await EventSource
+await Messages
   .OfTypes<FundsReserved, InventoryLocked>()
   .Take(2)
   .SuspendUntilCompletion();
@@ -357,16 +357,16 @@ public async Task ProcessOrder(Order order)
   Log.Logger.Information($"ORDER_PROCESSOR: Processing of order '{order.OrderId}' started");  
 
   await _messageBroker.Send(new ReserveFunds(order.OrderId, order.TotalPrice, Scrapbook.TransactionId, order.CustomerId));
-  await EventSource.NextOfType<FundsReserved>();
+  await Messages.NextOfType<FundsReserved>();
             
   await _messageBroker.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
-  await EventSource.NextOfType<ProductsShipped>();
+  await Messages.NextOfType<ProductsShipped>();
             
   await _messageBroker.Send(new CaptureFunds(order.OrderId, order.CustomerId, Scrapbook.TransactionId));
-  await EventSource.NextOfType<FundsCaptured>();
+  await Messages.NextOfType<FundsCaptured>();
 
   await _messageBroker.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId));
-  await EventSource.NextOfType<OrderConfirmationEmailSent>();
+  await Messages.NextOfType<OrderConfirmationEmailSent>();
 
   Log.Logger.ForContext<OrderProcessor>().Information($"Processing of order '{order.OrderId}' completed");      
 }
