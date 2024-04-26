@@ -16,12 +16,12 @@ public class SignupFlow : Flow<string>
                 .SuspendUntilFirstOrNone();
 
             if (emailVerifiedOption.HasValue)
-                return;
-
-            await Effect.Capture($"Reminder_{i}", () => SendReminderMail(customerEmail));
+                break;
 
             if (i == 5)
                 throw new UserSignupFailedException($"User '{customerEmail}' did not activate within threshold");
+            
+            await Effect.Capture($"Reminder_{i}", () => SendReminderMail(customerEmail));
         }
 
         await Effect.Capture("WelcomeMail", () => SendWelcomeMail(customerEmail));
