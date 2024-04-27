@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\SourceGeneration\Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
   </ItemGroup>
 

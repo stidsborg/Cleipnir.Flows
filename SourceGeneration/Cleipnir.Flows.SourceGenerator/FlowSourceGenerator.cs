@@ -66,7 +66,7 @@ namespace Cleipnir.Flows.SourceGenerator
                 var parameterName = runMethod.Parameters.Single().Name;
 
                 foundFlows.Add(GetFullyQualifiedName(flowType));
-                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType));
+                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol: null));
             }
 
             AddSourceGenerationOutput(context, $"Found flows: {string.Join(", ", foundFlows)}");
@@ -161,11 +161,6 @@ namespace Cleipnir.Flows.SourceGenerator
         private string CamelCase(string str)
         {
             return char.ToLower(str[0]) + str.Substring(1);
-        }
-
-        private string Spaces(int count)
-        {
-            return new string(' ', count);
         }
 
         private class TypeSyntaxReceiver : ISyntaxReceiver

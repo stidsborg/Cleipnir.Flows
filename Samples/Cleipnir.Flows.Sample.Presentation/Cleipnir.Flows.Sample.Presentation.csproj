@@ -8,11 +8,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Cleipnir.Flows.PostgresSql\Cleipnir.Flows.PostgresSql.csproj" />
-      <ProjectReference Include="..\..\Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\..\SourceGeneration\Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="MailKit" Version="4.5.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     </ItemGroup>
 </Project>

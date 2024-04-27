@@ -8,13 +8,15 @@ namespace Cleipnir.Flows.SourceGenerator
         public ITypeSymbol ParamTypeSymbol { get; }
         public string ParameterName { get; }
         public ITypeSymbol ResultTypeSymbol { get; }
+        public ITypeSymbol StateTypeSymbol { get; }
 
-        public FlowInformation(INamedTypeSymbol flowType, ITypeSymbol paramType, string parameterName, ITypeSymbol resultType)
+        public FlowInformation(INamedTypeSymbol flowType, ITypeSymbol paramType, string parameterName, ITypeSymbol resultType, ITypeSymbol stateTypeSymbol)
         {
             FlowTypeSymbol = flowType;
             ParamTypeSymbol = paramType;
             ParameterName = parameterName;  
             ResultTypeSymbol = resultType;
+            StateTypeSymbol = stateTypeSymbol;
         }
     }
 }
