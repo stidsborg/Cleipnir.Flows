@@ -13,7 +13,7 @@ public class NewsletterFlow : Flow<MailAndRecipients>
         using var client = new SmtpClient();
         await client.ConnectAsync("mail.smtpbucket.com", 8025);
 
-        var state = await Effect.CreateOrGet<State>(nameof(State));
+        var state = Workflow.States.CreateOrGet<State>();
         
         for (var atRecipient = state.AtRecipient; atRecipient < mailAndRecipients.Recipients.Count; atRecipient++)
         {

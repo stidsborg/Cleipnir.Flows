@@ -51,7 +51,7 @@ public class Flows<TFlow, TParam>
         );
     }
 
-    public async Task<ControlPanel<TParam, WorkflowState, Unit>?> ControlPanel(string instanceId)
+    public async Task<ControlPanel<TParam, Unit>?> ControlPanel(string instanceId)
     {
         var controlPanel = await _registration.ControlPanel(instanceId);
         return controlPanel;
@@ -141,7 +141,7 @@ public class Flows<TFlow, TParam, TResult>
         );
     }
 
-    public Task<ControlPanel<TParam, WorkflowState, TResult>?> ControlPanel(string instanceId) 
+    public Task<ControlPanel<TParam, TResult>?> ControlPanel(string instanceId) 
         => _registration.ControlPanel(instanceId);
 
     public MessageWriter MessageWriter(string instanceId) 

@@ -6,7 +6,7 @@ public class StateFlow : Flow<string>
 {
     public override async Task Run(string param)
     {
-        var state = await Effect.CreateOrGet<State>("State");
+        var state = Workflow.States.CreateOrGet<State>();
         if (state.Started == null)
         {
             state.Started = DateTime.Now;
