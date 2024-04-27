@@ -55,7 +55,9 @@ internal static class Program
     private static IEnumerable<string> FindAllProjects(string path)
     {
         var currPathProjects = Directory.GetFiles(path, "*.csproj");
-        var subFolders = Directory.GetDirectories(path);
+        var subFolders = Directory
+            .GetDirectories(path)
+            .Where(d => !d.Contains("Cleipnir.ResilientFunctions"));
         return currPathProjects.Concat(subFolders.SelectMany(FindAllProjects)).ToList();
     }
 
