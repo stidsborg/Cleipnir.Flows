@@ -9,7 +9,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         var root = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/RiderProjects/Cleipnir.Flows";
-        var output = Path.GetFullPath(@"./nugets");
+        var output = Path.GetFullPath("./nugets");
 
         if (Directory.Exists(output))
             Directory.Delete(output, recursive: true);
@@ -30,7 +30,7 @@ internal static class Program
         }
 
         //compile & publish source generator
-        PublishSourceGenerator(@$"{root}/Cleipnir.Flows.SourceGenerator", output);
+        PublishSourceGenerator($"{root}/SourceGeneration/Cleipnir.Flows.SourceGenerator", output);
         
         //pack
         foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
@@ -46,7 +46,7 @@ internal static class Program
             .Single(nugetPackage => Regex.IsMatch(nugetPackage, @"Cleipnir.Flows.\d*.\d*.\d*.nupkg"));
         AddSourceGeneratorToNugetPackage(
             coreProjectNugetPackage,
-            @$"{output}/Cleipnir.Flows.SourceGenerator.dll"
+            $"{output}/Cleipnir.Flows.SourceGenerator.dll"
         );
 
         return 0;
@@ -91,7 +91,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName =  @"/usr/bin/dotnet";
+        p.StartInfo.FileName =  "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = projectPath;
         p.StartInfo.Arguments = $"dotnet pack -c Release /p:ContinuousIntegrationBuild=true -o {outputPath}";
         p.Start();
@@ -110,7 +110,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = @"/usr/bin/dotnet";
+        p.StartInfo.FileName = "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = sourceGeneratorProjectPath;
         p.StartInfo.Arguments = $"dotnet publish -c Release -o {outputPath}";
         p.Start();
@@ -135,6 +135,6 @@ internal static class Program
         using var zipArchive = ZipFile.Open(nugetPath, ZipArchiveMode.Update);
 
         var fileInfo = new FileInfo(sourceGeneratorDllPath);
-        zipArchive.CreateEntryFromFile(sourceGeneratorDllPath, @$"analyzers/dotnet/cs/{fileInfo.Name}");
+        zipArchive.CreateEntryFromFile(sourceGeneratorDllPath, $"analyzers/dotnet/cs/{fileInfo.Name}");
     }
 }
