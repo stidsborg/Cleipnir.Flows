@@ -16,6 +16,6 @@ public class LogisticsServiceStub
             return;
 
         await Task.Delay(1_000);
-        await _messageBroker.Send(new ProductsShipped(command.OrderId));
+        await _messageBroker.Send(new ProductsShipped(command.OrderId, TrackAndTrace: Guid.NewGuid().ToString()));
     }
 }

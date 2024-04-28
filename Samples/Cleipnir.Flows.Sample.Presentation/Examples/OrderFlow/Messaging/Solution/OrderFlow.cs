@@ -1,4 +1,5 @@
-﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
+﻿using Cleipnir.ResilientFunctions.Helpers;
+using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -18,24 +19,14 @@ public class OrderFlow(MessageBroker messageBroker) : Flow<Order>
         await Messages.FirstOfType<FundsReserved>();
 
         await messageBroker.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
-
-        await Messages.FirstOfType<ProductsShipped>();
+        var trackAndTrace = await Messages.FirstOfType<ProductsShipped>().SelectAsync(msg => msg.TrackAndTrace);
         
         await messageBroker.Send(new CaptureFunds(order.OrderId, order.CustomerId, transactionId));
         await Messages.FirstOfType<FundsCaptured>();
 
-        await messageBroker.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId));
+        await messageBroker.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, trackAndTrace));
         await Messages.FirstOfType<OrderConfirmationEmailSent>();
 
         Logger.Information($"Processing of order '{order.OrderId}' completed");
     }
-    
-    /*
-       var either = await Messages.OfTypes<ProductsShipped, ProductsShipmentFailed>().First();
-       if (either.HasSecond)
-       {
-           await _messageBroker.Send(new CancelFundsReservation(order.OrderId, transactionId));
-           return;
-       }
-     */
 }
