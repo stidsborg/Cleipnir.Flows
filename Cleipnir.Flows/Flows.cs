@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
@@ -20,11 +21,14 @@ public class Flows<TFlow, TParam>
 
     private readonly Next<TFlow, TParam, Unit> _next;
     private readonly Action<TFlow, Workflow> _workflowSetter;
+    private readonly Action<TFlow, States> _stateSetter; 
     
     public Flows(string flowName, FlowsContainer flowsContainer)
     {
         _flowsContainer = flowsContainer;
         _workflowSetter = CreateWorkflowSetter();
+        _stateSetter = CreateStateSetter();
+        
         _next = CreateCallChain(flowsContainer.ServiceProvider);
         
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, Unit>(
@@ -43,6 +47,7 @@ public class Flows<TFlow, TParam>
 
                 var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
                 _workflowSetter(flow, workflow);
+                _stateSetter(flow, workflow.States);
                                 
                 await flow.Run(param);
                 
@@ -56,6 +61,9 @@ public class Flows<TFlow, TParam>
         var controlPanel = await _registration.ControlPanel(instanceId);
         return controlPanel;
     }
+    
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+        => _registration.GetState<TState>(functionInstanceId);
     
     public MessageWriter MessageWriter(string instanceId) 
         => _registration.MessageWriters.For(instanceId);
@@ -79,6 +87,32 @@ public class Flows<TFlow, TParam>
     
     private async Task<Result<Unit>> PrepareAndRunFlow(TParam param, Workflow workflow) 
         => await _next(param, workflow);
+    
+    private Action<TFlow, States> CreateStateSetter()
+    {
+        var iHaveStateType = typeof(TFlow)
+            .GetInterfaces()
+            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHaveState<>));
+
+        if (iHaveStateType == null)
+            return (_, _) => { };
+
+        var stateType = iHaveStateType.GenericTypeArguments[0];
+        
+        //fetch state
+        var methodInfo = typeof(States)
+            .GetMethods()
+            .Single(m => m.Name == nameof(States.CreateOrGet) && !m.GetParameters().Any());
+
+        var genericMethodInfo = methodInfo.MakeGenericMethod(stateType);
+        var statePropertyInfo = iHaveStateType.GetProperty("State");
+        
+        return (flow, states) =>
+        {
+            var state = genericMethodInfo.Invoke(states, parameters: null);
+            statePropertyInfo!.SetValue(flow, state);
+        };
+    }
     
     private Action<TFlow, Workflow> CreateWorkflowSetter()
     {
@@ -111,11 +145,13 @@ public class Flows<TFlow, TParam, TResult>
     private readonly Next<TFlow, TParam, TResult> _next;
     
     private readonly Action<TFlow, Workflow> _workflowSetter;
+    private readonly Action<TFlow, States> _stateSetter; 
     
     public Flows(string flowName, FlowsContainer flowsContainer)
     {
         _flowsContainer = flowsContainer;
         _workflowSetter = CreateWorkflowSetter();
+        _stateSetter = CreateStateSetter();
         _next = CreateCallChain(flowsContainer.ServiceProvider);
         
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
@@ -134,6 +170,7 @@ public class Flows<TFlow, TParam, TResult>
 
                 var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
                 _workflowSetter(flow, workflow);
+                _stateSetter(flow, workflow.States);
                 
                 var result = await flow.Run(param);
                 return result;
@@ -163,6 +200,9 @@ public class Flows<TFlow, TParam, TResult>
         TParam param,
         TimeSpan delay
     ) => _registration.ScheduleIn(functionInstanceId, param, delay);
+
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+        => _registration.GetState<TState>(functionInstanceId);
     
     private async Task<Result<TResult>> PrepareAndRunFlow(TParam param, Workflow workflow) 
         => await _next(param, workflow);
@@ -185,5 +225,31 @@ public class Flows<TFlow, TParam, TResult>
         // Compile and invoke the lambda expression
         var setter = lambdaExpr.Compile();
         return setter;
+    }
+    
+    private Action<TFlow, States> CreateStateSetter()
+    {
+        var iHaveStateType = typeof(TFlow)
+            .GetInterfaces()
+            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHaveState<>));
+
+        if (iHaveStateType == null)
+            return (_, _) => { };
+
+        var stateType = iHaveStateType.GenericTypeArguments[0];
+        
+        //fetch state
+        var methodInfo = typeof(States)
+            .GetMethods()
+            .Single(m => m.Name == nameof(States.CreateOrGet) && !m.GetParameters().Any());
+
+        var genericMethodInfo = methodInfo.MakeGenericMethod(stateType);
+        var statePropertyInfo = iHaveStateType.GetProperty("State");
+        
+        return (flow, states) =>
+        {
+            var state = genericMethodInfo.Invoke(states, parameters: null);
+            statePropertyInfo!.SetValue(flow, state);
+        };
     }
 }

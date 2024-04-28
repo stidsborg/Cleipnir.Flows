@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -12,6 +13,7 @@ namespace Cleipnir.Flows.SourceGenerator
     {
         private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
+        private const string IHaveStateType = "Cleipnir.Flows.IHaveState`1";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -41,6 +43,14 @@ namespace Cleipnir.Flows.SourceGenerator
                 AddSourceGenerationOutput(context, "unable to locate abstract flow");
                 return;
             }
+            
+            var iHaveStateType = context.Compilation.GetTypeByMetadataName(IHaveStateType);
+            if (iHaveStateType == null)
+            {
+                AddSourceGenerationOutput(context, "unable to locate IHaveState type");
+                return;
+            }
+            iHaveStateType = iHaveStateType.ConstructUnboundGenericType();
 
             var implementationTypes = new List<FlowInformation>();
             var foundFlows = new List<string>();
@@ -65,11 +75,19 @@ namespace Cleipnir.Flows.SourceGenerator
                     .Single(m => m.Name == "Run" && m.IsOverride);
                 var parameterName = runMethod.Parameters.Single().Name;
 
-                foundFlows.Add(GetFullyQualifiedName(flowType));
-                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol: null));
-            }
+                ITypeSymbol stateTypeSymbol = null;
+                foreach (var implementedInterface in flowType.AllInterfaces)
+                    if (implementedInterface.IsGenericType &&
+                        SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), iHaveStateType)) 
+                    {
+                        stateTypeSymbol = implementedInterface.TypeArguments[0];
+                        break;
+                    }
 
-            AddSourceGenerationOutput(context, $"Found flows: {string.Join(", ", foundFlows)}");
+                foundFlows.Add(GetFullyQualifiedName(flowType));
+                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol));
+            }
+            
             GenerateCode(context, implementationTypes);
         }
 
@@ -96,8 +114,7 @@ namespace Cleipnir.Flows.SourceGenerator
 
         private static string GetNamespace(ITypeSymbol typeSymbol)
         {
-            var split = GetFullyQualifiedName(typeSymbol).Split('.');
-            return string.Join(".", split, startIndex: 0, split.Length - 1);
+            return typeSymbol.ContainingNamespace.ToString();
         }
 
         private void GenerateCode(GeneratorExecutionContext context, List<FlowInformation> flowInformations)
@@ -118,32 +135,50 @@ namespace Cleipnir.Flows.SourceGenerator
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
-
+            var stateType = flowInformation.StateTypeSymbol == null
+                ? null
+                : GetFullyQualifiedName(flowInformation.StateTypeSymbol);
+            
             string generatedCode;
             if (resultType == null)
             {
-                generatedCode = @"namespace " + flowsNamespace + @"
-{
+                generatedCode = 
+$@"namespace {flowsNamespace}
+{{
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + @">
-    {
-        public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: " + $@"""{flowName}""" + @", flowsContainer) { }
-    }
-}";
+    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}>
+    {{
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
+            : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
+    }}
+}}";
             }
             else
             {
-                generatedCode = @"namespace " + flowsNamespace + @"
-{
+                generatedCode = 
+$@"namespace {flowsNamespace}
+{{
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class " + flowsName + " : Cleipnir.Flows.Flows<" + flowType + ", " + paramType + ", " + resultType + @">
-    {
-        public " + flowsName + @"(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: " + $@"""{flowName}"""+ @", flowsContainer) { }
-    }
-}";
+    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}, {resultType}>
+    {{
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
+            : base(flowName: ""{flowName}"", flowsContainer) {{ }}
+    }}
+}}";
             }
+
+            if (flowInformation.StateTypeSymbol != null)
+            {   
+                var getStateStr = $@"
+
+        #nullable enable
+        public Task<{stateType}?> GetState(string functionInstanceId) 
+            => GetState<{stateType}>(functionInstanceId);
+        #nullable disable";
+                var constructorEndPosition = generatedCode.IndexOf("{ }", StringComparison.Ordinal);
+                generatedCode = generatedCode.Insert(constructorEndPosition + 3, getStateStr);
+            }
+            
             
             // Add the generated code to the compilation
             var fileName =
@@ -176,18 +211,18 @@ namespace Cleipnir.Flows.SourceGenerator
 
         private void AddSourceGenerationOutput(GeneratorExecutionContext context, string output)
         {
-            string source = 
-$@"using System;
+            var descriptor = new DiagnosticDescriptor(
+                id: "CLEIPNIR",
+                title: "Source Generator Error",
+                messageFormat: "{0}",
+                category: "Design",
+                defaultSeverity: DiagnosticSeverity.Warning,
+                isEnabledByDefault: true
+            );
 
-namespace Cleipnir.Flows
-{{
-    public static class SourceGenerationOutput
-    {{
-        public const string Output = ""{output}"";
-    }}
-}}
-";
-            context.AddSource($"SourceGenerationOutput.g.cs", source);
+            context.ReportDiagnostic(
+                Diagnostic.Create(descriptor, Location.None, output)
+            );
         }
     }
 }

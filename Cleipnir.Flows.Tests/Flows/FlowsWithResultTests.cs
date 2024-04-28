@@ -13,7 +13,7 @@ public class FlowsWithResultTests
     public async Task SimpleFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<SimpleFlow>();
+        serviceCollection.AddTransient<SimpleFuncFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -21,12 +21,12 @@ public class FlowsWithResultTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleFlow, string, int>(nameof(SimpleFlow));
+        var flows = flowsContainer.CreateFlows<SimpleFuncFlow, string, int>(nameof(SimpleFuncFlow));
         var result = await flows.Run("someInstanceId", "someParameter");
         result.ShouldBe(1);
         
-        SimpleFlow.InstanceId.ShouldBe("someInstanceId");
-        SimpleFlow.ExecutedWithParameter.ShouldBe("someParameter");
+        SimpleFuncFlow.InstanceId.ShouldBe("someInstanceId");
+        SimpleFuncFlow.ExecutedWithParameter.ShouldBe("someParameter");
 
         var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
         controlPanel.ShouldNotBeNull();
@@ -34,7 +34,7 @@ public class FlowsWithResultTests
         controlPanel.Result.ShouldBe(1);
     }
 
-    private class SimpleFlow : Flow<string, int>
+    public class SimpleFuncFlow : Flow<string, int>
     {
         public static string? ExecutedWithParameter { get; set; }
         public static string? InstanceId { get; set; } 
@@ -53,7 +53,7 @@ public class FlowsWithResultTests
     public async Task EventDrivenFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<MessageDrivenFlow>();
+        serviceCollection.AddTransient<MessageDrivenFuncFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -61,7 +61,7 @@ public class FlowsWithResultTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<MessageDrivenFlow, string, int>(nameof(MessageDrivenFlow));
+        var flows = flowsContainer.CreateFlows<MessageDrivenFuncFlow, string, int>(nameof(MessageDrivenFuncFlow));
 
         await flows.Schedule("someInstanceId", "someParameter");
 
@@ -81,7 +81,7 @@ public class FlowsWithResultTests
         controlPanel.Result.ShouldBe(2);
     }
     
-    private class MessageDrivenFlow : Flow<string, int>
+    public class MessageDrivenFuncFlow : Flow<string, int>
     {
         public override async Task<int> Run(string param)
         {

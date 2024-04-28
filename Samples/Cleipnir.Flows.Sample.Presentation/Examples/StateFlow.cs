@@ -2,21 +2,23 @@
 
 namespace Cleipnir.Flows.Sample.Presentation.Examples;
 
-public class StateFlow : Flow<string>
+public class StateFlow : Flow<string, string>, IHaveState<StateFlow.FlowState>
 {
-    public override async Task Run(string param)
+    public required FlowState State { get; init; }
+    
+    public override async Task<string> Run(string param)
     {
-        var state = Workflow.States.CreateOrGet<State>();
-        if (state.Started == null)
+        if (State.Started == null)
         {
-            state.Started = DateTime.Now;
-            await state.Save();
+            State.Started = DateTime.Now;
+            await State.Save();
         }
 
-        Console.WriteLine("Flow was initially started: " + state.Started);
+        Console.WriteLine("Flow was initially started: " + State.Started);
+        return param;
     }
 
-    public class State : WorkflowState
+    public class FlowState : WorkflowState
     {
         public DateTime? Started { get; set; }
     }

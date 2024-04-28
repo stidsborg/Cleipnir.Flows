@@ -13,7 +13,7 @@ public class UnitFlowsTests
     public async Task SimpleFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<SimpleFlow>();
+        serviceCollection.AddTransient<SimpleUnitFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -21,18 +21,18 @@ public class UnitFlowsTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleFlow, string>(nameof(SimpleFlow));
+        var flows = flowsContainer.CreateFlows<SimpleUnitFlow, string>(nameof(SimpleUnitFlow));
         await flows.Run("someInstanceId", "someParameter");
         
-        SimpleFlow.InstanceId.ShouldBe("someInstanceId");
-        SimpleFlow.ExecutedWithParameter.ShouldBe("someParameter");
+        SimpleUnitFlow.InstanceId.ShouldBe("someInstanceId");
+        SimpleUnitFlow.ExecutedWithParameter.ShouldBe("someParameter");
 
         var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
-    private class SimpleFlow : Flow<string>
+    public class SimpleUnitFlow : Flow<string>
     {
         public static string? ExecutedWithParameter { get; set; }
         public static string? InstanceId { get; set; } 
@@ -49,7 +49,7 @@ public class UnitFlowsTests
     public async Task EventDrivenFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<EventDrivenFlow>();
+        serviceCollection.AddTransient<EventDrivenUnitFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -57,7 +57,7 @@ public class UnitFlowsTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<EventDrivenFlow, string>(nameof(EventDrivenFlow));
+        var flows = flowsContainer.CreateFlows<EventDrivenUnitFlow, string>(nameof(EventDrivenUnitFlow));
 
         await flows.Schedule("someInstanceId", "someParameter");
 
@@ -76,7 +76,7 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    private class EventDrivenFlow : Flow<string>
+    public class EventDrivenUnitFlow : Flow<string>
     {
         public override async Task Run(string param)
         {

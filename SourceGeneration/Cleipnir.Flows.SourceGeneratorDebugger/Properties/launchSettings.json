@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "ExecuteConsole": {
+      "commandName": "Project",
+      "dotnetRunMessages": true
+    },
+    "Generators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "./Cleipnir.Flows.SourceGeneratorDebugger.csproj"
+    }
+  }
+}
