@@ -36,15 +36,15 @@ public class FlowsContainer : IDisposable
                 );
         }
              
-        FunctionRegistry = new FunctionsRegistry(flowStore, options?.MapToRFunctionsSettings());
-        Middlewares = options?.Middlewares
+        FunctionRegistry = new FunctionsRegistry(flowStore, options.MapToRFunctionsSettings());
+        Middlewares = options.Middlewares
             .Select(m => m switch
             {
                 MiddlewareInstance middlewareInstance => middlewareInstance.Middleware,
                 MiddlewareType middlewareType => (IMiddleware)serviceProvider.GetRequiredService(middlewareType.Type),
                 _ => throw new ArgumentOutOfRangeException(nameof(m))
             })
-            .ToList() ?? new List<IMiddleware>();
+            .ToList();
     }
 
     public Flows<TFlow, TParam> CreateFlows<TFlow, TParam>(string flowName)
