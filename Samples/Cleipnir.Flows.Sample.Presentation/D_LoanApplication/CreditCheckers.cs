@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.E_LoanApplication;
+﻿namespace Cleipnir.Flows.Sample.Presentation.D_LoanApplication;
 
 public static class CreditChecker1
 {

@@ -1,4 +1,4 @@
-namespace Cleipnir.Flows.Sample.Presentation.D_CustomerSignup;
+namespace Cleipnir.Flows.Sample.Presentation.E_CustomerSignup;
 
 public class SignupFlow : Flow<string>
 {
@@ -7,15 +7,16 @@ public class SignupFlow : Flow<string>
         // Flow:
         // 1. send activation mail
         // 2. wait for EmailVerified event or send reminder mail after 1 day
-        //    * send a maximum of 5 reminders before failing flow 
+        //    * send a maximum of 3 reminders before failing flow 
         // 3. finally send welcome mail or fail
         
         await SendActivationMail(customerEmail);
         
-        for (var i = 0; i <= 5; i++)
+        for (var i = 0; i <= 3; i++)
         {
             await SendReminderMail(customerEmail);
-            if (i == 5)
+            
+            if (i == 3)
                 throw new UserSignupFailedException($"User '{customerEmail}' did not activate within threshold");
         }
         

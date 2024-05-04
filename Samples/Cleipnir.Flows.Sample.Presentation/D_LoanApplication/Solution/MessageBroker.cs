@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.E_LoanApplication.Solution;
+﻿namespace Cleipnir.Flows.Sample.Presentation.D_LoanApplication.Solution;
 
 public static class MessageBroker
 {

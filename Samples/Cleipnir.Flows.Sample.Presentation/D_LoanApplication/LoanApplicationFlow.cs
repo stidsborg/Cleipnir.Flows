@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Presentation.E_LoanApplication;
+namespace Cleipnir.Flows.Sample.Presentation.D_LoanApplication;
 
 public class LoanApplicationFlow : Flow<LoanApplication>
 {

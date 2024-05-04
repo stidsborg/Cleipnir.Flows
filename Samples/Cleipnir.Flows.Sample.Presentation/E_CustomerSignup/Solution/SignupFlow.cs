@@ -1,24 +1,24 @@
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Presentation.D_CustomerSignup.Solution;
+namespace Cleipnir.Flows.Sample.Presentation.E_CustomerSignup.Solution;
 
 public class SignupFlow : Flow<string>
 {
     public override async Task Run(string customerEmail)
     {
         await Effect.Capture("ActivationMail", () => SendActivationMail(customerEmail));
-
-        for (var i = 0; i <= 5; i++)
+        
+        for (var i = 0; i <= 3; i++)
         {
             var emailVerifiedOption = await Messages
                 .OfType<EmailVerified>()
-                .TakeUntilTimeout($"Timeout_{i}", TimeSpan.FromDays(1))
+                .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromDays(1))
                 .SuspendUntilFirstOrNone();
 
             if (emailVerifiedOption.HasValue)
                 break;
 
-            if (i == 5)
+            if (i == 3)
                 throw new UserSignupFailedException($"User '{customerEmail}' did not activate email within threshold");
             
             await Effect.Capture($"Reminder_{i}", () => SendReminderMail(customerEmail));
