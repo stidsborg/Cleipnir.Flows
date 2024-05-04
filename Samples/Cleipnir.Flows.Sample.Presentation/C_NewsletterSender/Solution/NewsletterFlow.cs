@@ -3,7 +3,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 
-namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender.Solution;
+namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender.Solution;
 
 public class NewsletterFlow : Flow<MailAndRecipients>, IHaveState<NewsletterFlow.FlowState>
 {

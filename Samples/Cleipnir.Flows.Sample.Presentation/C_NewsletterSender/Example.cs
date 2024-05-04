@@ -1,7 +1,6 @@
-﻿using Cleipnir.Flows.PostgresSql;
-using Cleipnir.ResilientFunctions.PostgreSQL;
+﻿using Cleipnir.ResilientFunctions.PostgreSQL;
 
-namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
+namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender;
 
 public static class Example
 {

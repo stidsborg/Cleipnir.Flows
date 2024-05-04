@@ -1,6 +1,6 @@
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Presentation.B_CustomerSignup.Solution;
+namespace Cleipnir.Flows.Sample.Presentation.D_CustomerSignup.Solution;
 
 public class SignupFlow : Flow<string>
 {

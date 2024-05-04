@@ -1,4 +1,4 @@
-namespace Cleipnir.Flows.Sample.Presentation.B_CustomerSignup;
+namespace Cleipnir.Flows.Sample.Presentation.D_CustomerSignup;
 
 public class SignupFlow : Flow<string>
 {

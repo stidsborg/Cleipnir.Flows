@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Helpers;
 
-namespace Cleipnir.Flows.Sample.Presentation.B_BankTransfer;
+namespace Cleipnir.Flows.Sample.Presentation.Z_BankTransfer;
 
 public interface IBankCentralClient
 {

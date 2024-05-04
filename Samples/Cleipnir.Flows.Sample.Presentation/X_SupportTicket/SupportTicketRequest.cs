@@ -1,3 +1,3 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket;
+﻿namespace Cleipnir.Flows.Sample.Presentation.X_SupportTicket;
 
 public record SupportTicketRequest(Guid SupportTicketId, string[] CustomerSupportAgents);

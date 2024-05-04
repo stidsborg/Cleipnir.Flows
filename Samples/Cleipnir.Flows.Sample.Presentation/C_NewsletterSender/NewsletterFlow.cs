@@ -2,7 +2,7 @@
 using MimeKit;
 using MimeKit.Text;
 
-namespace Cleipnir.Flows.Sample.Presentation.A_NewsletterSender;
+namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender;
 
 public class NewsletterFlow : Flow<MailAndRecipients>
 {

@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Presentation.D_SupportTicket.Solution;
+namespace Cleipnir.Flows.Sample.Presentation.X_SupportTicket.Solution;
 
 public class SupportTicketFlow : Flow<SupportTicketRequest>
 {
