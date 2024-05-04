@@ -6,7 +6,7 @@ public static class Example
 {
     public static async Task Execute()
     {
-        var messageBroker = new MessageBroker();
+        var messageBroker = new Bus();
         var emailService = new EmailServiceStub(messageBroker);
         var logisticsService = new LogisticsServiceStub(messageBroker);
         var paymentProviderService = new PaymentProviderStub(messageBroker);
