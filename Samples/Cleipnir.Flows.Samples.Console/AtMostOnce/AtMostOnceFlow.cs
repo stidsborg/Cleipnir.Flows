@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Domain;
 
-namespace Cleipnir.Flows.Sample.Console.AtMostOnce;
+namespace Cleipnir.Flows.Sample.ConsoleApp.AtMostOnce;
 
 public class AtMostOnceFlow : Flow<string>
 {

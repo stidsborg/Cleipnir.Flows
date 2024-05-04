@@ -11,6 +11,8 @@ internal static class Program
             .Enrich.FromLogContext()
             .CreateLogger();
 
-        await Examples.OrderFlow.Rpc.Example.Do();
+        await Task.CompletedTask;
+        
+        Console.ReadLine();
     }
 }

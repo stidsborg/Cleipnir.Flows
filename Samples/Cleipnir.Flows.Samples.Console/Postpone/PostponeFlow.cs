@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Domain.Exceptions;
 
-namespace Cleipnir.Flows.Sample.Console.Postpone;
+namespace Cleipnir.Flows.Sample.ConsoleApp.Postpone;
 
 public class PostponeFlow : Flow<string>
 {

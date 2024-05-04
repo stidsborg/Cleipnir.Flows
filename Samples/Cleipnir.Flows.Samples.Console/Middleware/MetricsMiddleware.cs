@@ -3,7 +3,7 @@ using Cleipnir.ResilientFunctions.CoreRuntime.Invocation;
 using Cleipnir.ResilientFunctions.Domain;
 using IMiddleware = Cleipnir.Flows.CrossCutting.IMiddleware;
 
-namespace Cleipnir.Flows.Sample.Console.Middleware;
+namespace Cleipnir.Flows.Sample.ConsoleApp.Middleware;
 
 public class MetricsMiddleware : IMiddleware
 {

@@ -1,7 +1,7 @@
 ﻿using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cleipnir.Flows.Sample.Console.WaitForMessages;
+namespace Cleipnir.Flows.Sample.ConsoleApp.WaitForMessages;
 
 public static class Example
 {

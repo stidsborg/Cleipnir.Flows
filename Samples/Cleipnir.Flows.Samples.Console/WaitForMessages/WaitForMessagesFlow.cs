@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Console.WaitForMessages;
+namespace Cleipnir.Flows.Sample.ConsoleApp.WaitForMessages;
 
 public class WaitForMessagesFlow : Flow<string>
 {

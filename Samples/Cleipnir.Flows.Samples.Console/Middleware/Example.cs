@@ -1,7 +1,7 @@
 ﻿using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cleipnir.Flows.Sample.Console.Middleware;
+namespace Cleipnir.Flows.Sample.ConsoleApp.Middleware;
 
 public static class Example
 {

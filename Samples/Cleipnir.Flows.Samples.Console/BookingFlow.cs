@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Console;
+﻿namespace Cleipnir.Flows.Sample.ConsoleApp;
 
 public class BookingFlow : Flow<string, string>
 {

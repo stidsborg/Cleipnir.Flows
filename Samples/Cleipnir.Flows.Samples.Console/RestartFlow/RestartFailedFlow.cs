@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Console.RestartFlow;
+﻿namespace Cleipnir.Flows.Sample.ConsoleApp.RestartFlow;
 
 public class RestartFailedFlow : Flow<string>
 {

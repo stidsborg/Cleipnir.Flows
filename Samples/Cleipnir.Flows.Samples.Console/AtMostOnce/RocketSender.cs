@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Console.AtMostOnce;
+﻿namespace Cleipnir.Flows.Sample.ConsoleApp.AtMostOnce;
 
 public class RocketSender
 {

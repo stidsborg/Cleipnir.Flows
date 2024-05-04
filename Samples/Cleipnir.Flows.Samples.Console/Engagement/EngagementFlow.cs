@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
-namespace Cleipnir.Flows.Sample.Console.Engagement;
+namespace Cleipnir.Flows.Sample.ConsoleApp.Engagement;
 
 public class EngagementFlow : Flow<string> 
 {

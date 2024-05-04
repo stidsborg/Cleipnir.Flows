@@ -1,6 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Domain.Exceptions;
 
-namespace Cleipnir.Flows.Sample.Console.Middleware;
+namespace Cleipnir.Flows.Sample.ConsoleApp.Middleware;
 
 public class MiddlewareFlow : Flow<string>
 {
