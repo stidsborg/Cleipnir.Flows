@@ -4,6 +4,11 @@ namespace Cleipnir.Flows.Sample.Presentation.B_OrderFlow_Messaging;
 
 public class OrderFlow : Flow<Order>
 {
+    /*
+     * 1. In-memory execution
+     * 2. Suspend execution while waiting for messages
+     */
+    
     private Bus Bus { get; }
 
     public OrderFlow(Bus bus) => Bus = bus;
