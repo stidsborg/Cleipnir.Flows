@@ -1,0 +1,9 @@
+# Update the submodule to the latest commit:
+git submodule update --remote
+
+# Commit latest commit to git repo
+git add Cleipnir.ResilientFunctions
+git commit -m "Updated Cleipnir.ResilientFunctions to the latest commit"
+
+# Push to origin
+git push
