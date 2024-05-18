@@ -24,12 +24,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
+        <ProjectReference Include="../../Cleipnir.ResilientFunctions/Stores/MySQL/Cleipnir.ResilientFunctions.MySQL/Cleipnir.ResilientFunctions.MySQL.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Cleipnir.ResilientFunctions.MySQL" Version="2.0.2" />
-    </ItemGroup>
-
+    
     <ItemGroup>
         <None Include="..\cleipnir.png">
             <Pack>True</Pack>
