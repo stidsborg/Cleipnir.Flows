@@ -47,21 +47,17 @@ public class FlowsContainer : IDisposable
             .ToList();
     }
 
+    public Flows<TFlow> CreateFlows<TFlow>(string flowName)
+        where TFlow : Flow => new(flowName, flowsContainer: this);
+    
     public Flows<TFlow, TParam> CreateFlows<TFlow, TParam>(string flowName)
-        where TFlow : Flow<TParam>
-        where TParam : notnull
-    {
-        var flowRegistration = new Flows<TFlow, TParam>(flowName, flowsContainer: this);
-        return flowRegistration;
-    }
+        where TFlow : Flow<TParam> 
+        where TParam : notnull => new(flowName, flowsContainer: this);
     
     public Flows<TFlow, TParam, TResult> CreateFlows<TFlow, TParam, TResult>(string flowName)
         where TFlow : Flow<TParam, TResult>
-        where TParam : notnull
-    {
-        var flowRegistration = new Flows<TFlow, TParam, TResult>(flowName, flowsContainer: this);
-        return flowRegistration;
-    }
+        where TParam : notnull => new(flowName, flowsContainer: this);
+    
 
     public void Dispose() => FunctionRegistry.Dispose();
 

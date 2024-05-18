@@ -83,4 +83,47 @@ public class UnitFlowsTests
             await Messages.FirstOfType<int>();
         }
     }
+    
+    [TestMethod]
+    public async Task FailingFlowCompletesWithError()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<FailingUnitFlow>();
+
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider()
+        );
+
+        var flows = flowsContainer.CreateFlows<FailingUnitFlow, string>(nameof(FailingUnitFlow));
+
+        FailingUnitFlow.ShouldThrow = true;
+        
+        await Should.ThrowAsync<TimeoutException>(() =>
+            flows.Run("someInstanceId", "someParameter")
+        );
+        
+        var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Failed);
+
+        FailingUnitFlow.ShouldThrow = false;
+        await controlPanel.ReInvoke();
+
+        await controlPanel.Refresh();
+        controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+    
+    public class FailingUnitFlow : Flow<string>
+    {
+        public static bool ShouldThrow = true;
+        
+        public override Task Run(string param)
+        {
+            return ShouldThrow 
+                ? Task.FromException<TimeoutException>(new TimeoutException()) 
+                : Task.CompletedTask;
+        }
+    }
 }

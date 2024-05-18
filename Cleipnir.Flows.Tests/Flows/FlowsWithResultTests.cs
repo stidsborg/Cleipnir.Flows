@@ -89,4 +89,49 @@ public class FlowsWithResultTests
             return next;
         }
     }
+    
+    [TestMethod]
+    public async Task FailingFlowCompletesWithError()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<FailingFuncFlow>();
+
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider()
+        );
+
+        var flows = flowsContainer.CreateFlows<FailingFuncFlow, string, string>(nameof(FailingFuncFlow));
+
+        FailingFuncFlow.ShouldThrow = true;
+        
+        await Should.ThrowAsync<ArgumentException>(() =>
+            flows.Run("someInstanceId", "someParameter")
+        );
+        
+        var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Failed);
+
+        FailingFuncFlow.ShouldThrow = false;
+        await controlPanel.ReInvoke();
+
+        await controlPanel.Refresh();
+        controlPanel.Status.ShouldBe(Status.Succeeded);
+        controlPanel.Result.ShouldBe("someParameter");
+    }
+    
+    public class FailingFuncFlow : Flow<string, string>
+    {
+        public static bool ShouldThrow = true;
+        
+        public override async Task<string> Run(string param)
+        {
+            if (ShouldThrow)
+                throw new ArgumentException(param);
+
+            return param;
+        }
+    }
 }

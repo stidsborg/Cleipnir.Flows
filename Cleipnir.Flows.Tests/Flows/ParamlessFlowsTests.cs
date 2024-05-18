@@ -7,13 +7,13 @@ using Shouldly;
 namespace Cleipnir.Flows.Tests.Flows;
 
 [TestClass]
-public class UnitFlowsTests
+public class ParamlessFlowsTests
 {
     [TestMethod]
     public async Task SimpleFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<SimpleUnitFlow>();
+        serviceCollection.AddTransient<SimpleParamlessFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -21,26 +21,23 @@ public class UnitFlowsTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleUnitFlow, string>(nameof(SimpleUnitFlow));
-        await flows.Run("someInstanceId", "someParameter");
+        var flows = flowsContainer.CreateFlows<SimpleParamlessFlow>(nameof(SimpleParamlessFlow));
+        await flows.Run("someInstanceId");
         
-        SimpleUnitFlow.InstanceId.ShouldBe("someInstanceId");
-        SimpleUnitFlow.ExecutedWithParameter.ShouldBe("someParameter");
+        SimpleParamlessFlow.InstanceId.ShouldBe("someInstanceId");
 
         var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
-    public class SimpleUnitFlow : Flow<string>
+    public class SimpleParamlessFlow : Flow
     {
-        public static string? ExecutedWithParameter { get; set; }
         public static string? InstanceId { get; set; } 
 
-        public override async Task Run(string param)
+        public override async Task Run()
         {
             await Task.Delay(1);
-            ExecutedWithParameter = param;
             InstanceId = Workflow.FunctionId.InstanceId.ToString();
         }
     }
@@ -49,7 +46,7 @@ public class UnitFlowsTests
     public async Task EventDrivenFlowCompletesSuccessfully()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<EventDrivenUnitFlow>();
+        serviceCollection.AddTransient<EventDrivenParamlessFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -57,9 +54,9 @@ public class UnitFlowsTests
             serviceCollection.BuildServiceProvider()
         );
 
-        var flows = flowsContainer.CreateFlows<EventDrivenUnitFlow, string>(nameof(EventDrivenUnitFlow));
+        var flows = flowsContainer.CreateFlows<EventDrivenParamlessFlow>(nameof(EventDrivenParamlessFlow));
 
-        await flows.Schedule("someInstanceId", "someParameter");
+        await flows.Schedule("someInstanceId");
 
         await Task.Delay(10);
         var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
@@ -76,11 +73,54 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    public class EventDrivenUnitFlow : Flow<string>
+    public class EventDrivenParamlessFlow : Flow
     {
-        public override async Task Run(string param)
+        public override async Task Run()
         {
             await Messages.FirstOfType<int>();
+        }
+    }
+    
+    [TestMethod]
+    public async Task FailingFlowCompletesWithError()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<FailingParamlessFlow>();
+
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider()
+        );
+
+        var flows = flowsContainer.CreateFlows<FailingParamlessFlow>(nameof(FailingParamlessFlow));
+
+        FailingParamlessFlow.ShouldThrow = true;
+        
+        await Should.ThrowAsync<TimeoutException>(() =>
+            flows.Run("someInstanceId")
+        );
+        
+        var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Failed);
+
+        FailingParamlessFlow.ShouldThrow = false;
+        await controlPanel.ReInvoke();
+
+        await controlPanel.Refresh();
+        controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+    
+    public class FailingParamlessFlow : Flow
+    {
+        public static bool ShouldThrow = true;
+        
+        public override Task Run()
+        {
+            return ShouldThrow 
+                ? Task.FromException<TimeoutException>(new TimeoutException()) 
+                : Task.CompletedTask;
         }
     }
 }

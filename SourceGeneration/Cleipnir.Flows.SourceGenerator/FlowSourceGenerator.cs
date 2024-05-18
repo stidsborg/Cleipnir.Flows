@@ -11,6 +11,7 @@ namespace Cleipnir.Flows.SourceGenerator
     [Generator]
     public class FlowSourceGenerator : ISourceGenerator
     {
+        private const string ParamlessFlowType = "Cleipnir.Flows.Flow";
         private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
         private const string IHaveStateType = "Cleipnir.Flows.IHaveState`1";
@@ -30,6 +31,13 @@ namespace Cleipnir.Flows.SourceGenerator
                 return;
             }
 
+            var paramlessFlowType = context.Compilation.GetTypeByMetadataName(ParamlessFlowType);
+            if (paramlessFlowType == null)
+            {
+                AddSourceGenerationOutput(context, "unable to locate abstract flow");
+                return;
+            }
+            
             var unitFlowType = context.Compilation.GetTypeByMetadataName(UnitFlowType);
             if (unitFlowType == null)
             {
@@ -53,44 +61,69 @@ namespace Cleipnir.Flows.SourceGenerator
             iHaveStateType = iHaveStateType.ConstructUnboundGenericType();
 
             var implementationTypes = new List<FlowInformation>();
-            var foundFlows = new List<string>();
             foreach (var classDeclaration in syntaxReceiver.ClassDeclarations)
             {
                 var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-                var flowType = (INamedTypeSymbol) semanticModel.GetDeclaredSymbol(classDeclaration);
+                var flowType = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration);
 
                 if (
-                    !InheritsFromFlowType(flowType, unitFlowType) && 
+                    flowType == null ||
+                    !InheritsFromParamlessFlowType(flowType, paramlessFlowType) &&
+                    !InheritsFromFlowType(flowType, unitFlowType) &&
                     !InheritsFromFlowType(flowType, resultFlowType)
                 ) continue;
 
-                var baseType = flowType.BaseType;
-                var baseTypeTypeArguments = baseType.TypeArguments;
-
-                var paramType = baseTypeTypeArguments[0];
-                var resultType = baseTypeTypeArguments.Length == 2 ? baseTypeTypeArguments[1] : null;
-                
-                var runMethod = flowType.GetMembers()
-                    .OfType<IMethodSymbol>()
-                    .Single(m => m.Name == "Run" && m.IsOverride);
-                var parameterName = runMethod.Parameters.Single().Name;
-
                 ITypeSymbol stateTypeSymbol = null;
                 foreach (var implementedInterface in flowType.AllInterfaces)
-                    if (implementedInterface.IsGenericType &&
-                        SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), iHaveStateType)) 
+                    if (
+                        implementedInterface.IsGenericType && 
+                        SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), iHaveStateType)
+                    )
                     {
                         stateTypeSymbol = implementedInterface.TypeArguments[0];
                         break;
                     }
+                
+                if (InheritsFromParamlessFlowType(flowType, paramlessFlowType))
+                {
+                    implementationTypes.Add(
+                        new FlowInformation(
+                            flowType,
+                            paramType: null,
+                            parameterName: null,
+                            resultType: null,
+                            stateTypeSymbol,
+                            paramless: true
+                        )
+                    );
+                    continue;
+                }
 
-                foundFlows.Add(GetFullyQualifiedName(flowType));
-                implementationTypes.Add(new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol));
+                var baseType = flowType.BaseType;
+                if (baseType == null)
+                    continue;
+                
+                var baseTypeTypeArguments = baseType.TypeArguments;
+
+                var paramType = baseTypeTypeArguments.Length > 0 ? baseTypeTypeArguments[0] : null;
+                var resultType = baseTypeTypeArguments.Length == 2 ? baseTypeTypeArguments[1] : null;
+
+                var runMethod = flowType.GetMembers()
+                    .OfType<IMethodSymbol>()
+                    .Single(m => m.Name == "Run" && m.IsOverride);
+                var parameterName = runMethod.Parameters.Single().Name;
+                
+                implementationTypes.Add(
+                    new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol, paramless: false)
+                );
             }
-            
+
             GenerateCode(context, implementationTypes);
         }
-
+        
+        private static bool InheritsFromParamlessFlowType(INamedTypeSymbol childTypeSymbol, INamedTypeSymbol parentTypeSymbol) 
+            => SymbolEqualityComparer.Default.Equals(childTypeSymbol.BaseType, parentTypeSymbol);
+        
         private static bool InheritsFromFlowType(INamedTypeSymbol childTypeSymbol, INamedTypeSymbol parentTypeSymbol)
         {
             var baseType = childTypeSymbol.BaseType;
@@ -129,9 +162,11 @@ namespace Cleipnir.Flows.SourceGenerator
             var flowsName = $"{flowInformation.FlowTypeSymbol.Name}s";
             var flowsNamespace = GetNamespace(flowInformation.FlowTypeSymbol);
             var flowType = GetFullyQualifiedName(flowInformation.FlowTypeSymbol);
-            var flowName = flowInformation.FlowTypeSymbol.Name;
-            var paramType = GetFullyQualifiedName(flowInformation.ParamTypeSymbol);
-            var paramName = CamelCase(flowInformation.ParameterName);
+            var flowName = flowInformation.FlowTypeSymbol?.Name;
+            var paramType = flowInformation.ParamTypeSymbol == null 
+                ? null 
+                : GetFullyQualifiedName(flowInformation.ParamTypeSymbol);
+            //var paramName = CamelCase(flowInformation.ParameterName);
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
@@ -140,7 +175,20 @@ namespace Cleipnir.Flows.SourceGenerator
                 : GetFullyQualifiedName(flowInformation.StateTypeSymbol);
             
             string generatedCode;
-            if (resultType == null)
+            if (flowInformation.Paramless)
+            {
+                generatedCode = 
+$@"namespace {flowsNamespace}
+{{
+    [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
+    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}>
+    {{
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
+            : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
+    }}
+}}";                
+            }
+            else if (resultType == null)
             {
                 generatedCode = 
 $@"namespace {flowsNamespace}
@@ -178,7 +226,6 @@ $@"namespace {flowsNamespace}
                 var constructorEndPosition = generatedCode.IndexOf("{ }", StringComparison.Ordinal);
                 generatedCode = generatedCode.Insert(constructorEndPosition + 3, getStateStr);
             }
-            
             
             // Add the generated code to the compilation
             var fileName =

@@ -12,6 +12,119 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows;
 
+public class Flows<TFlow> where TFlow : Flow
+{
+    private readonly FlowsContainer _flowsContainer;
+    private readonly ParamlessRegistration _registration;
+
+    private readonly Next<TFlow, Unit, Unit> _next;
+    private readonly Action<TFlow, Workflow> _workflowSetter;
+    private readonly Action<TFlow, States> _stateSetter; 
+    
+    public Flows(string flowName, FlowsContainer flowsContainer)
+    {
+        _flowsContainer = flowsContainer;
+        _workflowSetter = CreateWorkflowSetter();
+        _stateSetter = CreateStateSetter();
+        
+        _next = CreateCallChain(flowsContainer.ServiceProvider);
+        
+        _registration = flowsContainer.FunctionRegistry.RegisterParamless(
+            flowName,
+            PrepareAndRunFlow
+        );
+    }
+
+    private Next<TFlow, Unit, Unit> CreateCallChain(IServiceProvider serviceProvider)
+    {
+        return CallChain.Create<TFlow, Unit, Unit>(
+            _flowsContainer.Middlewares,
+            async (_, workflow) =>
+            {
+                await using var scope = serviceProvider.CreateAsyncScope();
+
+                var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
+                _workflowSetter(flow, workflow);
+                _stateSetter(flow, workflow.States);
+                                
+                await flow.Run();
+                
+                return Unit.Instance;
+            }
+        );
+    }
+
+    public async Task<ControlPanel?> ControlPanel(string instanceId)
+    {
+        var controlPanel = await _registration.ControlPanel(instanceId);
+        return controlPanel;
+    }
+    
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+        => _registration.GetState<TState>(functionInstanceId);
+    
+    public MessageWriter MessageWriter(string instanceId) 
+        => _registration.MessageWriters.For(instanceId);
+
+    public Task Run(string instanceId) 
+        => _registration.Invoke(instanceId);
+
+    public Task Schedule(string instanceId)
+        => _registration.Schedule(instanceId);
+    
+    public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
+    public Task ScheduleIn(string functionInstanceId, TimeSpan delay) => _registration.ScheduleIn(functionInstanceId, delay);
+    
+    private async Task<Result<Unit>> PrepareAndRunFlow(Workflow workflow) 
+        => await _next(Unit.Instance, workflow);
+    
+    private Action<TFlow, States> CreateStateSetter()
+    {
+        var iHaveStateType = typeof(TFlow)
+            .GetInterfaces()
+            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHaveState<>));
+
+        if (iHaveStateType == null)
+            return (_, _) => { };
+
+        var stateType = iHaveStateType.GenericTypeArguments[0];
+        
+        //fetch state
+        var methodInfo = typeof(States)
+            .GetMethods()
+            .Single(m => m.Name == nameof(States.CreateOrGet) && !m.GetParameters().Any());
+
+        var genericMethodInfo = methodInfo.MakeGenericMethod(stateType);
+        var statePropertyInfo = iHaveStateType.GetProperty("State");
+        
+        return (flow, states) =>
+        {
+            var state = genericMethodInfo.Invoke(states, parameters: null);
+            statePropertyInfo!.SetValue(flow, state);
+        };
+    }
+    
+    private Action<TFlow, Workflow> CreateWorkflowSetter()
+    {
+        ParameterExpression flowParam = Expression.Parameter(typeof(TFlow), "flow");
+        ParameterExpression contextParam = Expression.Parameter(typeof(Workflow), "workflow");
+        MemberExpression propertyExpr = Expression.Property(flowParam, nameof(Flow.Workflow));
+                
+        BinaryExpression assignExpr = Expression.Assign(propertyExpr, contextParam);
+
+        // Create a lambda expression
+        Expression<Action<TFlow, Workflow>> lambdaExpr = Expression.Lambda<Action<TFlow, Workflow>>(
+            assignExpr,
+            flowParam,
+            contextParam
+        );
+
+        // Compile and invoke the lambda expression
+        var setter = lambdaExpr.Compile();
+        return setter;
+    }
+}
+
 public class Flows<TFlow, TParam> 
     where TFlow : Flow<TParam>
     where TParam : notnull

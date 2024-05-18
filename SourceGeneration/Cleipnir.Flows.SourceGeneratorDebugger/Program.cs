@@ -16,27 +16,30 @@ public static class Program
             serviceCollection.BuildServiceProvider()
         );
 
-        var funFlows = new FunFlows(container);
-        await funFlows.Run("SomeInstance", "SomeParam");
+        var flows = new FunFlows(container);
+        await flows.Run("test");
 
-        var state = await funFlows.GetState("SomeInstance");
-        Console.WriteLine("Fetched State-value: " + state!.Value);
+        await Task.CompletedTask;
+        //var funFlows = new FunFlows(container);
+        //await funFlows.Run("SomeInstance", "SomeParam");
+
+        //var state = await funFlows.GetState("SomeInstance");
+        //Console.WriteLine("Fetched State-value: " + state!.Value);
     }
 }
 
 
 public class OuterClass
 {
-    public class FunFlow : Flow<string>, IHaveState<FunFlow.FunFlowState>
+    public class FunFlow : Flow // IHaveState<FunFlow.FunFlowState>
     {
         public required FunFlowState State { get; init; }
     
-        public override Task Run(string param)
+        public override Task Run()
         {
-            State.Value = param;
             return Task.CompletedTask;
         }
-
+        
         public class FunFlowState : WorkflowState
         {
             public string Value { get; set; } = "";
