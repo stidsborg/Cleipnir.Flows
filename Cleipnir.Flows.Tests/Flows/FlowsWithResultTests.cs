@@ -1,4 +1,5 @@
 ﻿using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -126,12 +127,12 @@ public class FlowsWithResultTests
     {
         public static bool ShouldThrow = true;
         
-        public override async Task<string> Run(string param)
+        public override Task<string> Run(string param)
         {
             if (ShouldThrow)
-                throw new ArgumentException(param);
+                return Task.FromException<string>(new ArgumentException(param));
 
-            return param;
+            return param.ToTask();
         }
     }
 }
