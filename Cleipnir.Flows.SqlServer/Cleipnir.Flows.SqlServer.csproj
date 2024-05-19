@@ -24,7 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
-        <ProjectReference Include="../../Cleipnir.ResilientFunctions/Stores/SqlServer/Cleipnir.ResilientFunctions.SqlServer/Cleipnir.ResilientFunctions.SqlServer.csproj" />
+        <ProjectReference Include="../Cleipnir.ResilientFunctions/Stores/SqlServer/Cleipnir.ResilientFunctions.SqlServer/Cleipnir.ResilientFunctions.SqlServer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
