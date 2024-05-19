@@ -39,13 +39,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.SourceGenera
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.SourceGeneratorDebugger", "SourceGeneration\Cleipnir.Flows.SourceGeneratorDebugger\Cleipnir.Flows.SourceGeneratorDebugger.csproj", "{19BAF8B6-41E4-45F5-B2E2-97B60A9B6372}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.PostgreSQL", "..\Cleipnir.ResilientFunctions\Stores\PostgreSQL\Cleipnir.ResilientFunctions.PostgreSQL\Cleipnir.ResilientFunctions.PostgreSQL.csproj", "{785F156E-024C-4D30-83D0-C077B3CCC0CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.PostgreSQL", "Cleipnir.ResilientFunctions\Stores\PostgreSQL\Cleipnir.ResilientFunctions.PostgreSQL\Cleipnir.ResilientFunctions.PostgreSQL.csproj", "{785F156E-024C-4D30-83D0-C077B3CCC0CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stores", "Stores", "{9A4E176B-52F2-4375-87DB-AB66F0C37646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.MySQL", "..\Cleipnir.ResilientFunctions\Stores\MySQL\Cleipnir.ResilientFunctions.MySQL\Cleipnir.ResilientFunctions.MySQL.csproj", "{B6C02093-1375-48B1-A4D7-E6F4A0581506}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.MySQL", "Cleipnir.ResilientFunctions\Stores\MySQL\Cleipnir.ResilientFunctions.MySQL\Cleipnir.ResilientFunctions.MySQL.csproj", "{B6C02093-1375-48B1-A4D7-E6F4A0581506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.SqlServer", "..\Cleipnir.ResilientFunctions\Stores\SqlServer\Cleipnir.ResilientFunctions.SqlServer\Cleipnir.ResilientFunctions.SqlServer.csproj", "{BC926BA5-072D-4098-9792-712C21C61189}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.SqlServer", "Cleipnir.ResilientFunctions\Stores\SqlServer\Cleipnir.ResilientFunctions.SqlServer\Cleipnir.ResilientFunctions.SqlServer.csproj", "{BC926BA5-072D-4098-9792-712C21C61189}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
