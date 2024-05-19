@@ -8,23 +8,56 @@ namespace Cleipnir.Flows.Tests.AspNet;
 [TestClass]
 public class IntegrationTest
 {
-    private const string HostUrl = "http://localhost:5000";
-    private const string StartFlowUrl = $"{HostUrl}/startFlow";
-
     private readonly HttpClient _httpClient = new();
     
     [TestMethod]
-    public async Task SunshineScenario()
+    public async Task SunshineScenarioInMemory()
+    {
+        const string hostUrl = "http://localhost:5000";
+        var startFlowUrl = $"{hostUrl}/startFlow";
+        await SunshineScenario(hostUrl, startFlowUrl, new InMemoryFunctionStore());
+    }
+    
+    [TestMethod]
+    public async Task SunshineScenarioSqlServer()
+    {
+        var store = await SqlServerHelper.CreateAndInitializeStore();
+        const string hostUrl = "http://localhost:5001";
+        var startFlowUrl = $"{hostUrl}/startFlow";
+        await SunshineScenario(hostUrl, startFlowUrl, store);
+    }
+    
+    [TestMethod]
+    public async Task SunshineScenarioPostgres()
+    {
+        var store = await PostgresSqlHelper.CreateAndInitializeStore();
+        const string hostUrl = "http://localhost:5002";
+        var startFlowUrl = $"{hostUrl}/startFlow";
+        await SunshineScenario(hostUrl, startFlowUrl, store);
+    }
+    
+    [TestMethod]
+    public async Task SunshineScenarioMySql()
+    {
+        var store = await MySqlHelper.CreateAndInitializeMySqlStore();
+        const string hostUrl = "http://localhost:5003";
+        var startFlowUrl = $"{hostUrl}/startFlow";
+        await SunshineScenario(hostUrl, startFlowUrl, store);
+    }
+
+    private async Task SunshineScenario(string hostUrl, string startFlowUrl, IFunctionStore functionStore)
     {
         var (webApplication, testFlows) = await StartWebserverLocalHost(
             bindings: serviceCollection => serviceCollection.AddTransient<TestFlow>(),
             startFlow: provider => provider
-                    .GetRequiredService<TestFlows>()
-                    .Run("someInstance", "someParameter")
-            );
+                .GetRequiredService<TestFlows>()
+                .Run("someInstance", "someParameter"),
+            hostUrl,
+            functionStore
+        );
         await using var _ = webApplication;
 
-        var response = await _httpClient.PostAsync(StartFlowUrl, new StringContent(""));
+        var response = await _httpClient.PostAsync(startFlowUrl, new StringContent(""));
         Assert.IsTrue(response.IsSuccessStatusCode, "Response status code was not successful");
 
         var controlPanel = await testFlows.ControlPanel("someInstance");
@@ -35,19 +68,21 @@ public class IntegrationTest
 
     private async Task<(WebApplication, TestFlows)> StartWebserverLocalHost(
         Action<IServiceCollection> bindings,
-        Func<IServiceProvider, Task> startFlow
+        Func<IServiceProvider, Task> startFlow,
+        string hostUrl, 
+        IFunctionStore functionStore
     )
     {
         var builder = WebApplication.CreateBuilder();
+        
         bindings(builder.Services);
-        Cleipnir.Flows.AspNet.FlowsModule.UseFlows(builder.Services, new InMemoryFunctionStore());
+        Cleipnir.Flows.AspNet.FlowsModule.UseFlows(builder.Services, functionStore);
 
         var app = builder.Build();
-
         app.MapGet("/", () => "Hello World!");
         app.MapPost("/startFlow", startFlow);
 
-        _ = Task.Run(() => app.RunAsync(HostUrl));
+        _ = Task.Run(() => app.RunAsync(hostUrl));
 
         await Task.Delay(1000);
 
@@ -56,7 +91,7 @@ public class IntegrationTest
         {
             try
             {
-                var response = await httpClient.GetAsync(HostUrl);
+                var response = await httpClient.GetAsync(hostUrl);
                 if (response.IsSuccessStatusCode) break;
             }
             catch (Exception)

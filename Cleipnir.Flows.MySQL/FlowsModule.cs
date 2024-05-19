@@ -16,7 +16,7 @@ public static class FlowsModule
         bool initializeDatabase = true
     )
     {
-        var flowStore = new MySqlFunctionStore(connectionString);
+        var flowStore = new MySqlFunctionStore(connectionString, tablePrefix: "flows");
         
         return AspNet.FlowsModule.UseFlows(
             services,

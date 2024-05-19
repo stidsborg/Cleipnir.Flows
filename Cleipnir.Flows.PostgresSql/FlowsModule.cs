@@ -16,7 +16,7 @@ public static class FlowsModule
         bool initializeDatabase = true
     )
     {
-        var flowStore = new PostgreSqlFunctionStore(connectionString);
+        var flowStore = new PostgreSqlFunctionStore(connectionString, tablePrefix: "flows");
         
         return AspNet.FlowsModule.UseFlows(
             services,
