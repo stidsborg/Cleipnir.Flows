@@ -29,6 +29,8 @@ namespace Cleipnir.Flows.Tests.AspNet
 
         public static async Task<SqlServerFunctionStore> CreateAndInitializeStore()
         {
+            CreateDatabase();
+            
             var store = new SqlServerFunctionStore(ConnectionString, tablePrefix: "SqlServerFlows");
             await store.DropIfExists();
             await store.Initialize();
