@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.X_SupportTicket;
+﻿namespace Cleipnir.Flows.Sample.Presentation.G_SupportTicket.Solution;
 
 public static class MessageBroker
 {

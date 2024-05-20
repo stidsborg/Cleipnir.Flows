@@ -1,4 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.Z_BankTransfer.Solution;
+﻿using Cleipnir.Flows.Sample.Presentation.Solutions.H_BankTransfer.Other;
+
+namespace Cleipnir.Flows.Sample.Presentation.Solutions.H_BankTransfer;
 
 public sealed class TransferFlow : Flow<Transfer>
 {

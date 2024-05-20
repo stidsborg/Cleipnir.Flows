@@ -1,4 +1,4 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.Z_BankTransfer.Solution;
+﻿namespace Cleipnir.Flows.Sample.Presentation.H_BankTransfer.Solution;
 
 public record Transfer(
     Guid TransactionId,
