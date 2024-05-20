@@ -70,6 +70,10 @@ public class FlowsWithStateTests
         var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
+        
+        var flowState = controlPanel.States.Get<FuncFlowWithState.FlowState>();
+        flowState.ShouldNotBeNull();
+        flowState.Value.ShouldBe("someParameter");
     }
     
     public class ActionFlowWithState : Flow<string>, IHaveState<ActionFlowWithState.FlowState>
@@ -111,6 +115,10 @@ public class FlowsWithStateTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Result.ShouldBe("someParameter");
         controlPanel.Status.ShouldBe(Status.Succeeded);
+        
+        var flowState = controlPanel.States.Get<FuncFlowWithState.FlowState>();
+        flowState.ShouldNotBeNull();
+        flowState.Value.ShouldBe("someParameter");
     }
     
     public class FuncFlowWithState : Flow<string, string>, IHaveState<FuncFlowWithState.FlowState>
