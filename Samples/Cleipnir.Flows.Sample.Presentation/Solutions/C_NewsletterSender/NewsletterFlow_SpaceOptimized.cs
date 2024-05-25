@@ -23,6 +23,8 @@ public class NewsletterFlow_SpaceOptimized : Flow<MailAndRecipients>
             message.Subject = subject;
             message.Body = new TextPart(TextFormat.Html) { Text = content };
             await client.SendAsync(message);
+
+            await Effect.Upsert("atRecipient", atRecipient);
         }
     }
 }
