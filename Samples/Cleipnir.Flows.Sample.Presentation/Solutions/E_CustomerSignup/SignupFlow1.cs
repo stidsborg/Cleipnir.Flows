@@ -2,7 +2,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.Solutions.E_CustomerSignup;
 
-public class SignupFlow : Flow<string>
+public class SignupFlow1 : Flow<string>
 {
     public override async Task Run(string customerEmail)
     {

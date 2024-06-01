@@ -3,7 +3,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.Solutions.D_LoanApplication;
 
-public class LoanApplicationFlow : Flow<LoanApplication>
+public class LoanApplicationFlow2 : Flow<LoanApplication>
 {
     public override async Task Run(LoanApplication loanApplication)
     {
