@@ -2,7 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.Presentation.Solutions.B_OrderFlowMessaging.Other;
 
-public class MessageBroker
+public class Bus
 {
     private readonly List<Func<EventsAndCommands, Task>> _subscribers = new();
     private readonly object _lock = new();
@@ -15,7 +15,7 @@ public class MessageBroker
     
     public Task Send(EventsAndCommands msg)
     {
-        Log.Logger.ForContext<MessageBroker>().Information($"Sending: {msg.GetType()}");
+        Log.Logger.ForContext<Bus>().Information($"Sending: {msg.GetType()}");
         Task.Run(async () =>
         {
             List<Func<EventsAndCommands, Task>> subscribers;
