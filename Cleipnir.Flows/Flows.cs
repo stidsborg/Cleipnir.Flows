@@ -28,11 +28,28 @@ public class Flows<TFlow> where TFlow : Flow
         _stateSetter = CreateStateSetter();
         
         _next = CreateCallChain(flowsContainer.ServiceProvider);
+
+        var subscriptions = typeof(TFlow)
+            .GetInterfaces()
+            .Select(i => i.IsGenericType
+                ? new { GenericType = i, OpenGenericType = i.GetGenericTypeDefinition() }
+                : null
+            )
+            .Where(a => a is not null && a.OpenGenericType == typeof(ISubscribeTo<>))
+            .Select(a => new { a!.GenericType, SubscriptionType = a.GenericType.GetGenericArguments()[0] })
+            //.Select(a => new RoutingInformation())
+            .ToList();
         
         _registration = flowsContainer.FunctionRegistry.RegisterParamless(
             flowName,
             PrepareAndRunFlow
+            /*new Settings(
+                routes: subscriptions.Any()
+                    ?
+                )*/
         );
+        
+        
     }
 
     private Next<TFlow, Unit, Unit> CreateCallChain(IServiceProvider serviceProvider)
