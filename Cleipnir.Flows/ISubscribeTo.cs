@@ -1,11 +1,8 @@
-using System.Threading.Tasks;
+using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows;
 
-public delegate Task BusPublish(object msg);
-
-public interface ISubscribeTo<TMessage>
+public interface ISubscribeTo<TMessage> where TMessage : notnull
 {
-    public BusPublish PublishOnBus(object msg);
-    static abstract string Correlate(TMessage msg);
+    static abstract RoutingInfo Correlate(TMessage msg);
 }

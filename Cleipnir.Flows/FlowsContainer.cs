@@ -57,8 +57,10 @@ public class FlowsContainer : IDisposable
     public Flows<TFlow, TParam, TResult> CreateFlows<TFlow, TParam, TResult>(string flowName)
         where TFlow : Flow<TParam, TResult>
         where TParam : notnull => new(flowName, flowsContainer: this);
-    
 
+    public async Task DeliverMessage<TMessage>(TMessage msg) where TMessage : notnull 
+        => await FunctionRegistry.DeliverMessage(msg);
+    
     public void Dispose() => FunctionRegistry.Dispose();
 
     public Task ShutdownGracefully(TimeSpan? maxWait = null) => FunctionRegistry.ShutdownGracefully(maxWait);
