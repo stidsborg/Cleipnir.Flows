@@ -19,7 +19,8 @@ public class SubscribeToFlowTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = new RouteToInstanceParamlessFlows(flowsContainer);
@@ -53,7 +54,8 @@ public class SubscribeToFlowTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = new RouteUsingCorrelationParamlessFlows(flowsContainer);

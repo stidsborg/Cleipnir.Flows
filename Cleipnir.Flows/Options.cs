@@ -9,6 +9,8 @@ namespace Cleipnir.Flows;
 
 public class Options
 {
+    public static Options Default { get; } = new();
+    
     internal Action<RFunctionException>? UnhandledExceptionHandler { get; }
     internal TimeSpan? CrashedCheckFrequency { get; }
     internal TimeSpan? PostponedCheckFrequency { get; }

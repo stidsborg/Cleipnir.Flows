@@ -13,7 +13,8 @@ public static class Program
 
         var container = new FlowsContainer(
             new InMemoryFunctionStore(),
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = new FunFlows(container);

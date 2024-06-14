@@ -18,7 +18,8 @@ public class ParamlessFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = flowsContainer.CreateFlows<SimpleParamlessFlow>(nameof(SimpleParamlessFlow));
@@ -51,7 +52,8 @@ public class ParamlessFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<EventDrivenParamlessFlow>(nameof(EventDrivenParamlessFlow));
@@ -90,7 +92,8 @@ public class ParamlessFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<FailingParamlessFlow>(nameof(FailingParamlessFlow));

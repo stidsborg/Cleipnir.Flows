@@ -19,7 +19,8 @@ public class FlowsWithResultTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = flowsContainer.CreateFlows<SimpleFuncFlow, string, int>(nameof(SimpleFuncFlow));
@@ -59,7 +60,8 @@ public class FlowsWithResultTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<MessageDrivenFuncFlow, string, int>(nameof(MessageDrivenFuncFlow));
@@ -100,7 +102,8 @@ public class FlowsWithResultTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<FailingFuncFlow, string, string>(nameof(FailingFuncFlow));

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Cleipnir.Flows.SourceGeneration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,27 +10,20 @@ namespace Cleipnir.Flows.AspNet;
 public class FlowsHostedService : IHostedService
 {
     private readonly IServiceProvider _services;
-    private readonly Assembly _callingAssembly;
+    private readonly IEnumerable<Type> _flowsTypes;
     private readonly bool _gracefulShutdown;
 
-    public FlowsHostedService(IServiceProvider services, Assembly callingAssembly, bool gracefulShutdown)
+    public FlowsHostedService(IServiceProvider services, IEnumerable<Type> flowsTypes, bool gracefulShutdown)
     {
         _services = services;
-        _callingAssembly = callingAssembly;
+        _flowsTypes = flowsTypes;
         _gracefulShutdown = gracefulShutdown;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        var flowTypes = _callingAssembly
-            .GetReferencedAssemblies()
-            .Select(Assembly.Load)
-            .Concat(new[] { _callingAssembly })
-            .SelectMany(a => a.GetTypes())
-            .Where(t => t.IsSubclassOfRawGeneric(typeof(Flows<,>)) || t.IsSubclassOfRawGeneric(typeof(Flows<,,>)));
-
-        foreach (var iRegisterRFuncOnInstantiationType in flowTypes)
-            _ = _services.GetService(iRegisterRFuncOnInstantiationType); //flow is registered with the flow container when resolved
+        foreach (var flowsType in _flowsTypes)
+            _ = _services.GetService(flowsType); //flow is registered with the flow container when resolved
 
         return Task.CompletedTask;
     }

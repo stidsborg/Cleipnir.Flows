@@ -11,10 +11,11 @@ public static class Example
         serviceCollection.AddTransient<IEmailClient, EmailClientStub>();
         serviceCollection.AddTransient<ILogisticsClient, LogisticsClientStub>();
         serviceCollection.AddTransient<OrderFlow>();
-
+        
         var flowsContainer = new FlowsContainer(
             new InMemoryFunctionStore(),
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var orderFlows = new OrderFlows(flowsContainer);

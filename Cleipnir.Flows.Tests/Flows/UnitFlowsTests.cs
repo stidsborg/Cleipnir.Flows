@@ -18,7 +18,8 @@ public class UnitFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = flowsContainer.CreateFlows<SimpleUnitFlow, string>(nameof(SimpleUnitFlow));
@@ -54,7 +55,8 @@ public class UnitFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<EventDrivenUnitFlow, string>(nameof(EventDrivenUnitFlow));
@@ -93,7 +95,8 @@ public class UnitFlowsTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = flowsContainer.CreateFlows<FailingUnitFlow, string>(nameof(FailingUnitFlow));

@@ -17,7 +17,8 @@ public class FlowsWithStateTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
         );
 
         var flows = new ParamlessFlowWithStates(flowsContainer);
@@ -57,7 +58,8 @@ public class FlowsWithStateTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = new ActionFlowWithStates(flowsContainer);
@@ -101,7 +103,8 @@ public class FlowsWithStateTests
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
-            serviceCollection.BuildServiceProvider()
+            serviceCollection.BuildServiceProvider(),
+            new Options()
         );
 
         var flows = new FuncFlowWithStates(flowsContainer);

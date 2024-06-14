@@ -16,10 +16,9 @@ public class FlowsContainer : IDisposable
     internal readonly FunctionsRegistry FunctionRegistry;
     internal readonly List<IMiddleware> Middlewares;
 
-    public FlowsContainer(IFunctionStore flowStore, IServiceProvider serviceProvider, Options? options = null)
+    public FlowsContainer(IFunctionStore flowStore, IServiceProvider serviceProvider, Options options)
     {
         ServiceProvider = serviceProvider;
-        options ??= new Options();
         
         if (options.UnhandledExceptionHandler == null && serviceProvider.GetService<ILogger>() != null)
         {

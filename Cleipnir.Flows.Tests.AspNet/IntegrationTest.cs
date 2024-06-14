@@ -1,4 +1,5 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
+﻿using Cleipnir.Flows.AspNet;
+using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,7 +77,10 @@ public class IntegrationTest
         var builder = WebApplication.CreateBuilder();
         
         bindings(builder.Services);
-        Cleipnir.Flows.AspNet.FlowsModule.UseFlows(builder.Services, functionStore);
+        builder.Services.UseFlows(c => c
+            .UseStore(functionStore)
+            .RegisterFlowsAutomatically()
+        );
 
         var app = builder.Build();
         app.MapGet("/", () => "Hello World!");

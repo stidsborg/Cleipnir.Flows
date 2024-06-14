@@ -1,30 +1,26 @@
-﻿using System;
-using System.Reflection;
+﻿using Cleipnir.Flows.AspNet;
 using Cleipnir.ResilientFunctions.MySQL;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.MySQL;
 
 public static class FlowsModule
 {
-    public static IServiceCollection UseFlows(
-        this IServiceCollection services, 
-        string connectionString,
-        Func<IServiceProvider, Options>? options = null,
-        bool gracefulShutdown = false,
-        Assembly? rootAssembly = null,
-        bool initializeDatabase = true
+    public static FlowsConfigurator UsePostgresSqlStore(
+        this FlowsConfigurator configurator, string connectionString, bool initializeDatabase = true
     )
     {
-        var flowStore = new MySqlFunctionStore(connectionString, tablePrefix: "flows");
-        
-        return AspNet.FlowsModule.UseFlows(
-            services,
-            flowStore,
-            options,
-            gracefulShutdown,
-            rootAssembly ?? Assembly.GetCallingAssembly(),
-            initializeDatabase
-        );
+        configurator.Services.AddSingleton<IFunctionStore>(
+            _ =>
+            {
+                var store = new MySqlFunctionStore(connectionString, tablePrefix: "flows");
+                if (initializeDatabase)
+                    store.Initialize().GetAwaiter().GetResult();
+
+                return store;
+            });
+
+        return configurator;
     }
 }
