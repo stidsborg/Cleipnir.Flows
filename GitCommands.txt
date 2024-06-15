@@ -1,3 +1,7 @@
+# Clone submodule after initial clone
+git submodule init
+git submodule update
+
 # Update the submodule to the latest commit:
 git submodule update --remote
 
