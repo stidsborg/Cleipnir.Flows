@@ -82,7 +82,9 @@ public class FlowsConfigurator
             Services.AddTransient(sourceGeneratedFlowsType);
             var flowType = sourceGeneratedFlowsType.BaseType?.GenericTypeArguments[0];
             if (flowType != null)
-                Services.AddTransient(flowType);
+                Services.AddScoped(flowType);
+            
+            FlowsTypes = FlowsTypes.Append(sourceGeneratedFlowsType);
         }
 
         return this;
