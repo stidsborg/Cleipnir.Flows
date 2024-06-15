@@ -53,7 +53,7 @@ public class IntegrationTests
             .ConfigureServices((_, services) =>
             {
                 services.AddHostedService<TestHostedService>();
-                services.UseFlows(c => c
+                services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlow<RebusTestFlow, RebusTestFlows>());
                 services.AddRebus(

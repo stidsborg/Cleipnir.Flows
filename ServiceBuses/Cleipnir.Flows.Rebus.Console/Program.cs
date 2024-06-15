@@ -36,7 +36,7 @@ internal static class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((_, services) =>
             {
-                services.UseFlows(c => c.UseInMemoryStore().RegisterFlowsAutomatically());
+                services.AddFlows(c => c.UseInMemoryStore().RegisterFlowsAutomatically());
                 services.AddRebus(
                     configure => configure
                         .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "who cares"))

@@ -77,7 +77,7 @@ public class IntegrationTest
         var builder = WebApplication.CreateBuilder();
         
         bindings(builder.Services);
-        builder.Services.UseFlows(c => c
+        builder.Services.AddFlows(c => c
             .UseStore(functionStore)
             .RegisterFlowsAutomatically()
         );

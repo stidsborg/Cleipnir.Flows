@@ -10,7 +10,7 @@ namespace Cleipnir.Flows.AspNet;
 
 public static class FlowsModule
 {
-    public static IServiceCollection UseFlows(this IServiceCollection services, Func<FlowsConfigurator, FlowsConfigurator> configure)
+    public static IServiceCollection AddFlows(this IServiceCollection services, Func<FlowsConfigurator, FlowsConfigurator> configure)
     {
         var configurator = new FlowsConfigurator(services);
         configure(configurator);
