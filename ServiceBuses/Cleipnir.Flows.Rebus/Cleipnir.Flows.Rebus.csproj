@@ -45,7 +45,7 @@
     </PropertyGroup>
     <ItemGroup Label="SourceLink">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-        <PackageReference Include="Rebus" Version="8.4.2" />
+        <PackageReference Include="Rebus" Version="8.4.3" />
         <PackageReference Include="Rebus.ServiceProvider" Version="10.1.2" />
     </ItemGroup>
     
