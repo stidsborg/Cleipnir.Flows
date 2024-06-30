@@ -2,6 +2,7 @@ using Cleipnir.Flows.AspNet;
 using Cleipnir.Flows.PostgresSql;
 using Cleipnir.Flows.Sample.Clients;
 using Cleipnir.Flows.Sample.Flows;
+using Cleipnir.ResilientFunctions.PostgreSQL;
 using Serilog;
 
 namespace Cleipnir.Flows.Sample;
@@ -24,10 +25,10 @@ internal static class Program
         
         const string connectionString = "Server=localhost;Port=5432;Userid=postgres;Password=Pa55word!;Database=flows;";
         
-        //await DatabaseHelper.RecreateDatabase(connectionString); //use to create db initially or clean existing state in database
+        await DatabaseHelper.CreateDatabaseIfNotExists(connectionString); //use to create db initially or clean existing state in database
         builder.Services.AddFlows(c => c
             .UsePostgresSqlStore(connectionString)
-            .WithOptions(new Options(crashedCheckFrequency: TimeSpan.FromSeconds(5)))
+            .WithOptions(new Options(leaseLength: TimeSpan.FromSeconds(5)))
             .RegisterFlowsAutomatically()
         );
         

@@ -26,4 +26,23 @@ public class OrderController : ControllerBase
         
         return Ok();
     }
+    
+    [HttpGet]
+    public async Task<ActionResult> Get(string orderId)
+    {
+        var controlPanel = await _orderFlows.ControlPanel(orderId);
+        if (controlPanel is null)
+            return NotFound();
+
+        var effects = string.Join(
+            Environment.NewLine,
+            controlPanel
+                .Effects
+                .All
+                .Values
+                .Select(se => new { Id = se.EffectId, se.WorkStatus }.ToString())
+        );
+        
+        return Ok(effects);
+    }
 }
