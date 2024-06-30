@@ -12,34 +12,43 @@ public class Options
     public static Options Default { get; } = new();
     
     internal Action<RFunctionException>? UnhandledExceptionHandler { get; }
-    internal TimeSpan? CrashedCheckFrequency { get; }
-    internal TimeSpan? PostponedCheckFrequency { get; }
-    internal TimeSpan? TimeoutCheckFrequency { get; }
-    internal TimeSpan? EventSourcePullFrequency { get; }
+    internal TimeSpan? RetentionPeriod { get; }
+    internal TimeSpan? RetentionCleanUpFrequency { get; }
+    internal TimeSpan? LeaseLength { get; }
+    internal bool? EnableWatchdogs { get; }
+    internal TimeSpan? WatchdogCheckFrequency { get; }
     internal TimeSpan? DelayStartup { get; }
     internal int? MaxParallelRetryInvocations { get; }
+    internal TimeSpan? MessagesPullFrequency { get; }
     internal ISerializer? Serializer { get; }
+    internal IEnumerable<RoutingInformation>? Routes { get; }
     internal List<MiddlewareInstanceOrType> Middlewares  { get; } = new();
 
     public Options(
         Action<RFunctionException>? unhandledExceptionHandler = null, 
-        TimeSpan? crashedCheckFrequency = null, 
-        TimeSpan? postponedCheckFrequency = null, 
-        TimeSpan? timeoutCheckFrequency = null,
-        TimeSpan? eventSourcePullFrequency = null,
+        TimeSpan? retentionPeriod = null,
+        TimeSpan? retentionCleanUpFrequency = null,
+        TimeSpan? leaseLength = null, 
+        bool? enableWatchdogs = null,
+        TimeSpan? watchdogCheckFrequency = null,
+        TimeSpan? messagesPullFrequency = null,
         TimeSpan? delayStartup = null, 
         int? maxParallelRetryInvocations = null, 
-        ISerializer? serializer = null
+        ISerializer? serializer = null,
+        IEnumerable<RoutingInformation>? routes = null
     )
     {
         UnhandledExceptionHandler = unhandledExceptionHandler;
-        CrashedCheckFrequency = crashedCheckFrequency;
-        PostponedCheckFrequency = postponedCheckFrequency;
-        TimeoutCheckFrequency = timeoutCheckFrequency;
-        EventSourcePullFrequency = eventSourcePullFrequency;
+        WatchdogCheckFrequency = watchdogCheckFrequency;
+        LeaseLength = leaseLength;
+        RetentionPeriod = retentionPeriod;
+        RetentionCleanUpFrequency = retentionCleanUpFrequency;
+        EnableWatchdogs = enableWatchdogs;
+        MessagesPullFrequency = messagesPullFrequency;
         DelayStartup = delayStartup;
         MaxParallelRetryInvocations = maxParallelRetryInvocations;
         Serializer = serializer;
+        Routes = routes;
     }
 
     public Options UseMiddleware<TMiddleware>() where TMiddleware : IMiddleware
@@ -57,12 +66,15 @@ public class Options
     internal Settings MapToRFunctionsSettings()
         => new(
             UnhandledExceptionHandler,
-            CrashedCheckFrequency,
-            PostponedCheckFrequency,
-            TimeoutCheckFrequency,
-            EventSourcePullFrequency,
+            RetentionPeriod,
+            RetentionCleanUpFrequency,
+            LeaseLength,
+            EnableWatchdogs,
+            WatchdogCheckFrequency,
+            MessagesPullFrequency,
             DelayStartup,
             MaxParallelRetryInvocations,
-            Serializer
+            Serializer,
+            Routes
         );
 }

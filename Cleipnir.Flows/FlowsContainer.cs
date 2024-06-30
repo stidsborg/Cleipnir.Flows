@@ -25,10 +25,12 @@ public class FlowsContainer : IDisposable
             var logger = serviceProvider.GetRequiredService<ILogger>();
             options = new Options(
                     unhandledExceptionHandler: excp => logger.LogError(excp, "Unhandled exception in Cleipnir Flows"),
-                    options.CrashedCheckFrequency, 
-                    options.PostponedCheckFrequency, 
-                    options.TimeoutCheckFrequency,
-                    options.EventSourcePullFrequency,
+                    options.RetentionPeriod, 
+                    options.RetentionCleanUpFrequency,
+                    options.LeaseLength, 
+                    options.EnableWatchdogs,
+                    options.WatchdogCheckFrequency,
+                    options.MessagesPullFrequency,
                     options.DelayStartup, 
                     options.MaxParallelRetryInvocations, 
                     options.Serializer
@@ -40,7 +42,7 @@ public class FlowsContainer : IDisposable
             .Select(m => m switch
             {
                 MiddlewareInstance middlewareInstance => middlewareInstance.Middleware,
-                MiddlewareType middlewareType => (IMiddleware)serviceProvider.GetRequiredService(middlewareType.Type),
+                MiddlewareType middlewareType => (IMiddleware) serviceProvider.GetRequiredService(middlewareType.Type),
                 _ => throw new ArgumentOutOfRangeException(nameof(m))
             })
             .ToList();
