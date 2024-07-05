@@ -1,4 +1,5 @@
-﻿using Cleipnir.Flows.AspNet;
+﻿using System;
+using Cleipnir.Flows.AspNet;
 using Cleipnir.ResilientFunctions.PostgreSQL;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,13 +9,17 @@ namespace Cleipnir.Flows.PostgresSql;
 public static class FlowsModule
 {
     public static FlowsConfigurator UsePostgresSqlStore(
-        this FlowsConfigurator configurator, string connectionString, bool initializeDatabase = true
+        this FlowsConfigurator configurator, 
+        Func<IServiceProvider, string> connectionStringFunc, 
+        bool initializeDatabase = true,
+        string tablePrefix = "flows"
     )
     {
         configurator.Services.AddSingleton<IFunctionStore>(
-            _ =>
+            sp =>
             {
-                var store = new PostgreSqlFunctionStore(connectionString, tablePrefix: "flows");
+                var connectionString = connectionStringFunc(sp);
+                var store = new PostgreSqlFunctionStore(connectionString, tablePrefix);
                 if (initializeDatabase)
                     store.Initialize().GetAwaiter().GetResult();
 
@@ -23,4 +28,11 @@ public static class FlowsModule
 
         return configurator;
     }
+
+    public static FlowsConfigurator UsePostgresSqlStore(
+        this FlowsConfigurator configurator,
+        string connectionString,
+        bool initializeDatabase = true,
+        string tablePrefix = "flows"
+    ) => UsePostgresSqlStore(configurator, _ => connectionString, initializeDatabase, tablePrefix);
 }

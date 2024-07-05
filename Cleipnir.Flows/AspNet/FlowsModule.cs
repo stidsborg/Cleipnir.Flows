@@ -14,8 +14,12 @@ public static class FlowsModule
     {
         var configurator = new FlowsConfigurator(services);
         configure(configurator);
+
+        if (configurator.OptionsFunc is null)
+            services.AddSingleton(new Options());
+        else
+            services.AddSingleton(configurator.OptionsFunc);
         
-        services.AddSingleton(configurator.Options);
         services.AddSingleton<FlowsContainer>();
 
         services.AddHostedService(
@@ -27,9 +31,10 @@ public static class FlowsModule
 
 public class FlowsConfigurator
 {
-    internal Options Options = new();
     internal bool EnableGracefulShutdown = false;
     internal IEnumerable<Type> FlowsTypes = [];
+
+    internal Func<IServiceProvider, Options>? OptionsFunc;
     public IServiceCollection Services { get; }
 
     public FlowsConfigurator(IServiceCollection services)
@@ -50,8 +55,11 @@ public class FlowsConfigurator
     }
 
     public FlowsConfigurator WithOptions(Options options)
+        => WithOptions(_ => options);
+    
+    public FlowsConfigurator WithOptions(Func<IServiceProvider, Options> optionsFunc)
     {
-        Options = options;
+        OptionsFunc = optionsFunc;
         return this;
     }
 
