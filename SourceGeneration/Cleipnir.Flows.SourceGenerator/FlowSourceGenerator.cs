@@ -63,6 +63,13 @@ namespace Cleipnir.Flows.SourceGenerator
             var implementationTypes = new List<FlowInformation>();
             foreach (var classDeclaration in syntaxReceiver.ClassDeclarations)
             {
+                if (classDeclaration.Modifiers.Any(m => m.Value is "private"))
+                    continue;
+                
+                var accessibilityModifier = classDeclaration.Modifiers.Any(m => m.Value is "public")
+                        ? "public"
+                        : "internal";
+                
                 var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
                 var flowType = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration);
 
@@ -93,7 +100,8 @@ namespace Cleipnir.Flows.SourceGenerator
                             parameterName: null,
                             resultType: null,
                             stateTypeSymbol,
-                            paramless: true
+                            paramless: true,
+                            accessibilityModifier
                         )
                     );
                     continue;
@@ -114,7 +122,7 @@ namespace Cleipnir.Flows.SourceGenerator
                 var parameterName = runMethod.Parameters.Single().Name;
                 
                 implementationTypes.Add(
-                    new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol, paramless: false)
+                    new FlowInformation(flowType, paramType, parameterName, resultType, stateTypeSymbol, paramless: false, accessibilityModifier)
                 );
             }
 
@@ -173,6 +181,8 @@ namespace Cleipnir.Flows.SourceGenerator
             var stateType = flowInformation.StateTypeSymbol == null
                 ? null
                 : GetFullyQualifiedName(flowInformation.StateTypeSymbol);
+
+            var accessibilityModifier = flowInformation.AccessibilityModifier;
             
             string generatedCode;
             if (flowInformation.Paramless)
@@ -181,7 +191,7 @@ namespace Cleipnir.Flows.SourceGenerator
 $@"namespace {flowsNamespace}
 {{
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}>
+    {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}>
     {{
         public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
@@ -194,7 +204,7 @@ $@"namespace {flowsNamespace}
 $@"namespace {flowsNamespace}
 {{
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}>
+    {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}>
     {{
         public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
@@ -207,7 +217,7 @@ $@"namespace {flowsNamespace}
 $@"namespace {flowsNamespace}
 {{
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
-    public class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}, {resultType}>
+    {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}, {resultType}>
     {{
         public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
             : base(flowName: ""{flowName}"", flowsContainer) {{ }}
