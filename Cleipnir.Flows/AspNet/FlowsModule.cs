@@ -55,7 +55,7 @@ public class FlowsConfigurator
         return this;
     }
 
-    public FlowsConfigurator RegisterFlow<TFlow, TFlows>() where TFlow : Flow where TFlows : BaseFlows<TFlow>
+    public FlowsConfigurator RegisterFlow<TFlow, TFlows>() where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
     {
         Services.AddScoped<TFlow>();
         Services.AddTransient<TFlows>();
