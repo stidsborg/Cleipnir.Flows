@@ -79,7 +79,7 @@ public class ParamlessFlowsTests
     {
         public override async Task Run()
         {
-            await Messages.FirstOfType<int>();
+            await Messages.FirstOfType<int>(maxWait: TimeSpan.MaxValue);
         }
     }
     

@@ -125,7 +125,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         return controlPanel;
     }
     
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
         => _registration.GetState<TState>(functionInstanceId);
     
     public MessageWriter MessageWriter(string instanceId) 
@@ -168,7 +168,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         return controlPanel;
     }
     
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
         => _registration.GetState<TState>(functionInstanceId);
     
     public MessageWriter MessageWriter(string instanceId) 
@@ -233,6 +233,6 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
         TimeSpan delay
     ) => _registration.ScheduleIn(functionInstanceId, param, delay);
 
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : WorkflowState, new() 
+    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
         => _registration.GetState<TState>(functionInstanceId);
 }

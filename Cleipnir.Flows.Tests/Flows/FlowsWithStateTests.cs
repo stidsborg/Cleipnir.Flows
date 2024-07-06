@@ -33,9 +33,9 @@ public class FlowsWithStateTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    public class ParamlessFlowWithState : Flow, IHaveState<ParamlessFlowWithState.FlowState>
+    public class ParamlessFlowWithState : Flow, IHaveState<ParamlessFlowWithState.WorkflowState>
     {
-        public required FlowState State { get; init; }
+        public required WorkflowState State { get; init; }
     
         public override Task Run()
         {
@@ -43,7 +43,7 @@ public class FlowsWithStateTests
             return Task.CompletedTask;
         }
 
-        public class FlowState : WorkflowState
+        public class WorkflowState : FlowState
         {
             public bool Boolean { get; set; }
         }
@@ -73,14 +73,14 @@ public class FlowsWithStateTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncFlowWithState.FlowState>();
+        var flowState = controlPanel.States.Get<FuncFlowWithState.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
     }
     
-    public class ActionFlowWithState : Flow<string>, IHaveState<ActionFlowWithState.FlowState>
+    public class ActionFlowWithState : Flow<string>, IHaveState<ActionFlowWithState.WorkflowState>
     {
-        public required FlowState State { get; init; }
+        public required WorkflowState State { get; init; }
     
         public override Task Run(string param)
         {
@@ -88,7 +88,7 @@ public class FlowsWithStateTests
             return Task.CompletedTask;
         }
 
-        public class FlowState : WorkflowState
+        public class WorkflowState : FlowState
         {
             public string Value { get; set; } = "";
         }
@@ -119,14 +119,14 @@ public class FlowsWithStateTests
         controlPanel.Result.ShouldBe("someParameter");
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncFlowWithState.FlowState>();
+        var flowState = controlPanel.States.Get<FuncFlowWithState.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
     }
     
-    public class FuncFlowWithState : Flow<string, string>, IHaveState<FuncFlowWithState.FlowState>
+    public class FuncFlowWithState : Flow<string, string>, IHaveState<FuncFlowWithState.WorkflowState>
     {
-        public required FlowState State { get; init; }
+        public required WorkflowState State { get; init; }
     
         public override Task<string> Run(string param)
         {
@@ -134,7 +134,7 @@ public class FlowsWithStateTests
             return Task.FromResult(param);
         }
 
-        public class FlowState : WorkflowState
+        public class WorkflowState : FlowState
         {
             public string Value { get; set; } = "";
         }

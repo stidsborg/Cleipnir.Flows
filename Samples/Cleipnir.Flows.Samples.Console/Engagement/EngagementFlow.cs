@@ -22,7 +22,7 @@ public class EngagementFlow : Flow<string>
                     )
                 )
                 .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromHours(1))
-                .SuspendUntilFirstOrDefault();
+                .FirstOrDefault();
 
             if (either?.AsObject() is EngagementAccepted)
             {

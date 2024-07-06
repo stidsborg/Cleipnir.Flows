@@ -2,9 +2,9 @@ using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.State;
 
-public class StateFlow : Flow<string, string>, IHaveState<StateFlow.FlowState>
+public class StateFlow : Flow<string, string>, IHaveState<StateFlow.WorkflowState>
 {
-    public required FlowState State { get; init; }
+    public required WorkflowState State { get; init; }
     
     public override async Task<string> Run(string param)
     {
@@ -19,7 +19,7 @@ public class StateFlow : Flow<string, string>, IHaveState<StateFlow.FlowState>
         return param;
     }
 
-    public class FlowState : WorkflowState
+    public class WorkflowState : FlowState
     {
         public DateTime? Started { get; set; }
     }

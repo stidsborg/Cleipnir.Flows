@@ -41,7 +41,7 @@ public class OuterClass
             return Task.CompletedTask;
         }
         
-        public class FunFlowState : WorkflowState
+        public class FunFlowState : FlowState
         {
             public string Value { get; set; } = "";
         }

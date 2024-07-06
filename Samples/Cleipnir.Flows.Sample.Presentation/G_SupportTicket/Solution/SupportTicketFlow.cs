@@ -20,7 +20,7 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
                 .OfTypes<SupportTicketTaken, SupportTicketRejected>()
                 .Where(e => e.Match(taken => taken.Iteration, rejected => rejected.Iteration) == i)
                 .TakeUntilTimeout(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15))
-                .SuspendUntilFirstOrNone();
+                .FirstOrNone();
 
             if (!option.HasValue && option.Value.AsObject() is SupportTicketTaken)
                 return; //ticket was taken in iteration i

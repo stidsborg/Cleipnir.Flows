@@ -13,7 +13,7 @@ public class SignupFlow1 : Flow<string>
             var emailVerifiedOption = await Messages
                 .OfType<EmailVerified>()
                 .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromDays(1))
-                .SuspendUntilFirstOrNone();
+                .FirstOrNone();
 
             if (emailVerifiedOption.HasValue)
                 break;

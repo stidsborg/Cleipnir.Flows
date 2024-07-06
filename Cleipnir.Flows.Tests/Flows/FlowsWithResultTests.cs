@@ -88,7 +88,7 @@ public class FlowsWithResultTests
     {
         public override async Task<int> Run(string param)
         {
-            var next = await Messages.FirstOfType<int>();
+            var next = await Messages.FirstOfType<int>(maxWait: TimeSpan.MaxValue);
             return next;
         }
     }

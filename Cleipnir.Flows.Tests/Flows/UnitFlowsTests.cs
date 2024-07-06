@@ -82,7 +82,7 @@ public class UnitFlowsTests
     {
         public override async Task Run(string param)
         {
-            await Messages.FirstOfType<int>();
+            await Messages.FirstOfType<int>(maxWait: TimeSpan.MaxValue);
         }
     }
     

@@ -13,7 +13,7 @@ public class LoanApplicationFlow2 : Flow<LoanApplication>
             .OfType<CreditCheckOutcome>()
             .Take(3)
             .TakeUntilTimeout("Timeout", TimeSpan.FromMinutes(15))
-            .SuspendUntilCompletion();
+            .Completion();
         
         if (outcomes.Count < 2)
             await MessageBroker.Send(LoanApplicationRejected(loanApplication));

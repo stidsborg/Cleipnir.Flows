@@ -5,9 +5,9 @@ using MimeKit.Text;
 
 namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender.Solution;
 
-public class NewsletterFlow : Flow<MailAndRecipients>, IHaveState<NewsletterFlow.FlowState>
+public class NewsletterFlow : Flow<MailAndRecipients>, IHaveState<NewsletterFlow.NewsletterState>
 {
-    public required FlowState State { get; init; }
+    public required NewsletterState State { get; init; }
     
     public override async Task Run(MailAndRecipients mailAndRecipients)
     {
@@ -31,7 +31,7 @@ public class NewsletterFlow : Flow<MailAndRecipients>, IHaveState<NewsletterFlow
         }
     }
     
-    public class FlowState : WorkflowState
+    public class NewsletterState : FlowState
     {
         public int AtRecipient { get; set; }
     }

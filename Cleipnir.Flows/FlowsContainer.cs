@@ -31,6 +31,7 @@ public class FlowsContainer : IDisposable
                     options.EnableWatchdogs,
                     options.WatchdogCheckFrequency,
                     options.MessagesPullFrequency,
+                    options.MessagesDefaultMaxWaitForCompletion,
                     options.DelayStartup, 
                     options.MaxParallelRetryInvocations, 
                     options.Serializer

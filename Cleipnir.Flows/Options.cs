@@ -20,6 +20,7 @@ public class Options
     internal TimeSpan? DelayStartup { get; }
     internal int? MaxParallelRetryInvocations { get; }
     internal TimeSpan? MessagesPullFrequency { get; }
+    internal TimeSpan? MessagesDefaultMaxWaitForCompletion { get; }
     internal ISerializer? Serializer { get; }
     internal IEnumerable<RoutingInformation>? Routes { get; }
     internal List<MiddlewareInstanceOrType> Middlewares  { get; } = new();
@@ -32,6 +33,7 @@ public class Options
         bool? enableWatchdogs = null,
         TimeSpan? watchdogCheckFrequency = null,
         TimeSpan? messagesPullFrequency = null,
+        TimeSpan? messagesDefaultMaxWaitForCompletion = null,
         TimeSpan? delayStartup = null, 
         int? maxParallelRetryInvocations = null, 
         ISerializer? serializer = null,
@@ -45,6 +47,7 @@ public class Options
         RetentionCleanUpFrequency = retentionCleanUpFrequency;
         EnableWatchdogs = enableWatchdogs;
         MessagesPullFrequency = messagesPullFrequency;
+        MessagesDefaultMaxWaitForCompletion = messagesDefaultMaxWaitForCompletion;
         DelayStartup = delayStartup;
         MaxParallelRetryInvocations = maxParallelRetryInvocations;
         Serializer = serializer;
@@ -72,6 +75,7 @@ public class Options
             EnableWatchdogs,
             WatchdogCheckFrequency,
             MessagesPullFrequency,
+            MessagesDefaultMaxWaitForCompletion,
             DelayStartup,
             MaxParallelRetryInvocations,
             Serializer,

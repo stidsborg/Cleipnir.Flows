@@ -3,9 +3,9 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.F_SmsVerificationFlow;
 
-public class SmsFlow : Flow<string>, IHaveState<SmsFlow.FlowState>
+public class SmsFlow : Flow<string>, IHaveState<SmsFlow.SmsState>
 {
-    public required FlowState State { get; init; }
+    public required SmsState State { get; init; }
     
     public override async Task Run(string customerPhoneNumber)
     {
@@ -24,7 +24,7 @@ public class SmsFlow : Flow<string>, IHaveState<SmsFlow.FlowState>
             var codeFromUser = await Messages
                 .OfType<CodeFromUser>()
                 .Skip(i)
-                .SuspendUntilFirst();
+                .First();
 
             if (IsExpired(codeFromUser))
                 State.Status = MostRecentAttempt.CodeExpired;
@@ -40,7 +40,7 @@ public class SmsFlow : Flow<string>, IHaveState<SmsFlow.FlowState>
         State.Status = MostRecentAttempt.MaxAttemptsExceeded;
     }
 
-    public class FlowState : WorkflowState
+    public class SmsState : FlowState
     {
         public MostRecentAttempt Status { get; set; }
     }
