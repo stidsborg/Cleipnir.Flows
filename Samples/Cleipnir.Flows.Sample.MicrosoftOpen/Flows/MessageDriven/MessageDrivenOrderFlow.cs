@@ -1,5 +1,4 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
-using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Route = Cleipnir.ResilientFunctions.Domain.Route;
@@ -16,8 +15,8 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
-    
-    private static readonly TimeSpan? MaxWait = TimeSpan.FromSeconds(30); 
+
+    private static readonly TimeSpan? MaxWait = null; //TimeSpan.FromSeconds(30); 
     
     public override async Task Run(Order order)
     {
@@ -38,13 +37,40 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
         
         Console.WriteLine("MessageDriven-OrderFlow Completed");
     }
-    
-    private Task ReserveFunds(Order order, Guid transactionId) 
-        => bus.Send(new ReserveFunds(order.OrderId, order.TotalPrice, transactionId, order.CustomerId));
+
+    private Task ReserveFunds(Order order, Guid transactionId)
+        => Effect.Capture(
+            "ReserveFunds",
+            async () =>
+            {
+                Console.WriteLine("Reserving funds");
+                await bus.Send(new ReserveFunds(order.OrderId, order.TotalPrice, transactionId, order.CustomerId));
+            });
+
     private Task ShipProducts(Order order)
-        => bus.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
+        => Effect.Capture(
+            "ShipProducts",
+            async () =>
+            {
+                Console.WriteLine("Shipping Products");
+                await bus.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
+            });
+
     private Task CaptureFunds(Order order, Guid transactionId)
-        => bus.Send(new CaptureFunds(order.OrderId, order.CustomerId, transactionId));
+        => Effect.Capture(
+            "CaptureFunds",
+            async () =>
+            {
+                Console.WriteLine("Capturing funds");
+                await bus.Send(new CaptureFunds(order.OrderId, order.CustomerId, transactionId));
+            });
+
     private Task SendOrderConfirmationEmail(Order order, ProductsShipped productsShipped)
-        => bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, productsShipped.TrackAndTraceNumber));
+        => Effect.Capture(
+            "SendOrderConfirmationEmail",
+            async () =>
+            {
+                Console.WriteLine("Sending Order-confirmation Email");
+                await bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, productsShipped.TrackAndTraceNumber));
+            });
 }

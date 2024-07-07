@@ -28,6 +28,19 @@ public class OrderController : ControllerBase
         return Ok();
     }
     
+    [HttpPost("RetryShipProducts")]
+    public async Task<ActionResult> Post(string orderNumber)
+    {
+        var controlPanel = await _orderFlows.ControlPanel(orderNumber);
+        if (controlPanel is null)
+            return NotFound();
+
+        await controlPanel.Effects.Remove("ShipProducts");
+        await controlPanel.ReInvoke();
+        
+        return Ok();
+    }
+    
     [HttpGet]
     public async Task<ActionResult> Get(string orderId)
     {
