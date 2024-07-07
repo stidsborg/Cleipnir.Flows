@@ -1,10 +1,9 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
-using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Route = Cleipnir.ResilientFunctions.Domain.Route;
 
-namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven;
+namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
 public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     ISubscribeTo<FundsReserved>,
@@ -17,23 +16,23 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
     
-    private static readonly TimeSpan? MaxWait = TimeSpan.FromSeconds(30); 
+    private static readonly TimeSpan? MaxWait = default; 
     
     public override async Task Run(Order order)
     {
         Console.WriteLine("MessageDriven-OrderFlow Started");
         var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
 
-        await ReserveFunds(order, transactionId);
+        await Effect.Capture("ReserveFunds", () => ReserveFunds(order, transactionId));
         await Messages.FirstOfType<FundsReserved>(MaxWait);
 
-        await ShipProducts(order);
+        await Effect.Capture("ShipProducts", () => ShipProducts(order));
         var productsShipped = await Messages.FirstOfType<ProductsShipped>(MaxWait);
         
-        await CaptureFunds(order, transactionId);
+        await Effect.Capture("CaptureFunds", () => CaptureFunds(order, transactionId));
         await Messages.FirstOfType<FundsCaptured>(MaxWait);
 
-        await SendOrderConfirmationEmail(order, productsShipped);
+        await Effect.Capture("SendOrderConfirmationEmail", () => SendOrderConfirmationEmail(order, productsShipped));
         await Messages.FirstOfType<OrderConfirmationEmailSent>(MaxWait);
         
         Console.WriteLine("MessageDriven-OrderFlow Completed");
