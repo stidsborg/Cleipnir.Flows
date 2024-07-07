@@ -123,21 +123,22 @@ public class WaitForMessagesFlow : Flow<string>
     await Messages
       .OfTypes<FundsReserved, InventoryLocked>()
       .Take(2)
-      .Completion();
+      .Completion(maxWait: TimeSpan.FromSeconds(30));
 
     System.Console.WriteLine("Complete order-processing");
   }
 }
 ```
-Alternatively, the flow can also be suspended to save resources:
+When the max wait duration has passed the flow is automatically suspended in order to save resources.
+Thus, the flow can also be suspended immediately when all messages have not been received:
 ```csharp
 await Messages
   .OfTypes<FundsReserved, InventoryLocked>()
   .Take(2)
-  .SuspendUntilCompletion();
+  .Completion();
 ```
 
-4: Signal externally to an executing Flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/a4ada3e734634278a81ca8fd25a39e058b628d50/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages/Example.cs#L26)):
+4: Signal externally to an executing flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/a4ada3e734634278a81ca8fd25a39e058b628d50/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages/Example.cs#L26)):
 ```csharp
 var messagesWriter = flows.MessagesWriter(orderId);
 await messagesWriter.AppendMessage(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
@@ -322,7 +323,7 @@ public async Task ProcessOrder(Order order)
 
 A *failed/exception throwing* flow is not automatically retried by the framework.
 
-Instead it must be manually restarted by using the flow's associated control-panel. 
+Instead, it must be manually restarted by using the flow's associated control-panel. 
 
 **Control Panel:**
 
@@ -356,16 +357,16 @@ public async Task ProcessOrder(Order order)
 {
   Log.Logger.Information($"ORDER_PROCESSOR: Processing of order '{order.OrderId}' started");  
 
-  await _messageBroker.Send(new ReserveFunds(order.OrderId, order.TotalPrice, Scrapbook.TransactionId, order.CustomerId));
+  await _bus.Send(new ReserveFunds(order.OrderId, order.TotalPrice, Scrapbook.TransactionId, order.CustomerId));
   await Messages.NextOfType<FundsReserved>();
             
-  await _messageBroker.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
+  await _bus.Send(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds));
   await Messages.NextOfType<ProductsShipped>();
             
-  await _messageBroker.Send(new CaptureFunds(order.OrderId, order.CustomerId, Scrapbook.TransactionId));
+  await _bus.Send(new CaptureFunds(order.OrderId, order.CustomerId, Scrapbook.TransactionId));
   await Messages.NextOfType<FundsCaptured>();
 
-  await _messageBroker.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId));
+  await _bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId));
   await Messages.NextOfType<OrderConfirmationEmailSent>();
 
   Log.Logger.ForContext<OrderProcessor>().Information($"Processing of order '{order.OrderId}' completed");      
