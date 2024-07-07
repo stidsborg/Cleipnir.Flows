@@ -1,19 +1,20 @@
 using Cleipnir.Flows.Sample.MicrosoftOpen.Flows;
-using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
+using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using static System.Environment;
 using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OrderController : ControllerBase
+public class MessageDrivenOrderController : ControllerBase
 {
     private readonly ILogger _logger = Log.Logger.ForContext<OrderController>();
-    private readonly OrderFlows _orderFlows;
+    private readonly MessageDrivenOrderFlows _orderFlows;
 
-    public OrderController(OrderFlows orderFlows)
+    public MessageDrivenOrderController(MessageDrivenOrderFlows orderFlows)
     {
         _orderFlows = orderFlows;
     }
@@ -22,7 +23,7 @@ public class OrderController : ControllerBase
     public async Task<ActionResult> Post(Order order)
     {
         _logger.Information("Started processing {OrderId}", order.OrderId);
-        await _orderFlows.Run(order.OrderId, order);
+        await _orderFlows.Schedule(order.OrderId, order);
         _logger.Information("Completed processing {OrderId}", order.OrderId);
         
         return Ok();
@@ -36,7 +37,7 @@ public class OrderController : ControllerBase
             return NotFound();
 
         var effects = string.Join(
-            Environment.NewLine,
+            NewLine,
             controlPanel
                 .Effects
                 .All
@@ -44,6 +45,16 @@ public class OrderController : ControllerBase
                 .Select(se => new { Id = se.EffectId, se.WorkStatus }.ToString())
         );
         
-        return Ok(effects);
+        var messages = string.Join(
+            NewLine,
+            controlPanel
+                .Messages
+                .Select(msg => msg.ToString())
+        );
+        
+        return Ok(
+            "Effects: " + NewLine + effects + NewLine + NewLine +
+            "Messages: " + NewLine + messages + NewLine
+        );
     }
 }

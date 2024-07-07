@@ -158,7 +158,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, Unit>(
             flowName,
-            (param, workflow) => callChain(param, workflow)
+            inner: (param, workflow) => callChain(param, workflow),
+            settings: new Settings(routes: CreateRoutingInformation())
         );
     }
 
@@ -206,7 +207,8 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
         
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
             flowName,
-            (param, workflow) => callChain(param, workflow)
+            inner: (param, workflow) => callChain(param, workflow),
+            new Settings(routes: CreateRoutingInformation())
         );
     }
 

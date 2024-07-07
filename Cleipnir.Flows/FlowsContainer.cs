@@ -60,8 +60,10 @@ public class FlowsContainer : IDisposable
         where TFlow : Flow<TParam, TResult>
         where TParam : notnull => new(flowName, flowsContainer: this);
 
-    public async Task DeliverMessage<TMessage>(TMessage msg) where TMessage : notnull 
-        => await FunctionRegistry.DeliverMessage(msg);
+    public async Task DeliverMessage<TMessage>(TMessage message) where TMessage : notnull 
+        => await FunctionRegistry.DeliverMessage(message);
+    public async Task DeliverMessage(object message, Type messageType) 
+        => await FunctionRegistry.DeliverMessage(message, messageType);
     
     public void Dispose() => FunctionRegistry.Dispose();
 

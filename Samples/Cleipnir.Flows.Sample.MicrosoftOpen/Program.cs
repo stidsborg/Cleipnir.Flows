@@ -1,7 +1,8 @@
 using Cleipnir.Flows.AspNet;
 using Cleipnir.Flows.PostgresSql;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Clients;
-using Cleipnir.Flows.Sample.MicrosoftOpen.Flows;
+using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
+using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
 using Cleipnir.ResilientFunctions.PostgreSQL;
 using Serilog;
 
@@ -28,9 +29,11 @@ internal static class Program
         
         builder.Services.AddFlows(c => c
             .UsePostgresSqlStore(connectionString)
-            .WithOptions(new Options(leaseLength: TimeSpan.FromSeconds(5)))
+            .WithOptions(new Options(leaseLength: TimeSpan.FromSeconds(5))) //, messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue
             .RegisterFlowsAutomatically()
         );
+
+        builder.Services.AddInMemoryBus();
         
         // Add services to the container.
         builder.Services.AddControllers();
