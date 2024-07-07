@@ -72,7 +72,8 @@ public static class RebusExtensions
          }
          */
         
-        var deliverMessageMethod = typeof(FlowsContainer).GetMethod(nameof(FlowsContainer.DeliverMessage));
+        var flowsContainerMethods = typeof(FlowsContainer).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        var deliverMessageMethod = flowsContainerMethods.SingleOrDefault(m => m.Name == nameof(FlowsContainer.DeliverMessage) && m.GetParameters().Length == 1);
         ArgumentNullException.ThrowIfNull(deliverMessageMethod);    
         
         var assemblyName = new AssemblyName("CleipnirRebusIntegration");

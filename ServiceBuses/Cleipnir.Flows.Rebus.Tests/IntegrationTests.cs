@@ -25,6 +25,7 @@ public class IntegrationTests
         public override async Task Run()
         {
             ReceivedMyMessage = await Messages.FirstOfType<MyMessage>(maxWait: TimeSpan.MaxValue);
+            Console.WriteLine("OK");
         }
     }
 
