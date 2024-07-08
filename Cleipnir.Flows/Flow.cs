@@ -21,6 +21,9 @@ public abstract class BaseFlow
         => Effect.Capture(id, work, resiliencyLevel);
     public Task Capture(string id, Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
         => Effect.Capture(id, work, resiliencyLevel);
+
+    public void Postpone(TimeSpan @for) => Workflow.Postpone(@for);
+    public void Postpone(DateTime until) => Workflow.Postpone(until);
 }
 
 public abstract class Flow : BaseFlow
