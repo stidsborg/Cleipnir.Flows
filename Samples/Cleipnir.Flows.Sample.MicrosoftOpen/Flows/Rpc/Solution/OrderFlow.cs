@@ -14,12 +14,12 @@ public class OrderFlow(
         var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid); 
         
         await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
-        await Effect.Capture(
+        var trackAndTrace = await Effect.Capture(
             "ShipProducts",
             () => logisticsClient.ShipProducts(order.CustomerId, order.ProductIds),
             ResiliencyLevel.AtMostOnce
         );
         await paymentProviderClient.Capture(transactionId);
-        await emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+        await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
     }
 }

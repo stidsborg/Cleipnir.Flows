@@ -14,8 +14,8 @@ public class OrderFlow(
         var transactionId = Guid.NewGuid(); 
         
         await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
-        await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
+        var trackAndTrace = await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
         await paymentProviderClient.Capture(transactionId);
-        await emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+        await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
     }
 }
