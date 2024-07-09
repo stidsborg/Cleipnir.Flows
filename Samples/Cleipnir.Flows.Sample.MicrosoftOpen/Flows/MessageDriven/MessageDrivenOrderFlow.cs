@@ -11,11 +11,13 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     ISubscribeTo<FundsCaptured>,
     ISubscribeTo<OrderConfirmationEmailSent>
 {
+    #region Routing
     public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
-
+    #endregion
+    
     private static readonly TimeSpan? MaxWait = null; //TimeSpan.FromSeconds(30); 
     
     public override async Task Run(Order order)
@@ -32,12 +34,13 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
         await CaptureFunds(order, transactionId);
         await Messages.FirstOfType<FundsCaptured>(MaxWait);
 
-        await SendOrderConfirmationEmail(order, productsShipped);
+        await SendOrderConfirmationEmail(order, productsShipped.TrackAndTraceNumber);
         await Messages.FirstOfType<OrderConfirmationEmailSent>(MaxWait);
         
         Console.WriteLine("MessageDriven-OrderFlow Completed");
     }
 
+    #region MessagePublishers
     private Task ReserveFunds(Order order, Guid transactionId)
         => Effect.Capture(
             "ReserveFunds",
@@ -65,12 +68,13 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
                 await bus.Send(new CaptureFunds(order.OrderId, order.CustomerId, transactionId));
             });
 
-    private Task SendOrderConfirmationEmail(Order order, ProductsShipped productsShipped)
+    private Task SendOrderConfirmationEmail(Order order, string trackAndTraceNumber)
         => Effect.Capture(
             "SendOrderConfirmationEmail",
             async () =>
             {
                 Console.WriteLine("Sending Order-confirmation Email");
-                await bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, productsShipped.TrackAndTraceNumber));
+                await bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, trackAndTraceNumber));
             });
+    #endregion
 }
