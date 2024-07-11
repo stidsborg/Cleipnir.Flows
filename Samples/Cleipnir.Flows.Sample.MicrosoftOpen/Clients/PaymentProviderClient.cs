@@ -7,6 +7,7 @@ public interface IPaymentProviderClient
     Task Reserve(Guid customerId, Guid transactionId, decimal amount);
     Task Capture(Guid transactionId);
     Task CancelReservation(Guid transactionId);
+    bool IsServiceDown();
 }
 
 public class PaymentProviderClientStub : IPaymentProviderClient
@@ -24,4 +25,6 @@ public class PaymentProviderClientStub : IPaymentProviderClient
         => Task.Delay(100).ContinueWith(_ => 
             Log.Logger.ForContext<IPaymentProviderClient>().Information("PAYMENT_PROVIDER: Reservation cancelled")
         );
+
+    public bool IsServiceDown() => false;
 }
