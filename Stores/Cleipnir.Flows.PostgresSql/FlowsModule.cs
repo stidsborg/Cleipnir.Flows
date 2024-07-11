@@ -8,7 +8,7 @@ namespace Cleipnir.Flows.PostgresSql;
 
 public static class FlowsModule
 {
-    public static FlowsConfigurator UsePostgresSqlStore(
+    public static FlowsConfigurator UsePostgresStore(
         this FlowsConfigurator configurator, 
         Func<IServiceProvider, string> connectionStringFunc, 
         bool initializeDatabase = true,
@@ -29,10 +29,10 @@ public static class FlowsModule
         return configurator;
     }
 
-    public static FlowsConfigurator UsePostgresSqlStore(
+    public static FlowsConfigurator UsePostgresStore(
         this FlowsConfigurator configurator,
         string connectionString,
         bool initializeDatabase = true,
         string tablePrefix = "flows"
-    ) => UsePostgresSqlStore(configurator, _ => connectionString, initializeDatabase, tablePrefix);
+    ) => UsePostgresStore(configurator, _ => connectionString, initializeDatabase, tablePrefix);
 }
