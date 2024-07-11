@@ -26,7 +26,10 @@ Install-Package Cleipnir.Flows.Postgres
 
 Secondly, add the following to the setup in `Program.cs`:
 ```csharp
-builder.Services.UseFlows(connectionString);
+builder.Services.AddFlows(c => c
+  .UsePostgresSqlStore(connectionString)  
+  .RegisterFlowsAutomatically()
+);
 ```
 
 Finally, implement your flow:
@@ -138,7 +141,7 @@ await Messages
   .Completion();
 ```
 
-4: Signal externally to an executing flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/a4ada3e734634278a81ca8fd25a39e058b628d50/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages/Example.cs#L26)):
+4: Emit a signal to a flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/a4ada3e734634278a81ca8fd25a39e058b628d50/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages/Example.cs#L26)):
 ```csharp
 var messagesWriter = flows.MessagesWriter(orderId);
 await messagesWriter.AppendMessage(new FundsReserved(orderId), idempotencyKey: nameof(FundsReserved));
