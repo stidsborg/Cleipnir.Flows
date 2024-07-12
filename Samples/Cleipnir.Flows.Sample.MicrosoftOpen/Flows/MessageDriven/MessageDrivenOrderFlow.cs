@@ -18,24 +18,22 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
     #endregion
     
-    private static readonly TimeSpan? MaxWait = null; //TimeSpan.FromSeconds(30); 
-    
     public override async Task Run(Order order)
     {
         Console.WriteLine("MessageDriven-OrderFlow Started");
         var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
 
         await ReserveFunds(order, transactionId);
-        await Messages.FirstOfType<FundsReserved>(MaxWait);
+        await Messages.FirstOfType<FundsReserved>();
 
         await ShipProducts(order);
-        var productsShipped = await Messages.FirstOfType<ProductsShipped>(MaxWait);
+        var productsShipped = await Messages.FirstOfType<ProductsShipped>();
         
         await CaptureFunds(order, transactionId);
-        await Messages.FirstOfType<FundsCaptured>(MaxWait);
+        await Messages.FirstOfType<FundsCaptured>();
 
         await SendOrderConfirmationEmail(order, productsShipped.TrackAndTraceNumber);
-        await Messages.FirstOfType<OrderConfirmationEmailSent>(MaxWait);
+        await Messages.FirstOfType<OrderConfirmationEmailSent>();
         
         Console.WriteLine("MessageDriven-OrderFlow Completed");
     }
