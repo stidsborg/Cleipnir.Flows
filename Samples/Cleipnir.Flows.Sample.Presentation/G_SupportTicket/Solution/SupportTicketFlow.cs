@@ -17,9 +17,9 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
             );
 
             var option = await Messages
+                .TakeUntilTimeout(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15))
                 .OfTypes<SupportTicketTaken, SupportTicketRejected>()
                 .Where(e => e.Match(taken => taken.Iteration, rejected => rejected.Iteration) == i)
-                .TakeUntilTimeout(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15))
                 .FirstOrNone();
 
             if (!option.HasValue && option.Value.AsObject() is SupportTicketTaken)

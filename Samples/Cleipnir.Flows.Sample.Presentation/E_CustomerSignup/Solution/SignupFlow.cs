@@ -11,8 +11,8 @@ public class SignupFlow : Flow<string>
         for (var i = 0; i <= 3; i++)
         {
             var emailVerifiedOption = await Messages
-                .OfType<EmailVerified>()
                 .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromDays(1))
+                .OfType<EmailVerified>()
                 .FirstOrNone();
 
             if (emailVerifiedOption.HasValue)
