@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using Cleipnir.Flows.AspNet;
 using Rebus.Config;
 using Rebus.Handlers;
 
@@ -36,12 +36,15 @@ public class CleipnirRebusConfiguation
 
 public static class RebusExtensions
 {
-    public static IServiceCollection IntegrateRebusWithFlows(
-        this IServiceCollection services, 
-        Func<CleipnirRebusConfiguation, CleipnirRebusConfiguation> config)
+    public static FlowsConfigurator IntegrateWithRebus(
+        this FlowsConfigurator flowsConfigurator, 
+        Func<CleipnirRebusConfiguation, CleipnirRebusConfiguation>? config = null)
     {
         var configuration = new CleipnirRebusConfiguation();
-        config(configuration);
+        if (config != null)
+            config(configuration);
+        else
+            configuration.AddFlowsAutomatically(Assembly.GetCallingAssembly());
 
         var messageTypes = configuration.FlowTypes
             .SelectMany(t => t.GetInterfaces())
@@ -51,9 +54,9 @@ public static class RebusExtensions
             .ToList();
         
         var rebusHandlerType = CreateHandlerType(messageTypes);
-        services.AddRebusHandler(rebusHandlerType);
+        flowsConfigurator.Services.AddRebusHandler(rebusHandlerType);
 
-        return services;
+        return flowsConfigurator;
     }
     
     private static Type CreateHandlerType(IEnumerable<Type> handlerTypes)

@@ -24,7 +24,7 @@ public class IntegrationTests
         
         public override async Task Run()
         {
-            ReceivedMyMessage = await Messages.FirstOfType<MyMessage>(maxWait: TimeSpan.MaxValue);
+            ReceivedMyMessage = await Messages.FirstOfType<MyMessage>();
         }
     }
 
@@ -53,16 +53,17 @@ public class IntegrationTests
             .ConfigureServices((_, services) =>
             {
                 services.AddHostedService<TestHostedService>();
+                
                 services.AddFlows(c => c
                     .UseInMemoryStore()
-                    .RegisterFlow<RebusTestFlow, RebusTestFlows>());
-                services.AddRebus(
-                    configure => configure
-                        .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "who cares"))
+                    .RegisterFlow<RebusTestFlow, RebusTestFlows>()
+                    .IntegrateWithRebus()
                 );
-
-                services.IntegrateRebusWithFlows(
-                    c => c.AddFlowsAutomatically(typeof(RebusTestFlow).Assembly)
+                
+                services.AddRebus(configure =>
+                    configure.Transport(t => 
+                        t.UseInMemoryTransport(new InMemNetwork(), "who cares")
+                    )
                 );
             });
         var cancellationTokenSource = new CancellationTokenSource();
@@ -71,7 +72,7 @@ public class IntegrationTests
             cancellationTokenSource.Token
         );
 
-        await BusyWait.UntilAsync(() => RebusTestFlow.ReceivedMyMessage is not null);
+        await BusyWait.UntilAsync(() => RebusTestFlow.ReceivedMyMessage is not null, maxWait: TimeSpan.FromMinutes(5));
         RebusTestFlow.ReceivedMyMessage!.Value.ShouldBe("SomeMessage");
         await cancellationTokenSource.CancelAsync();
     }

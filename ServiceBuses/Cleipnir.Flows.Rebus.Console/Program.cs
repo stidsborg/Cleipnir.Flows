@@ -36,12 +36,17 @@ internal static class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((_, services) =>
             {
-                services.AddFlows(c => c.UseInMemoryStore().RegisterFlowsAutomatically());
-                services.AddRebus(
-                    configure => configure
-                        .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "who cares"))
+                services.AddFlows(c => c
+                    .UseInMemoryStore()
+                    .RegisterFlowsAutomatically()
+                    .IntegrateWithRebus()
                 );
-                services.IntegrateRebusWithFlows(c => c.AddFlowsAutomatically(typeof(SimpleFlow).Assembly));
+                
+                services.AddRebus(configure => 
+                    configure.Transport(
+                        t => t.UseInMemoryTransport(new InMemNetwork(), "who cares")
+                    )
+                );
                 services.AddHostedService<Service>();
             });
 }
