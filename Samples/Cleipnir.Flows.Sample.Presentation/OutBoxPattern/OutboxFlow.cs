@@ -6,6 +6,8 @@ public class OutboxFlow(IBus bus) : Flow<Order>
 {
     public override async Task Run(Order order)
     {
+        _ = bus; //fix compiler warning
+        
         await PersistOrder(order);
         await PersistToOutboxTable(new OrderHandled(order.OrderId));
     }

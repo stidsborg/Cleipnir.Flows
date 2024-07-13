@@ -10,9 +10,9 @@ public class LoanApplicationFlow2 : Flow<LoanApplication>
         await MessageBroker.Send(PerformCreditCheck(loanApplication));
         
         var outcomes = await Messages
+            .TakeUntilTimeout("Timeout", TimeSpan.FromMinutes(15))
             .OfType<CreditCheckOutcome>()
             .Take(3)
-            .TakeUntilTimeout("Timeout", TimeSpan.FromMinutes(15))
             .Completion();
         
         if (outcomes.Count < 2)

@@ -14,6 +14,7 @@ public class EngagementFlow : Flow<string>
         for (var i = 0; i < 10; i++)
         {
             var either = await Messages
+                .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromHours(1))
                 .OfTypes<EngagementAccepted, EngagementRejected>()
                 .Where(either =>
                     either.Match(
@@ -21,7 +22,6 @@ public class EngagementFlow : Flow<string>
                         second: r => r.Iteration == i
                     )
                 )
-                .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromHours(1))
                 .FirstOrDefault();
 
             if (either?.AsObject() is EngagementAccepted)
