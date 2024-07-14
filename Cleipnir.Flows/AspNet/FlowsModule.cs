@@ -71,6 +71,15 @@ public class FlowsConfigurator
 
         return this;
     }
+    
+    public FlowsConfigurator RegisterFlow<TFlow, TFlows>(Func<IServiceProvider, TFlows> factory) where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
+    {
+        Services.AddScoped<TFlow>();
+        Services.AddTransient(factory);
+        FlowsTypes = FlowsTypes.Append(typeof(TFlows));
+
+        return this;
+    }
 
     public FlowsConfigurator RegisterFlowsAutomatically(Assembly? rootAssembly = null)
     {

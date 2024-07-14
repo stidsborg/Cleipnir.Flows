@@ -1,0 +1,66 @@
+using Cleipnir.Flows.AspNet;
+using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Domain.Exceptions;
+using Cleipnir.ResilientFunctions.Reactive.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
+
+namespace Cleipnir.Flows.Tests.Flows;
+
+[TestClass]
+public class OptionsTests
+{
+    [TestMethod]
+    public async Task SimpleFlowCompletesSuccessfully()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddFlows(c => c
+            .UseInMemoryStore()
+            .WithOptions(new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue))
+            .RegisterFlow<OptionsTestWithOverriddenOptionsFlow, OptionsTestWithOverriddenOptionsFlows>(
+                factory: sp => new OptionsTestWithOverriddenOptionsFlows(
+                    sp.GetRequiredService<FlowsContainer>(),
+                    new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.Zero)
+                )
+            )
+            .RegisterFlow<OptionsTestWithDefaultProvidedOptionsFlow, OptionsTestWithDefaultProvidedOptionsFlows>()
+        );
+
+        var sp = serviceCollection.BuildServiceProvider();
+        var flowsWithOverridenOptions = sp.GetRequiredService<OptionsTestWithOverriddenOptionsFlows>();
+
+        await Should.ThrowAsync<FunctionInvocationSuspendedException>(
+            () => flowsWithOverridenOptions.Run("Id")
+        );
+        
+        var flowsWithDefaultProvidedOptions = sp.GetRequiredService<OptionsTestWithDefaultProvidedOptionsFlows>();
+        await flowsWithDefaultProvidedOptions.Schedule("Id");
+
+        await Task.Delay(100);
+        
+        var controlPanel = await flowsWithDefaultProvidedOptions.ControlPanel("Id");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Executing);
+
+        await controlPanel.Messages.Append("Hello");
+
+        await controlPanel.WaitForCompletion();        
+    }
+
+    public class OptionsTestWithOverriddenOptionsFlow : Flow
+    {
+        public override async Task Run()
+        {
+            await Messages.First();
+        }
+    }
+    
+    public class OptionsTestWithDefaultProvidedOptionsFlow : Flow
+    {
+        public override async Task Run()
+        {
+            await Messages.First();
+        }
+    }
+}

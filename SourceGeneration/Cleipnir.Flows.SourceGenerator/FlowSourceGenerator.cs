@@ -190,12 +190,14 @@ namespace Cleipnir.Flows.SourceGenerator
                 generatedCode = 
 $@"namespace {flowsNamespace}
 {{
+    #nullable enable
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}>
-    {{
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
+    {{        
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, Cleipnir.Flows.Options? options = null)
+            : base(flowName: ""{flowName}"", flowsContainer, options) {{ }}             
     }}
+    #nullable disable   
 }}";                
             }
             else if (resultType == null)
@@ -203,12 +205,14 @@ $@"namespace {flowsNamespace}
                 generatedCode = 
 $@"namespace {flowsNamespace}
 {{
+    #nullable enable
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}>
     {{
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: ""{flowName}"", flowsContainer) {{ }}      
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, Cleipnir.Flows.Options? options = null)
+            : base(flowName: ""{flowName}"", flowsContainer, options) {{ }}      
     }}
+    #nullable disable
 }}";
             }
             else
@@ -216,12 +220,14 @@ $@"namespace {flowsNamespace}
                 generatedCode = 
 $@"namespace {flowsNamespace}
 {{
+    #nullable enable
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}, {resultType}>
     {{
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer)
-            : base(flowName: ""{flowName}"", flowsContainer) {{ }}
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, Cleipnir.Flows.Options? options = null)
+            : base(flowName: ""{flowName}"", flowsContainer, options) {{ }}
     }}
+    #nullable disable
 }}";
             }
 
@@ -229,10 +235,8 @@ $@"namespace {flowsNamespace}
             {   
                 var getStateStr = $@"
 
-        #nullable enable
         public Task<{stateType}?> GetState(string functionInstanceId) 
-            => GetState<{stateType}>(functionInstanceId);
-        #nullable disable";
+            => GetState<{stateType}>(functionInstanceId);";
                 var constructorEndPosition = generatedCode.IndexOf("{ }", StringComparison.Ordinal);
                 generatedCode = generatedCode.Insert(constructorEndPosition + 3, getStateStr);
             }

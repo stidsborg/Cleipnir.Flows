@@ -104,7 +104,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 {
     private readonly ParamlessRegistration _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<Unit, Unit>(runFlow: async (flow, _) =>
         {
@@ -115,7 +115,9 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         _registration = flowsContainer.FunctionRegistry.RegisterParamless(
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
-            new Settings(routes: CreateRoutingInformation())
+            (options ?? Options.Default)
+                .Merge(new Options(routes: CreateRoutingInformation()))
+                .MapToRFunctionsSettings()
         );
     }
 
@@ -147,7 +149,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 {
     private readonly FuncRegistration<TParam, Unit> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<TParam, Unit>(
             runFlow: async (flow, param) =>
@@ -159,7 +161,9 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, Unit>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
-            settings: new Settings(routes: CreateRoutingInformation())
+            settings: (options ?? Options.Default)
+                .Merge(new Options(routes: CreateRoutingInformation()))
+                .MapToRFunctionsSettings()
         );
     }
 
@@ -199,7 +203,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 {
     private readonly FuncRegistration<TParam, TResult> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<TParam, TResult>(
             runFlow: (flow, param) => flow.Run(param)
@@ -208,7 +212,9 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
-            new Settings(routes: CreateRoutingInformation())
+            (options ?? Options.Default)
+                .Merge(new Options(routes: CreateRoutingInformation()))
+                .MapToRFunctionsSettings()
         );
     }
 

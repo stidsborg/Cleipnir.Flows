@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cleipnir.Flows.CrossCutting;
 using Cleipnir.ResilientFunctions.CoreRuntime.ParameterSerialization;
 using Cleipnir.ResilientFunctions.Domain;
@@ -64,6 +65,33 @@ public class Options
     {
         Middlewares.Add(new MiddlewareInstance(middleware));
         return this;
+    }
+
+    public Options Merge(Options options)
+    {
+        var merged = new Options(
+            UnhandledExceptionHandler ?? options.UnhandledExceptionHandler,
+            RetentionPeriod ?? options.RetentionPeriod,
+            RetentionCleanUpFrequency ?? options.RetentionCleanUpFrequency,
+            LeaseLength ?? options.LeaseLength,
+            EnableWatchdogs ?? options.EnableWatchdogs,
+            WatchdogCheckFrequency ?? options.WatchdogCheckFrequency,
+            MessagesPullFrequency ?? options.MessagesPullFrequency,
+            MessagesDefaultMaxWaitForCompletion ?? options.MessagesDefaultMaxWaitForCompletion,
+            DelayStartup ?? options.DelayStartup,
+            MaxParallelRetryInvocations ?? options.MaxParallelRetryInvocations,
+            Serializer ?? options.Serializer,
+            Routes ?? options.Routes
+        );
+        
+        if (Middlewares.Any())
+            foreach (var middleware in Middlewares)
+                merged.Middlewares.Add(middleware);
+        else
+            foreach (var middleware in options.Middlewares)
+                merged.Middlewares.Add(middleware);
+
+        return merged;
     }
 
     internal Settings MapToRFunctionsSettings()
