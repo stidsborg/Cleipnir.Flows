@@ -39,7 +39,7 @@ public class ParamlessFlowsTests
         public override async Task Run()
         {
             await Task.Delay(1);
-            InstanceId = Workflow.FunctionId.InstanceId.ToString();
+            InstanceId = Workflow.FlowId.Instance.ToString();
         }
     }
     
@@ -109,7 +109,7 @@ public class ParamlessFlowsTests
         controlPanel.Status.ShouldBe(Status.Failed);
 
         FailingParamlessFlow.ShouldThrow = false;
-        await controlPanel.ReInvoke();
+        await controlPanel.Restart();
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);

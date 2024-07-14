@@ -85,7 +85,7 @@ public class OptionsTests
         var flows = sp.GetRequiredService<SimpleFlows>();
         await flows.Run("Id");
         var store = sp.GetRequiredService<IFunctionStore>();
-        var sf = await store.GetFunction(new FunctionId("SomeOtherFlowName", "Id"));
+        var sf = await store.GetFunction(new FlowId("SomeOtherFlowName", "Id"));
         sf.ShouldNotBeNull();
         sf.Status.ShouldBe(Status.Succeeded);
     }

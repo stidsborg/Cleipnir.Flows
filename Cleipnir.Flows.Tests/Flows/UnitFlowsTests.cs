@@ -42,7 +42,7 @@ public class UnitFlowsTests
         {
             await Task.Delay(1);
             ExecutedWithParameter = param;
-            InstanceId = Workflow.FunctionId.InstanceId.ToString();
+            InstanceId = Workflow.FlowId.Instance.ToString();
         }
     }
     
@@ -112,7 +112,7 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Failed);
 
         FailingUnitFlow.ShouldThrow = false;
-        await controlPanel.ReInvoke();
+        await controlPanel.Restart();
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);

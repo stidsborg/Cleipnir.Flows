@@ -36,7 +36,7 @@ public class OrderController : ControllerBase
             return NotFound();
 
         await controlPanel.Effects.Remove("ShipProducts");
-        await controlPanel.ReInvoke();
+        await controlPanel.Restart();
         
         return Ok();
     }

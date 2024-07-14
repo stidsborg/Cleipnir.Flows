@@ -45,7 +45,7 @@ public class FlowsWithResultTests
         {
             await Task.Delay(1);
             ExecutedWithParameter = param;
-            InstanceId = Workflow.FunctionId.InstanceId.ToString();
+            InstanceId = Workflow.FlowId.Instance.ToString();
 
             return 1;
         }
@@ -119,7 +119,7 @@ public class FlowsWithResultTests
         controlPanel.Status.ShouldBe(Status.Failed);
 
         FailingFuncFlow.ShouldThrow = false;
-        await controlPanel.ReInvoke();
+        await controlPanel.Restart();
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);
