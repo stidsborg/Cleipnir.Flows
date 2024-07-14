@@ -10,6 +10,6 @@ public class SimpleFlow : Flow, ISubscribeTo<MyMessage>
     public override async Task Run()
     {
         var msg = await Messages.FirstOfType<MyMessage>();
-        System.Console.WriteLine($"Message received in SimpleFlow: {msg}");
+        System.Console.WriteLine($"SimpleFlow({msg}) executed");
     }
 }

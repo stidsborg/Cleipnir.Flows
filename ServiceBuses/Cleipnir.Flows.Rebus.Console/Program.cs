@@ -1,4 +1,6 @@
 ﻿using Cleipnir.Flows.AspNet;
+using Cleipnir.ResilientFunctions.Helpers;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rebus.Bus;
@@ -9,27 +11,28 @@ namespace Cleipnir.Flows.Rebus.Console;
 
 internal static class Program
 {
-    private class Service(IBus bus) : IHostedService
-    {
-        
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _ = Task.Delay(1_000).ContinueWith(_ =>
-                bus.SendLocal(new MyMessage("Hallo from HostedService!!!"))
-            );
-            
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-    }
-    
     public static async Task Main(string[] args)
     {
-        await CreateHostBuilder([]).RunConsoleAsync();
+        var host = await CreateHostBuilder([]).StartAsync();
+        var bus = host.Services.GetRequiredService<IBus>();
+        var store = host.Services.GetRequiredService<IFunctionStore>();
+        
+        for (var i = 0; i < 1_000; i++)
+            await bus.SendLocal(new MyMessage(i.ToString()));
+        
+        while (true)
+        {
+            var succeeded = await store.GetSucceededFunctions(
+                nameof(SimpleFlow),
+                DateTime.UtcNow.Ticks + 1_000_000
+            ).SelectAsync(f => f.Count);
+            if (succeeded == 1_000)
+                break;
+            await Task.Delay(250);
+        }
+
+        System.Console.WriteLine("All completed");
+        //await host.WaitForShutdownAsync();
     }
     
     private static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -47,6 +50,5 @@ internal static class Program
                         t => t.UseInMemoryTransport(new InMemNetwork(), "who cares")
                     )
                 );
-                services.AddHostedService<Service>();
             });
 }
