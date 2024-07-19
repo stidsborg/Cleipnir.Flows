@@ -23,15 +23,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../Cleipnir.Flows/Cleipnir.Flows.csproj" />
+        <ProjectReference Include="../../../Cleipnir.Flows/Cleipnir.Flows.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../../cleipnir.png">
+        <None Include="../../../cleipnir.png">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
-        <None Include="../../README.md">
+        <None Include="../../../README.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
