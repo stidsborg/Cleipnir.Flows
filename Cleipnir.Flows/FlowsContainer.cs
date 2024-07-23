@@ -24,7 +24,7 @@ public class FlowsContainer : IDisposable
         {
             var logger = serviceProvider.GetRequiredService<ILogger>();
             options = new Options(
-                    unhandledExceptionHandler: excp => logger.LogError(excp, "Unhandled exception in Cleipnir Flows"),
+                    unhandledExceptionHandler: ex => logger.LogError(ex, "Unhandled exception in Cleipnir Flows"),
                     options.RetentionPeriod, 
                     options.RetentionCleanUpFrequency,
                     options.LeaseLength, 
@@ -48,24 +48,7 @@ public class FlowsContainer : IDisposable
             })
             .ToList();
     }
-
-    public Flows<TFlow> CreateFlows<TFlow>(string flowName)
-        where TFlow : Flow => new(flowName, flowsContainer: this);
-    
-    public Flows<TFlow, TParam> CreateFlows<TFlow, TParam>(string flowName)
-        where TFlow : Flow<TParam> 
-        where TParam : notnull => new(flowName, flowsContainer: this);
-    
-    public Flows<TFlow, TParam, TResult> CreateFlows<TFlow, TParam, TResult>(string flowName)
-        where TFlow : Flow<TParam, TResult>
-        where TParam : notnull => new(flowName, flowsContainer: this);
-
-    public async Task DeliverMessage<TMessage>(TMessage message) where TMessage : notnull 
-        => await FunctionRegistry.DeliverMessage(message);
-    public async Task DeliverMessage(object message, Type messageType) 
-        => await FunctionRegistry.DeliverMessage(message, messageType);
     
     public void Dispose() => FunctionRegistry.Dispose();
-
     public Task ShutdownGracefully(TimeSpan? maxWait = null) => FunctionRegistry.ShutdownGracefully(maxWait);
 }

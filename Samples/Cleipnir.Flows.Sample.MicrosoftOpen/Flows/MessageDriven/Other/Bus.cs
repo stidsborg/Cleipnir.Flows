@@ -1,6 +1,6 @@
 ﻿namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
 
-public class Bus(FlowsContainer flowsContainer)
+public class Bus(Solution.MessageDrivenOrderFlows flows)
 {
     private readonly List<Func<EventsAndCommands, Task>> _subscribers = new();
     private readonly object _lock = new();
@@ -22,7 +22,7 @@ public class Bus(FlowsContainer flowsContainer)
             foreach (var subscriber in subscribers)
                 await subscriber(msg);
 
-            await flowsContainer.DeliverMessage(msg, msg.GetType());
+            await flows.RouteMessage(msg, msg.GetType());
         });
         
         return Task.CompletedTask;

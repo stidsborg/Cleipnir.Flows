@@ -22,7 +22,7 @@ public class ParamlessFlowsTests
             Options.Default
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleParamlessFlow>(nameof(SimpleParamlessFlow));
+        var flows = new SimpleParamlessFlows(flowsContainer);
         await flows.Run("someInstanceId");
         
         SimpleParamlessFlow.InstanceId.ShouldBe("someInstanceId");
@@ -32,6 +32,12 @@ public class ParamlessFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
+    private class SimpleParamlessFlows : Flows<SimpleParamlessFlow>
+    {
+        public SimpleParamlessFlows(FlowsContainer flowsContainer) 
+            : base(nameof(SimpleParamlessFlow), flowsContainer, options: null) { }
+    }
+    
     public class SimpleParamlessFlow : Flow
     {
         public static string? InstanceId { get; set; } 
@@ -56,8 +62,7 @@ public class ParamlessFlowsTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<EventDrivenParamlessFlow>(nameof(EventDrivenParamlessFlow));
-
+        var flows = new EventDrivenParamlessFlows(flowsContainer); 
         await flows.Schedule("someInstanceId");
 
         await Task.Delay(10);
@@ -73,6 +78,12 @@ public class ParamlessFlowsTests
         await controlPanel.Refresh();
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+
+    private class EventDrivenParamlessFlows : Flows<EventDrivenParamlessFlow>
+    {
+        public EventDrivenParamlessFlows(FlowsContainer flowsContainer) 
+            : base(nameof(EventDrivenParamlessFlow), flowsContainer, options: null) { }
     }
     
     public class EventDrivenParamlessFlow : Flow
@@ -96,8 +107,7 @@ public class ParamlessFlowsTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<FailingParamlessFlow>(nameof(FailingParamlessFlow));
-
+        var flows = new FailingParamlessFlows(flowsContainer);
         FailingParamlessFlow.ShouldThrow = true;
         
         await Should.ThrowAsync<TimeoutException>(() =>
@@ -113,6 +123,12 @@ public class ParamlessFlowsTests
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+
+    private class FailingParamlessFlows : Flows<FailingParamlessFlow>
+    {
+        public FailingParamlessFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingParamlessFlow), flowsContainer, options: null) { }
     }
     
     public class FailingParamlessFlow : Flow

@@ -14,8 +14,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows;
 
-public abstract class BaseFlows<TFlow> where TFlow : notnull
+public interface IBaseFlows
 {
+    public static abstract Type FlowType { get; }
+    public Task RouteMessage<T>(T message) where T : class;
+}
+public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
+{
+    public static Type FlowType { get; } = typeof(TFlow);
+    
     private FlowsContainer FlowsContainer { get; }
     
     protected BaseFlows(FlowsContainer flowsContainer) => FlowsContainer = flowsContainer;
@@ -98,12 +105,17 @@ public abstract class BaseFlows<TFlow> where TFlow : notnull
             }
         );
     }
+
+    public Task RouteMessage<T>(T message) where T : class
+        => RouteMessage(message, typeof(T));
+
+    public abstract Task RouteMessage(object message, Type messageType);
 }
 
 public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 {
     private readonly ParamlessRegistration _registration;
-    
+
     public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<Unit, Unit>(runFlow: async (flow, _) =>
@@ -141,6 +153,8 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     
     public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
     public Task ScheduleIn(string functionInstanceId, TimeSpan delay) => _registration.ScheduleIn(functionInstanceId, delay);
+    
+    public override Task RouteMessage(object message, Type messageType) => _registration.PostMessage(message, messageType);
 }
 
 public class Flows<TFlow, TParam> : BaseFlows<TFlow>
@@ -195,6 +209,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         TParam param,
         TimeSpan delay
     ) => _registration.ScheduleIn(functionInstanceId, param, delay);
+    
+    public override Task RouteMessage(object message, Type messageType) => _registration.PostMessage(message, messageType);
 }
 
 public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
@@ -243,4 +259,6 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 
     protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
         => _registration.GetState<TState>(functionInstanceId);
+    
+    public override Task RouteMessage(object message, Type messageType) => _registration.PostMessage(message, messageType);
 }

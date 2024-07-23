@@ -22,7 +22,7 @@ public class UnitFlowsTests
             Options.Default
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleUnitFlow, string>(nameof(SimpleUnitFlow));
+        var flows = new SimpleUnitFlows(flowsContainer);
         await flows.Run("someInstanceId", "someParameter");
         
         SimpleUnitFlow.InstanceId.ShouldBe("someInstanceId");
@@ -33,6 +33,12 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
+    private class SimpleUnitFlows : Flows<SimpleUnitFlow, string>
+    {
+        public SimpleUnitFlows(FlowsContainer flowsContainer) 
+            : base(nameof(SimpleUnitFlow), flowsContainer, options: null) { }
+    } 
+    
     public class SimpleUnitFlow : Flow<string>
     {
         public static string? ExecutedWithParameter { get; set; }
@@ -59,7 +65,7 @@ public class UnitFlowsTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<EventDrivenUnitFlow, string>(nameof(EventDrivenUnitFlow));
+        var flows = new EventDrivenUnitFlows(flowsContainer);
 
         await flows.Schedule("someInstanceId", "someParameter");
 
@@ -78,6 +84,12 @@ public class UnitFlowsTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
+    private class EventDrivenUnitFlows : Flows<EventDrivenUnitFlow, string>
+    {
+        public EventDrivenUnitFlows(FlowsContainer flowsContainer) 
+            : base(nameof(EventDrivenUnitFlow), flowsContainer, options: null) { }
+    }
+
     public class EventDrivenUnitFlow : Flow<string>
     {
         public override async Task Run(string param)
@@ -91,7 +103,7 @@ public class UnitFlowsTests
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<FailingUnitFlow>();
-
+        
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
             flowStore,
@@ -99,7 +111,7 @@ public class UnitFlowsTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<FailingUnitFlow, string>(nameof(FailingUnitFlow));
+        var flows = new FallingUnitFlows(flowsContainer);
 
         FailingUnitFlow.ShouldThrow = true;
         
@@ -116,6 +128,12 @@ public class UnitFlowsTests
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+
+    private class FallingUnitFlows : Flows<FailingUnitFlow, string>
+    {
+        public FallingUnitFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingUnitFlow), flowsContainer, options: null) { }
     }
     
     public class FailingUnitFlow : Flow<string>

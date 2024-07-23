@@ -23,7 +23,7 @@ public class FlowsWithResultTests
             Options.Default
         );
 
-        var flows = flowsContainer.CreateFlows<SimpleFuncFlow, string, int>(nameof(SimpleFuncFlow));
+        var flows = new SimpleFuncFlows(flowsContainer);
         var result = await flows.Run("someInstanceId", "someParameter");
         result.ShouldBe(1);
         
@@ -35,7 +35,13 @@ public class FlowsWithResultTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
         controlPanel.Result.ShouldBe(1);
     }
-
+    
+    private class SimpleFuncFlows : Flows<SimpleFuncFlow, string, int>
+    {
+        public SimpleFuncFlows(FlowsContainer flowsContainer) 
+            : base(nameof(SimpleFuncFlow), flowsContainer, options: null) { }
+    }
+    
     public class SimpleFuncFlow : Flow<string, int>
     {
         public static string? ExecutedWithParameter { get; set; }
@@ -64,8 +70,7 @@ public class FlowsWithResultTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<MessageDrivenFuncFlow, string, int>(nameof(MessageDrivenFuncFlow));
-
+        var flows = new MessageDrivenFuncFlows(flowsContainer);
         await flows.Schedule("someInstanceId", "someParameter");
 
         await Task.Delay(10);
@@ -82,6 +87,12 @@ public class FlowsWithResultTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
         controlPanel.Result.ShouldBe(2);
+    }
+
+    private class MessageDrivenFuncFlows : Flows<MessageDrivenFuncFlow, string, int>
+    {
+        public MessageDrivenFuncFlows(FlowsContainer flowsContainer) 
+            : base(nameof(MessageDrivenFuncFlow), flowsContainer, options: null) { }
     }
     
     public class MessageDrivenFuncFlow : Flow<string, int>
@@ -106,8 +117,7 @@ public class FlowsWithResultTests
             new Options()
         );
 
-        var flows = flowsContainer.CreateFlows<FailingFuncFlow, string, string>(nameof(FailingFuncFlow));
-
+        var flows = new FailingFuncFlows(flowsContainer);
         FailingFuncFlow.ShouldThrow = true;
         
         await Should.ThrowAsync<ArgumentException>(() =>
@@ -124,6 +134,12 @@ public class FlowsWithResultTests
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);
         controlPanel.Result.ShouldBe("someParameter");
+    }
+
+    private class FailingFuncFlows : Flows<FailingFuncFlow, string, string>
+    {
+        public FailingFuncFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingFuncFlow), flowsContainer, options: null) { }
     }
     
     public class FailingFuncFlow : Flow<string, string>

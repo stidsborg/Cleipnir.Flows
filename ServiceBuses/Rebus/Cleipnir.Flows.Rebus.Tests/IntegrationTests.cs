@@ -16,7 +16,7 @@ public class IntegrationTests
 {
     public record MyMessage(string Value);
 
-    private class RebusTestFlow : Flow, ISubscribeTo<MyMessage>
+    public class RebusTestFlow : Flow, ISubscribeTo<MyMessage>
     {
         public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
         
@@ -28,7 +28,7 @@ public class IntegrationTests
         }
     }
 
-    private class RebusTestFlows : Flows<RebusTestFlow>
+    public class RebusTestFlows : Flows<RebusTestFlow>
     {
         public RebusTestFlows(FlowsContainer flowsContainer) : base(flowName: "RebusTestFlow", flowsContainer) { }
     }

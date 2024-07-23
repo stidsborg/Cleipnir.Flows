@@ -5,22 +5,22 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Cleipnir.Flows.AspNet;
-using Rebus.Config;
-using Rebus.Handlers;
+using MassTransit;
+using MassTransit.Configuration;
 
-namespace Cleipnir.Flows.Rebus;
+namespace Cleipnir.Flows.MassTransit;
 
-public class CleipnirRebusConfiguation
+public class CleipnirMassTransitConfiguation
 {
     internal Dictionary<Type, Type> FlowsTypes { get; } = new();
 
-    public CleipnirRebusConfiguation AddFlow<TFlows>() where TFlows : IBaseFlows
+    public CleipnirMassTransitConfiguation AddFlow<TFlows>() where TFlows : IBaseFlows
     {
         FlowsTypes[typeof(TFlows)] = TFlows.FlowType;
         return this;
     }
 
-    public CleipnirRebusConfiguation AddFlowsAutomatically(Assembly? assembly = null)
+    public CleipnirMassTransitConfiguation AddFlowsAutomatically(Assembly? assembly = null)
     {
         assembly ??= Assembly.GetCallingAssembly();
         var assemblyFlowsTypes = assembly
@@ -48,13 +48,13 @@ public class CleipnirRebusConfiguation
     }
 }
 
-public static class RebusExtensions
+public static class MassTransitExtensions
 {
-    public static FlowsConfigurator IntegrateWithRebus(
+    public static FlowsConfigurator IntegrateWithMassTransit(
         this FlowsConfigurator flowsConfigurator, 
-        Func<CleipnirRebusConfiguation, CleipnirRebusConfiguation>? config = null)
+        Func<CleipnirMassTransitConfiguation, CleipnirMassTransitConfiguation>? config = null)
     {
-        var configuration = new CleipnirRebusConfiguation();
+        var configuration = new CleipnirMassTransitConfiguation();
         if (config != null)
             config(configuration);
         else
@@ -62,42 +62,34 @@ public static class RebusExtensions
                 Assembly.GetCallingAssembly()
             );
 
-        var rebusHandlerTypes = CreateHandlerTypes(configuration.FlowsTypes);
-        foreach (var rebusHandlerType in rebusHandlerTypes)
-            flowsConfigurator.Services.AddRebusHandler(rebusHandlerType);   
+        var massTransitConsumerTypes = CreateConsumerTypes(configuration.FlowsTypes);
+        foreach (var consumerType in massTransitConsumerTypes)
+        {
+            flowsConfigurator.Services.RegisterConsumer(
+                new DependencyInjectionContainerRegistrar(flowsConfigurator.Services),
+                consumerType
+            );
+        }
         
         return flowsConfigurator;
     }
     
-    private static IEnumerable<Type> CreateHandlerTypes(Dictionary<Type, Type> flowsDictionary)
+    private static IEnumerable<Type> CreateConsumerTypes(Dictionary<Type, Type> flowsDictionary)
     {
-        /*
-         Handler high-level:
-         
-         public class CleipnirRebusHandler : IHandleMessages<T1>, IHandleMessages<T2> ... 
-         {
-            public FlowsContainer _flowsContainer;
-            public CleipnirRebusHandler(FlowsContainer flowsContainer) => _flowsContainer = flowsContainer;
-         
-            public Task Handle(T1 msg) => _flowsContainer.DeliverMessage(msg);
-            public Task Handle(T2 msg) => _flowsContainer.DeliverMessage(msg);
-            ...        
-         }
-         */
-        
-        var assemblyName = new AssemblyName("CleipnirRebusIntegration");
+        var assemblyName = new AssemblyName("CleipnirMassTransitIntegration");
         var assembly = AssemblyBuilder.DefineDynamicAssembly(
             assemblyName,
             AssemblyBuilderAccess.Run
         );
-        var module = assembly.DefineDynamicModule("CleipnirRebusModule");
+        var module = assembly.DefineDynamicModule("CleipnirMassTransitModule");
 
-        var rebusIntegrationHandlerTypes = new List<Type>(flowsDictionary.Count);
+        var integrationHandlerTypes = new List<Type>(flowsDictionary.Count);
         
         foreach (var (flowsType, flowType) in flowsDictionary)
         {
-            var baseHandlerType = typeof(RebusGenericHandler<>).MakeGenericType(flowsType);
-            var type = module.DefineType($"{flowType.Name}Handler", TypeAttributes.Public, parent: baseHandlerType);
+            var baseHandlerType = typeof(MassTransitGenericHandler<>).MakeGenericType(flowsType);
+            //todo make this type specific name to avoid collisions
+            var type = module.DefineType($"{flowType.Name}Consumer", TypeAttributes.Public, parent: baseHandlerType);
 
             // Define Constructor
             var ctor = type.DefineConstructor(
@@ -121,13 +113,14 @@ public static class RebusExtensions
 
             foreach (var handlerType in handlerTypes)
             {
-                type.AddInterfaceImplementation(typeof(IHandleMessages<>).MakeGenericType(handlerType));
+                type.AddInterfaceImplementation(typeof(IConsumer<>).MakeGenericType(handlerType));
+                var consumeContextHandlerType = typeof(ConsumeContext<>).MakeGenericType(handlerType);
                 var handleMethod = type.DefineMethod(
-                    "Handle",
+                    "Consume",
                     MethodAttributes.Public | MethodAttributes.Virtual,
                     CallingConventions.Standard,
                     returnType: typeof(Task),
-                    [handlerType]
+                    [consumeContextHandlerType]
                 );
 
                 var handleIl = handleMethod.GetILGenerator();
@@ -144,9 +137,9 @@ public static class RebusExtensions
             }
 
             var rebusMessageHandlerType = type.CreateType();
-            rebusIntegrationHandlerTypes.Add(rebusMessageHandlerType);
+            integrationHandlerTypes.Add(rebusMessageHandlerType);
         }
 
-        return rebusIntegrationHandlerTypes;
+        return integrationHandlerTypes;
     }
 }
