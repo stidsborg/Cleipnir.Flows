@@ -33,7 +33,10 @@ public class OrderFlow : Flow<Order>
 
         await _paymentProviderClient.Capture(transactionId);
 
-        await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+        await Effect.Capture(
+            "EmailOrderConfirmation",
+            () => _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds)
+        );
 
         _logger.Information($"Processing of order '{order.OrderId}' completed");
     }

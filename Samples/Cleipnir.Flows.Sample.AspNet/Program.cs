@@ -1,7 +1,6 @@
 using Cleipnir.Flows.AspNet;
 using Cleipnir.Flows.PostgresSql;
 using Cleipnir.Flows.Sample.Clients;
-using Cleipnir.Flows.Sample.Flows;
 using Cleipnir.ResilientFunctions.PostgreSQL;
 using Serilog;
 
@@ -18,7 +17,6 @@ internal static class Program
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Host.UseSerilog();
-        builder.Services.AddScoped<OrderFlow>();
         builder.Services.AddSingleton<IEmailClient, EmailClientStub>();
         builder.Services.AddSingleton<ILogisticsClient, LogisticsClientStub>();
         builder.Services.AddSingleton<IPaymentProviderClient, PaymentProviderClientStub>();
@@ -48,7 +46,6 @@ internal static class Program
         }
 
         app.UseAuthorization();
-
         app.MapControllers();
 
         await app.RunAsync();
