@@ -16,7 +16,7 @@ public class IntegrationTests
 {
     public record MyMessage(string Value);
 
-    public class RebusTestFlow : Flow, ISubscribeTo<MyMessage>
+    public class RebusTestFlow : Flow, ISubscription<MyMessage>
     {
         public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
         

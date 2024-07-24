@@ -33,7 +33,7 @@ public class SubscribeToFlowTests
         RouteToInstanceParamlessFlow.ReceivedMessage.ShouldBe(msg);
     }
 
-    public class RouteToInstanceParamlessFlow : Flow, ISubscribeTo<Message>
+    public class RouteToInstanceParamlessFlow : Flow, ISubscription<Message>
     {
         public static RoutingInfo Correlate(Message msg) => Route.To(msg.Route);
         
@@ -70,7 +70,7 @@ public class SubscribeToFlowTests
         RouteUsingCorrelationParamlessFlow.ReceivedMessage.ShouldBe(msg);
     }
 
-    public class RouteUsingCorrelationParamlessFlow : Flow, ISubscribeTo<Message>
+    public class RouteUsingCorrelationParamlessFlow : Flow, ISubscription<Message>
     {
         public static RoutingInfo Correlate(Message msg) => Route.Using(msg.Route);
 

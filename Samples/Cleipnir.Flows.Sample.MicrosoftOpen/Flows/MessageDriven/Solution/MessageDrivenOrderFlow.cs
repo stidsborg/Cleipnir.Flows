@@ -6,10 +6,10 @@ using Route = Cleipnir.ResilientFunctions.Domain.Route;
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
 public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
-    ISubscribeTo<FundsReserved>,
-    ISubscribeTo<ProductsShipped>,
-    ISubscribeTo<FundsCaptured>,
-    ISubscribeTo<OrderConfirmationEmailSent>
+    ISubscription<FundsReserved>,
+    ISubscription<ProductsShipped>,
+    ISubscription<FundsCaptured>,
+    ISubscription<OrderConfirmationEmailSent>
 {
     public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
     public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);

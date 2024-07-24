@@ -2,7 +2,7 @@ using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.Routing;
 
-public class SubscribeToFlow : Flow, ISubscribeTo<OrderCreated>
+public class SubscriptionFlow : Flow, ISubscription<OrderCreated>
 {
     public override Task Run()
     {

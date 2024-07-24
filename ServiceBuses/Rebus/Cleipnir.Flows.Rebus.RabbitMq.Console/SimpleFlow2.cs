@@ -3,7 +3,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Rebus.RabbitMq.Console;
 
-public class SimpleFlow2 : Flow, ISubscribeTo<MyMessage>
+public class SimpleFlow2 : Flow, ISubscription<MyMessage>
 {
     public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
     

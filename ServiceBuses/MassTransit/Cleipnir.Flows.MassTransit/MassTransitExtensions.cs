@@ -107,7 +107,7 @@ public static class MassTransitExtensions
             //Implement handler types
             var handlerTypes = flowType
                 .GetInterfaces()
-                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscribeTo<>))
+                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscription<>))
                 .Select(t => t.GenericTypeArguments[0])
                 .ToList();
 

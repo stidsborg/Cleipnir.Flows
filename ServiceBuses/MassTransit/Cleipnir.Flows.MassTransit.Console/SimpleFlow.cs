@@ -3,7 +3,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.MassTransit.Console;
 
-public class SimpleFlow : Flow, ISubscribeTo<MyMessage>
+public class SimpleFlow : Flow, ISubscription<MyMessage>
 {
     public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
     
