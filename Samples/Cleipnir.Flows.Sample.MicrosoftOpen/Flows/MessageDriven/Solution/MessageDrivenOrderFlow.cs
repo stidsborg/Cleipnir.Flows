@@ -11,10 +11,10 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
     ISubscription<FundsCaptured>,
     ISubscription<OrderConfirmationEmailSent>
 {
-    public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
+    public static RoutingInfo Route(FundsReserved msg) => ResilientFunctions.Domain.Route.To(msg.OrderId);
+    public static RoutingInfo Route(ProductsShipped msg) => ResilientFunctions.Domain.Route.To(msg.OrderId);
+    public static RoutingInfo Route(FundsCaptured msg) => ResilientFunctions.Domain.Route.To(msg.OrderId);
+    public static RoutingInfo Route(OrderConfirmationEmailSent msg) => ResilientFunctions.Domain.Route.To(msg.OrderId);
     
     private static readonly TimeSpan? MaxWait = default; 
     
