@@ -12,9 +12,12 @@
 # Cleipnir Flows
 Cleipnir Flows is a simple and intuitive workflow-as-code .NET framework - ensuring your code completes despite: failures, restarts, deployments, versioning etc.
 
-It is similar to Azure Durable Functions - but simpler, less restrictive and tailored for ASP.NET services.
+It is similar to Azure Durable Functions - but simpler, less restrictive and tailored for ASP.NET / generic host services.
 
 It works for both RPC and Message-based communication.
+
+## Introduction video
+[![Video link](https://img.youtube.com/vi/XHLes8EZNas/0.jpg)](https://www.youtube.com/watch?v=XHLes8EZNas)
 
 ## Getting Started
 To get started simply perform the following three steps in an ASP.NET service:
