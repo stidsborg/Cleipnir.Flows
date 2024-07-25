@@ -6,7 +6,7 @@ public class LoanApplicationFlow : Flow<LoanApplication>
 {
     public override async Task Run(LoanApplication loanApplication)
     {
-        await MessageBroker.Send(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
+        await Bus.Publish(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
         
         //replies are of type CreditCheckOutcome
         
@@ -19,6 +19,6 @@ public class LoanApplicationFlow : Flow<LoanApplication>
             ? new LoanApplicationApproved(loanApplication)
             : new LoanApplicationRejected(loanApplication);
 
-        await MessageBroker.Send(decision);
+        await Bus.Publish(decision);
     }
 }

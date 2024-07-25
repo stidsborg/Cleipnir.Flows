@@ -6,7 +6,7 @@ public class LoanApplicationFlow : Flow<LoanApplication>
 {
     public override async Task Run(LoanApplication loanApplication)
     {
-        await MessageBroker.Send(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
+        await Bus.Publish(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
         
         var outcomes = await Messages
             .TakeUntilTimeout("Timeout", TimeSpan.FromMinutes(15))
@@ -15,9 +15,9 @@ public class LoanApplicationFlow : Flow<LoanApplication>
             .Completion();
         
         if (outcomes.Count < 2)
-            await MessageBroker.Send(new LoanApplicationRejected(loanApplication));
+            await Bus.Publish(new LoanApplicationRejected(loanApplication));
         else
-            await MessageBroker.Send(
+            await Bus.Publish(
                 outcomes.All(o => o.Approved)
                     ? new LoanApplicationApproved(loanApplication)
                     : new LoanApplicationRejected(loanApplication)

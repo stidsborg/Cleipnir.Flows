@@ -1,6 +1,6 @@
-﻿namespace Cleipnir.Flows.Sample.Presentation.D_LoanApplication;
+﻿namespace Cleipnir.Flows.Sample.Presentation.D_LoanApplication.Solution;
 
-public static class MessageBroker
+public static class Bus
 {
     private static readonly List<Func<CommandAndEvents, Task>> _subscribers = new();
     private static readonly object _lock = new();
@@ -11,7 +11,7 @@ public static class MessageBroker
             _subscribers.Add(handler);
     }
     
-    public static Task Send(CommandAndEvents msg)
+    public static Task Publish(CommandAndEvents msg)
     {
         Console.WriteLine("MESSAGE_QUEUE SENDING: " + msg.GetType());
         Task.Run(async () =>
