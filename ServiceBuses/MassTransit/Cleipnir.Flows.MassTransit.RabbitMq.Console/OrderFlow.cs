@@ -7,17 +7,17 @@ namespace Cleipnir.Flows.MassTransit.RabbitMq.Console;
 
 public class OrderFlow(IBus bus) : Flow,
     ISubscription<Order>,
-    ISubscription<FundsReserved>,
-    ISubscription<ProductsShipped>,
-    ISubscription<FundsCaptured>,
-    ISubscription<OrderConfirmationEmailSent>
+    ISubscription<ConsumeContext<FundsReserved>>,
+    ISubscription<ConsumeContext<ProductsShipped>>,
+    ISubscription<ConsumeContext<FundsCaptured>>,
+    ISubscription<ConsumeContext<OrderConfirmationEmailSent>>
 {
     #region Routing
     public static RoutingInfo Correlate(Order order) => Route.To(order.OrderId);
-    public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
+    public static RoutingInfo Correlate(ConsumeContext<FundsReserved> msg) => Route.To(msg.Message.OrderId);
+    public static RoutingInfo Correlate(ConsumeContext<ProductsShipped> msg) => Route.To(msg.Message.OrderId);
+    public static RoutingInfo Correlate(ConsumeContext<FundsCaptured> msg) => Route.To(msg.Message.OrderId);
+    public static RoutingInfo Correlate(ConsumeContext<OrderConfirmationEmailSent> msg) => Route.To(msg.Message.OrderId);
     #endregion
     
     public override async Task Run()
