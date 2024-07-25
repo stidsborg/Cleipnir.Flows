@@ -6,7 +6,10 @@ public class LoanApplicationFlow : Flow<LoanApplication>
 {
     public override async Task Run(LoanApplication loanApplication)
     {
-        await Bus.Publish(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount));
+        await Effect.Capture(
+            "PerformCreditCheck",
+            () => Bus.Publish(new PerformCreditCheck(loanApplication.Id, loanApplication.CustomerId, loanApplication.Amount))
+        );
         
         var outcomes = await Messages
             .TakeUntilTimeout("Timeout", TimeSpan.FromMinutes(15))
