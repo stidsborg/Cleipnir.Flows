@@ -6,8 +6,8 @@ namespace Cleipnir.Flows.MassTransit.Console;
 
 public class SimpleFlow : Flow, ISubscription<ConsumeContext<MyMessage>>
 {
-    public static RoutingInfo Route(ConsumeContext<MyMessage> msg) 
-        => ResilientFunctions.Domain.Route.To(msg.Message.Value);
+    public static RoutingInfo Correlate(ConsumeContext<MyMessage> msg) 
+        => Route.To(msg.Message.Value);
     
     public override async Task Run()
     {

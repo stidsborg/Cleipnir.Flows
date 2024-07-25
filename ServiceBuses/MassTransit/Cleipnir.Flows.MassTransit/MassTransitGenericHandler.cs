@@ -17,7 +17,7 @@ public class MassTransitGenericHandler<TFlows, TFlow>(TFlows flows)
     static MassTransitGenericHandler() =>
         _consumeContextRoutes = typeof(TFlow)
             .GetMethods(BindingFlags.Static | BindingFlags.Public)
-            .Where(m => m.Name == nameof(ISubscription<string>.Route))
+            .Where(m => m.Name == nameof(ISubscription<string>.Correlate))
             .Where(m => m.GetParameters().Length == 1)
             .Where(m =>
                 m.GetParameters()[0].ParameterType.IsGenericType &&

@@ -52,7 +52,7 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
     protected static IReadOnlyList<RoutingInformation> CreateRoutingInformation() =>
         typeof(TFlow)
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => m.Name is nameof(ISubscription<string>.Route) && m.GetParameters().Length == 1 && m.ReturnType == typeof(RoutingInfo))
+            .Where(m => m.Name is nameof(ISubscription<string>.Correlate) && m.GetParameters().Length == 1 && m.ReturnType == typeof(RoutingInfo))
             .Select(m => new
             {
                 ParamType = m.GetParameters()[0].ParameterType,

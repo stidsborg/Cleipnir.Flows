@@ -10,7 +10,7 @@ public class SubscriptionFlow : Flow, ISubscription<OrderCreated>
         return Task.CompletedTask;
     }
     
-    public static RoutingInfo Route(OrderCreated msg) => ResilientFunctions.Domain.Route.To(msg.OrderNumber);
+    public static RoutingInfo Correlate(OrderCreated msg) => ResilientFunctions.Domain.Route.To(msg.OrderNumber);
 }
 
 public record OrderCreated(string OrderNumber, IEnumerable<string> OrderItems);

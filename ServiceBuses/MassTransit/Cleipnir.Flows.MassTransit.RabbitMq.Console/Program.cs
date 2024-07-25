@@ -1,4 +1,6 @@
 ﻿using Cleipnir.Flows.AspNet;
+using Cleipnir.Flows.MassTransit.RabbitMq.Console.Other;
+using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Storage;
 using MassTransit;
@@ -13,24 +15,25 @@ internal static class Program
     {
         var host = await CreateHostBuilder([]).StartAsync();
         var bus = host.Services.GetRequiredService<IBus>();
-        var store = host.Services.GetRequiredService<IFunctionStore>();
 
-        const int testSize = 10;
-        for (var i = 0; i < testSize; i++) 
-            await bus.Publish(new MyMessage(i.ToString()));
+        var order = new Order(
+            OrderId: "MK-54321",
+            CustomerId: Guid.NewGuid(),
+            ProductIds: [Guid.NewGuid()],
+            TotalPrice: 120.99M
+        );
+
+        await bus.Publish(order);
         
-        while (true)
+        var orderFlows = host.Services.GetRequiredService<OrderFlows>();
+        var controlPanel = await orderFlows.ControlPanel(order.OrderId);
+        while (controlPanel is null || controlPanel.Status != Status.Succeeded)
         {
-            var succeeded = await store.GetSucceededFunctions(
-                nameof(SimpleFlow),
-                DateTime.UtcNow.Ticks + 1_000_000
-            ).SelectAsync(f => f.Count);
-            if (succeeded == testSize)
-                break;
             await Task.Delay(250);
+            controlPanel = await orderFlows.ControlPanel(order.OrderId);
         }
-
-        System.Console.WriteLine("All completed");
+        
+        System.Console.WriteLine($"Order '{order.OrderId}' processing completed");
         await host.StopAsync();
     }
     
@@ -38,6 +41,8 @@ internal static class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((_, services) =>
             {
+                services.AddConsumerStubs();
+                
                 services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlowsAutomatically()
