@@ -6,5 +6,5 @@ public class RebusGenericHandler<TFlows>(TFlows flows)
     where TFlows : IBaseFlows
 {
     public Task HandleIncomingMessage<T>(T message) where T : class
-        => flows.RouteMessage(message);
+        => flows.Postman.RouteMessage(message);
 }

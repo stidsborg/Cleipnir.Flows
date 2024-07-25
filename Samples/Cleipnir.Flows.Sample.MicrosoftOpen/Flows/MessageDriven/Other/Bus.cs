@@ -22,7 +22,7 @@ public class Bus(Solution.MessageDrivenOrderFlows flows)
             foreach (var subscriber in subscribers)
                 await subscriber(msg);
 
-            await flows.RouteMessage(msg, msg.GetType());
+            await flows.Postman.RouteMessage(msg, msg.GetType());
         });
         
         return Task.CompletedTask;

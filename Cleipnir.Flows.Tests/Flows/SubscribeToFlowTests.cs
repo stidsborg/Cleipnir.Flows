@@ -27,7 +27,7 @@ public class SubscribeToFlowTests
         await flows.Schedule("SomeInstanceId");
         
         var msg = new Message("SomeInstanceId", "SomeValue");
-        await flows.RouteMessage(msg);
+        await flows.Postman.RouteMessage(msg);
 
         await BusyWait.UntilAsync(() => RouteToInstanceParamlessFlow.ReceivedMessage != null);
         RouteToInstanceParamlessFlow.ReceivedMessage.ShouldBe(msg);
@@ -64,7 +64,7 @@ public class SubscribeToFlowTests
         await BusyWait.UntilAsync(() => RouteUsingCorrelationParamlessFlow.CorrelationRegistered);
         
         var msg = new Message("SomeCorrelationId", "SomeValue");
-        await ((IBaseFlows) flows).RouteMessage(msg);
+        await ((IBaseFlows) flows).Postman.RouteMessage(msg);
 
         await BusyWait.UntilAsync(() => RouteUsingCorrelationParamlessFlow.ReceivedMessage != null);
         RouteUsingCorrelationParamlessFlow.ReceivedMessage.ShouldBe(msg);

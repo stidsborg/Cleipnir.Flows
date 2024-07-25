@@ -1,11 +1,13 @@
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
+using MassTransit;
 
 namespace Cleipnir.Flows.MassTransit.Console;
 
-public class SimpleFlow : Flow, ISubscription<MyMessage>
+public class SimpleFlow : Flow, ISubscription<ConsumeContext<MyMessage>>
 {
-    public static RoutingInfo Route(MyMessage msg) => ResilientFunctions.Domain.Route.To(msg.Value);
+    public static RoutingInfo Route(ConsumeContext<MyMessage> msg) 
+        => ResilientFunctions.Domain.Route.To(msg.Message.Value);
     
     public override async Task Run()
     {

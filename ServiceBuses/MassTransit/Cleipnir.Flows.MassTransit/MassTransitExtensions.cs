@@ -87,7 +87,7 @@ public static class MassTransitExtensions
         
         foreach (var (flowsType, flowType) in flowsDictionary)
         {
-            var baseHandlerType = typeof(MassTransitGenericHandler<>).MakeGenericType(flowsType);
+            var baseHandlerType = typeof(MassTransitGenericHandler<,>).MakeGenericType(flowsType, flowType);
             //todo make this type specific name to avoid collisions
             var type = module.DefineType($"{flowType.Name}Consumer", TypeAttributes.Public, parent: baseHandlerType);
 
@@ -109,6 +109,11 @@ public static class MassTransitExtensions
                 .GetInterfaces()
                 .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscription<>))
                 .Select(t => t.GenericTypeArguments[0])
+                .Select(t => 
+                    t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ConsumeContext<>)
+                        ? t.GenericTypeArguments[0]
+                        : t
+                    )
                 .ToList();
 
             foreach (var handlerType in handlerTypes)
