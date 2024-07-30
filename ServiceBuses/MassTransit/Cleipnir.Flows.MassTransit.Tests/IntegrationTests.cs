@@ -46,7 +46,7 @@ public class IntegrationTests
 
         var host = await hostBuilder.StartAsync();
         
-        await BusyWait.UntilAsync(() => MassTransitTestFlow.ReceivedMyMessage is not null);
+        await BusyWait.Until(() => MassTransitTestFlow.ReceivedMyMessage is not null);
 
         MassTransitTestFlow.ReceivedMyMessage.ShouldNotBeNull();
         MassTransitTestFlow.ReceivedMyMessage.Value.ShouldBe("test");

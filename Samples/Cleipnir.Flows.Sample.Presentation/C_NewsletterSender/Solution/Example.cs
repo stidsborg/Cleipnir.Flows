@@ -8,8 +8,8 @@ public static class Example
     {
         var connStr = "Server=localhost;Database=flows;User Id=postgres;Password=Pa55word!; Include Error Detail=true;";
         var flowStore = new PostgreSqlFunctionStore(connStr);
-        await flowStore.DropIfExists();
         await flowStore.Initialize();
+        await flowStore.TruncateTables();
         
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddTransient<NewsletterFlow>();

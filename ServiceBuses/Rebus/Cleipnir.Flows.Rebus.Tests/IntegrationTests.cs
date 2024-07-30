@@ -72,7 +72,7 @@ public class IntegrationTests
             cancellationTokenSource.Token
         );
 
-        await BusyWait.UntilAsync(() => RebusTestFlow.ReceivedMyMessage is not null, maxWait: TimeSpan.FromMinutes(5));
+        await BusyWait.Until(() => RebusTestFlow.ReceivedMyMessage is not null, maxWait: TimeSpan.FromMinutes(5));
         RebusTestFlow.ReceivedMyMessage!.Value.ShouldBe("SomeMessage");
         await cancellationTokenSource.CancelAsync();
     }

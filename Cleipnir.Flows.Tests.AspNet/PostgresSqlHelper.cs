@@ -37,7 +37,7 @@ namespace Cleipnir.Flows.Tests.AspNet
             
             var store = new PostgreSqlFunctionStore(ConnectionString, tablePrefix: "PostgresSqlFlows"); 
             await store.Initialize();
-            await store.TruncateTable();
+            await store.TruncateTables();
             return store;
         }
     }

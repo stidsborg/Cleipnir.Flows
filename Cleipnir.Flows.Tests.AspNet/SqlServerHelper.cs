@@ -32,8 +32,8 @@ namespace Cleipnir.Flows.Tests.AspNet
             CreateDatabase();
             
             var store = new SqlServerFunctionStore(ConnectionString, tablePrefix: "SqlServerFlows");
-            await store.DropIfExists();
             await store.Initialize();
+            await store.TruncateTables();
             return store;
         }
         

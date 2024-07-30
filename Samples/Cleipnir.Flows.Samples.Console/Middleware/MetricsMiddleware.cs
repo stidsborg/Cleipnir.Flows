@@ -23,7 +23,7 @@ public class MetricsMiddleware : IMiddleware
         Workflow workflow, 
         Next<TFlow, TParam, TResult> next) where TParam : notnull
     {
-        var started = workflow.Effect.TryGet<bool>(id: "Started", out _);
+        var started = (await workflow.Effect.TryGet<bool>(id: "Started")).HasValue;
         if (started)
             IncrementRestartedFlowsCounter();
         else
