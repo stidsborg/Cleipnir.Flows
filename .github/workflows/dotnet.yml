@@ -16,8 +16,7 @@ jobs:
       with:
         submodules: 'true'
     - name: Start containers
-      run: docker-compose -f "./Cleipnir.ResilientFunctions/docker-compose.yml" up -d --build     
-        
+      run: docker compose -f "./Cleipnir.ResilientFunctions/docker-compose.yml" up -d --build           
     - name: Build
       run: dotnet build
     - name: Test
