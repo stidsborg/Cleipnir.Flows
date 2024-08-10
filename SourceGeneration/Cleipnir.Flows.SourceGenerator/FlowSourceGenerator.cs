@@ -235,8 +235,8 @@ $@"namespace {flowsNamespace}
             {   
                 var getStateStr = $@"
 
-        public Task<{stateType}?> GetState(string functionInstanceId) 
-            => GetState<{stateType}>(functionInstanceId);";
+        public Task<{stateType}?> GetState(string instanceId) 
+            => GetState<{stateType}>(instanceId);";
                 var constructorEndPosition = generatedCode.IndexOf("{ }", StringComparison.Ordinal);
                 generatedCode = generatedCode.Insert(constructorEndPosition + 3, getStateStr);
             }
