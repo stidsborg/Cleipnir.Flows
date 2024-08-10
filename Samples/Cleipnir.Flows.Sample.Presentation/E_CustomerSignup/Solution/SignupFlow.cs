@@ -6,12 +6,12 @@ public class SignupFlow : Flow<string>
 {
     public override async Task Run(string customerEmail)
     {
-        await Effect.Capture("ActivationMail", () => SendActivationMail(customerEmail));
+        await Effect.Capture(() => SendActivationMail(customerEmail));
         
         for (var i = 0; i <= 3; i++)
         {
             var emailVerifiedOption = await Messages
-                .TakeUntilTimeout($"Timeout_{i}", expiresIn: TimeSpan.FromDays(1))
+                .TakeUntilTimeout(TimeSpan.FromDays(1))
                 .OfType<EmailVerified>()
                 .FirstOrNone();
 
@@ -21,10 +21,10 @@ public class SignupFlow : Flow<string>
             if (i == 3)
                 throw new UserSignupFailedException($"User '{customerEmail}' did not activate email within threshold");
             
-            await Effect.Capture($"Reminder_{i}", () => SendReminderMail(customerEmail));
+            await Effect.Capture(() => SendReminderMail(customerEmail));
         }
 
-        await Effect.Capture("WelcomeMail", () => SendWelcomeMail(customerEmail));
+        await Effect.Capture(() => SendWelcomeMail(customerEmail));
     }
 
     private static Task SendActivationMail(string customerEmail) => Task.CompletedTask;

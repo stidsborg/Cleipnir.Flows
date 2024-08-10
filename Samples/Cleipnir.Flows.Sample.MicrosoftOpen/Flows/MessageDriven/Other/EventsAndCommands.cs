@@ -14,3 +14,8 @@ public record CaptureFunds(string OrderId, Guid CustomerId, Guid TransactionId) 
 public record FundsCaptured(string OrderId) : EventsAndCommands;
 public record CancelFundsReservation(string OrderId, Guid TransactionId) : EventsAndCommands;
 public record FundsReservationCancelled(string OrderId) : EventsAndCommands;
+public record FundsReservationFailed(string OrderId) : EventsAndCommands;
+public record FundsCaptureFailed(string OrderId) : EventsAndCommands;
+public record ProductsShipmentFailed(string OrderId) : EventsAndCommands;
+public record OrderConfirmationEmailFailed(string OrderId) : EventsAndCommands;
+public record CancelProductShipment(string OrderId) : EventsAndCommands;

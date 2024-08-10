@@ -1,68 +1,87 @@
 ﻿using Cleipnir.Flows.MassTransit.RabbitMq.Console.Other;
 using Cleipnir.ResilientFunctions.Domain;
-using Cleipnir.ResilientFunctions.Reactive.Extensions;
+using Cleipnir.ResilientFunctions.Domain.Exceptions.Commands;
+using Cleipnir.ResilientFunctions.Helpers;
 using MassTransit;
 
 namespace Cleipnir.Flows.MassTransit.RabbitMq.Console;
 
-public class OrderFlow(IBus bus) : Flow,
-    ISubscription<Order>,
+public class OrderFlow(IBus bus) : Flow<Order>,
     ISubscription<ConsumeContext<FundsReserved>>,
     ISubscription<ConsumeContext<ProductsShipped>>,
     ISubscription<ConsumeContext<FundsCaptured>>,
     ISubscription<ConsumeContext<OrderConfirmationEmailSent>>
 {
     #region Routing
-    public static RoutingInfo Correlate(Order order) => Route.To(order.OrderId);
     public static RoutingInfo Correlate(ConsumeContext<FundsReserved> msg) => Route.To(msg.Message.OrderId);
     public static RoutingInfo Correlate(ConsumeContext<ProductsShipped> msg) => Route.To(msg.Message.OrderId);
     public static RoutingInfo Correlate(ConsumeContext<FundsCaptured> msg) => Route.To(msg.Message.OrderId);
     public static RoutingInfo Correlate(ConsumeContext<OrderConfirmationEmailSent> msg) => Route.To(msg.Message.OrderId);
     #endregion
     
-    public override async Task Run()
+    public override async Task Run(Order order)
     {
-        var order = await Messages.FirstOfType<Order>();
-        var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
+        var transactionId = await Capture(Guid.NewGuid);
+        try
+        {
+            await ReserveFunds(order, transactionId);
+            await Message<FundsReserved>();
 
-        await ReserveFunds(order, transactionId);
-        await Messages.FirstOfType<FundsReserved>();
+            await ShipProducts(order);
+            var trackAndTraceNumber = await Message<ProductsShipped>()
+                .SelectAsync(s => s.TrackAndTraceNumber);
 
-        await ShipProducts(order);
-        var productsShipped = await Messages.FirstOfType<ProductsShipped>();
-        
-        await CaptureFunds(order, transactionId);
-        await Messages.FirstOfType<FundsCaptured>();
+            await CaptureFunds(order, transactionId);
+            await Message<FundsCaptured>();
 
-        await SendOrderConfirmationEmail(order, productsShipped.TrackAndTraceNumber);
-        await Messages.FirstOfType<OrderConfirmationEmailSent>();
+            await SendOrderConfirmationEmail(order, trackAndTraceNumber);
+            await Message<OrderConfirmationEmailSent>();
+        }
+        catch (Exception e) when (e is not SuspendInvocationException)
+        {
+            await Compensate(order, transactionId);
+        }
     }
 
-    #region MessagePublishers
+    private async Task Compensate(Order order, Guid transactionId)
+    {
+        if (await Effect.GetStatus("ShipProducts") != WorkStatus.NotStarted)
+            await CancelShipment(order);
+
+        if (await Effect.GetStatus("CaptureFunds") != WorkStatus.NotStarted)
+            await ReverseTransaction(order, transactionId);
+        else if (await Effect.GetStatus("ReserveFunds") != WorkStatus.NotStarted)
+            await CancelReservation(order, transactionId);
+    }
 
     private Task ReserveFunds(Order order, Guid transactionId)
-        => Effect.Capture(
+        => Capture(
             "ReserveFunds",
-            async () => await bus.Publish(new ReserveFunds(order.OrderId, order.TotalPrice, transactionId, order.CustomerId))
+            () => bus.Publish(new ReserveFunds(order.OrderId, order.TotalPrice, transactionId, order.CustomerId))
         );
 
     private Task ShipProducts(Order order)
-        => Effect.Capture(
+        => Capture(
             "ShipProducts",
-            async () => await bus.Publish(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds))
+            () => bus.Publish(new ShipProducts(order.OrderId, order.CustomerId, order.ProductIds))
         );
-    
+
     private Task CaptureFunds(Order order, Guid transactionId)
-        => Effect.Capture(
+        => Capture(
             "CaptureFunds",
-            async () => await bus.Publish(new CaptureFunds(order.OrderId, order.CustomerId, transactionId))
+            () => bus.Publish(new CaptureFunds(order.OrderId, order.CustomerId, transactionId))
         );
 
     private Task SendOrderConfirmationEmail(Order order, string trackAndTraceNumber)
-        => Effect.Capture(
+        => Capture(
             "SendOrderConfirmationEmail",
-            async () => await bus.Publish(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, trackAndTraceNumber))
+            () => bus.Publish(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, trackAndTraceNumber))
         );
 
-    #endregion
+    private Task CancelShipment(Order order)
+        => Capture(() => bus.Publish(new CancelShipment(order.OrderId)));
+    private Task ReverseTransaction(Order order, Guid transactionId)
+        => Capture(() => bus.Publish(new ReverseTransaction(order.OrderId, transactionId)));
+    private Task CancelReservation(Order order, Guid transactionId)
+        => Capture(() => bus.Publish(new CancelFundsReservation(order.OrderId, transactionId)));
 }

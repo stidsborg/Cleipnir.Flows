@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Cleipnir.ResilientFunctions.CoreRuntime.Invocation;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Messaging;
+using Cleipnir.ResilientFunctions.Reactive.Extensions;
+using Cleipnir.ResilientFunctions.Reactive.Utilities;
 
 namespace Cleipnir.Flows;
 
@@ -21,9 +23,81 @@ public abstract class BaseFlow
         => Effect.Capture(id, work, resiliencyLevel);
     public Task Capture(string id, Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
         => Effect.Capture(id, work, resiliencyLevel);
+    
+    public Task<T> Capture<T>(Func<Task<T>> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(work, resiliencyLevel);
+    public Task<T> Capture<T>(Func<T> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(work, resiliencyLevel);
+    public Task Capture(Func<Task> work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(work, resiliencyLevel);
+    public Task Capture(Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
+        => Effect.Capture(work, resiliencyLevel);
 
     public void Postpone(TimeSpan @for) => Workflow.Postpone(@for);
     public void Postpone(DateTime until) => Workflow.Postpone(until);
+
+    public Task<TMessage> Message<TMessage>() => Workflow.Messages.FirstOfType<TMessage>();
+    public Task<TMessage> Message<TMessage>(string timeoutId, DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutAt)
+        .FirstOfType<TMessage>();
+    public Task<TMessage> Message<TMessage>(string timeoutId, TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutIn)
+        .FirstOfType<TMessage>();
+    public Task<TMessage> Message<TMessage>(DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutAt)
+        .FirstOfType<TMessage>();
+    public Task<TMessage> Message<TMessage>(TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutIn)
+        .FirstOfType<TMessage>();
+    
+    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>() 
+        => Workflow.Messages.OfTypes<TMessage1, TMessage2>().First();
+    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(string timeoutId, DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutAt)
+        .OfTypes<TMessage1, TMessage2>()
+        .First();
+    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(string timeoutId, TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutIn)
+        .OfTypes<TMessage1, TMessage2>()
+        .First();
+    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutAt)
+        .OfTypes<TMessage1, TMessage2>()
+        .First();
+    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutIn)
+        .OfTypes<TMessage1, TMessage2>()
+        .First();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>() 
+        => Workflow.Messages.OfTypes<TMessage1, TMessage2, TMessage3>().First();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(string timeoutId, DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutAt)
+        .OfTypes<TMessage1, TMessage2, TMessage3>()
+        .First();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(string timeoutId, TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timeoutId, timesOutIn)
+        .OfTypes<TMessage1, TMessage2, TMessage3>()
+        .First();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(DateTime timesOutAt) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutAt)
+        .OfTypes<TMessage1, TMessage2, TMessage3>()
+        .First();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(TimeSpan timesOutIn) => Workflow
+        .Messages
+        .TakeUntilTimeout(timesOutIn)
+        .OfTypes<TMessage1, TMessage2, TMessage3>()
+        .First();
 }
 
 public abstract class Flow : BaseFlow

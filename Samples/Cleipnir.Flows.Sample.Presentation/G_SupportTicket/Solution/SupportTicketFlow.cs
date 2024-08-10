@@ -12,8 +12,7 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
         {
             var customerSupportAgent = customerSupportAgents[i % customerSupportAgents.Length]; 
             await Effect.Capture(
-                id: $"RequestSupportForTicket{i}",
-                work: () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
+                () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
             );
 
             var option = await Messages
