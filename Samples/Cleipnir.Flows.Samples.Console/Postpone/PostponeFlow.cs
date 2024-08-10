@@ -1,4 +1,4 @@
-﻿using Cleipnir.ResilientFunctions.Domain.Exceptions;
+﻿using Cleipnir.ResilientFunctions.Domain.Exceptions.Commands;
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.Postpone;
 

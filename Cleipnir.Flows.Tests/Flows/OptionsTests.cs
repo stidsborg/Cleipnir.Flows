@@ -31,7 +31,7 @@ public class OptionsTests
         var sp = serviceCollection.BuildServiceProvider();
         var flowsWithOverridenOptions = sp.GetRequiredService<OptionsTestWithOverriddenOptionsFlows>();
 
-        await Should.ThrowAsync<FunctionInvocationSuspendedException>(
+        await Should.ThrowAsync<InvocationSuspendedException>(
             () => flowsWithOverridenOptions.Run("Id")
         );
         

@@ -1,3 +1,4 @@
+using System.Text;
 using Cleipnir.Flows.Sample.Flows;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -34,15 +35,13 @@ public class OrderController : ControllerBase
         if (controlPanel is null)
             return NotFound();
 
-        var effects = string.Join(
-            Environment.NewLine,
-            controlPanel
-                .Effects
-                .All
-                .Values
-                .Select(se => new { Id = se.EffectId, se.WorkStatus }.ToString())
-        );
-        
-        return Ok(effects);
+        var effects = controlPanel.Effects;
+        var effectIds = await effects.AllIds;
+
+        var stringBuilder = new StringBuilder();
+        foreach (var effectId in effectIds)
+            stringBuilder.AppendLine(new { Id = effectId, Status = await effects.GetStatus(effectId) }.ToString());
+
+        return Ok(stringBuilder.ToString());                
     }
 }

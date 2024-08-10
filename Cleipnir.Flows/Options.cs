@@ -12,7 +12,7 @@ public class Options
 {
     public static Options Default { get; } = new();
     
-    internal Action<RFunctionException>? UnhandledExceptionHandler { get; }
+    internal Action<FlowTypeException>? UnhandledExceptionHandler { get; }
     internal TimeSpan? RetentionPeriod { get; }
     internal TimeSpan? RetentionCleanUpFrequency { get; }
     internal TimeSpan? LeaseLength { get; }
@@ -27,7 +27,7 @@ public class Options
     internal List<MiddlewareInstanceOrType> Middlewares  { get; } = new();
 
     public Options(
-        Action<RFunctionException>? unhandledExceptionHandler = null, 
+        Action<FlowTypeException>? unhandledExceptionHandler = null, 
         TimeSpan? retentionPeriod = null,
         TimeSpan? retentionCleanUpFrequency = null,
         TimeSpan? leaseLength = null, 
