@@ -35,7 +35,7 @@ public class SubscribeToFlowTests
 
     public class RouteToInstanceParamlessFlow : Flow, ISubscription<Message>
     {
-        public static RoutingInfo Correlate(Message msg) => ResilientFunctions.Domain.Route.To(msg.Route);
+        public static RoutingInfo Correlate(Message msg) => Route.To(msg.Route);
         
         public static Message? ReceivedMessage { get; set; }
 
@@ -72,7 +72,7 @@ public class SubscribeToFlowTests
 
     public class RouteUsingCorrelationParamlessFlow : Flow, ISubscription<Message>
     {
-        public static RoutingInfo Correlate(Message msg) => ResilientFunctions.Domain.Route.Using(msg.Route);
+        public static RoutingInfo Correlate(Message msg) => Route.Using(msg.Route);
 
         public static volatile bool CorrelationRegistered;
         public static Message? ReceivedMessage { get; set; }

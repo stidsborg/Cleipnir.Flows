@@ -10,17 +10,17 @@ using Rebus.Handlers;
 
 namespace Cleipnir.Flows.Rebus;
 
-public class CleipnirRebusConfiguation
+public class CleipnirRebusConfiguration
 {
     internal Dictionary<Type, Type> FlowsTypes { get; } = new();
 
-    public CleipnirRebusConfiguation AddFlow<TFlows>() where TFlows : IBaseFlows
+    public CleipnirRebusConfiguration AddFlow<TFlows>() where TFlows : IBaseFlows
     {
         FlowsTypes[typeof(TFlows)] = TFlows.FlowType;
         return this;
     }
 
-    public CleipnirRebusConfiguation AddFlowsAutomatically(Assembly? assembly = null)
+    public CleipnirRebusConfiguration AddFlowsAutomatically(Assembly? assembly = null)
     {
         assembly ??= Assembly.GetCallingAssembly();
         var assemblyFlowsTypes = assembly
@@ -52,9 +52,9 @@ public static class RebusExtensions
 {
     public static FlowsConfigurator IntegrateWithRebus(
         this FlowsConfigurator flowsConfigurator, 
-        Func<CleipnirRebusConfiguation, CleipnirRebusConfiguation>? config = null)
+        Func<CleipnirRebusConfiguration, CleipnirRebusConfiguration>? config = null)
     {
-        var configuration = new CleipnirRebusConfiguation();
+        var configuration = new CleipnirRebusConfiguration();
         if (config != null)
             config(configuration);
         else
@@ -115,8 +115,18 @@ public static class RebusExtensions
             //Implement handler types
             var handlerTypes = flowType
                 .GetInterfaces()
-                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscription<>))
-                .Select(t => t.GenericTypeArguments[0])
+                .Where(t => t.IsGenericType && (
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,,>) ||
+                    t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,,,>) 
+                    )
+                )
+                .SelectMany(t => t.GenericTypeArguments)
                 .ToList();
 
             foreach (var handlerType in handlerTypes)

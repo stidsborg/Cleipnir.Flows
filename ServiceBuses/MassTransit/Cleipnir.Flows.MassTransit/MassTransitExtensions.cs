@@ -10,17 +10,17 @@ using MassTransit.Configuration;
 
 namespace Cleipnir.Flows.MassTransit;
 
-public class CleipnirMassTransitConfiguation
+public class CleipnirMassTransitConfiguration
 {
     internal Dictionary<Type, Type> FlowsTypes { get; } = new();
 
-    public CleipnirMassTransitConfiguation AddFlow<TFlows>() where TFlows : IBaseFlows
+    public CleipnirMassTransitConfiguration AddFlow<TFlows>() where TFlows : IBaseFlows
     {
         FlowsTypes[typeof(TFlows)] = TFlows.FlowType;
         return this;
     }
 
-    public CleipnirMassTransitConfiguation AddFlowsAutomatically(Assembly? assembly = null)
+    public CleipnirMassTransitConfiguration AddFlowsAutomatically(Assembly? assembly = null)
     {
         assembly ??= Assembly.GetCallingAssembly();
         var assemblyFlowsTypes = assembly
@@ -52,9 +52,9 @@ public static class MassTransitExtensions
 {
     public static FlowsConfigurator IntegrateWithMassTransit(
         this FlowsConfigurator flowsConfigurator, 
-        Func<CleipnirMassTransitConfiguation, CleipnirMassTransitConfiguation>? config = null)
+        Func<CleipnirMassTransitConfiguration, CleipnirMassTransitConfiguration>? config = null)
     {
-        var configuration = new CleipnirMassTransitConfiguation();
+        var configuration = new CleipnirMassTransitConfiguration();
         if (config != null)
             config(configuration);
         else
@@ -107,8 +107,18 @@ public static class MassTransitExtensions
             //Implement handler types
             var handlerTypes = flowType
                 .GetInterfaces()
-                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISubscription<>))
-                .Select(t => t.GenericTypeArguments[0])
+                .Where(t => t.IsGenericType && (
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,,>) ||
+                        t.GetGenericTypeDefinition() == typeof(ISubscription<,,,,,,,>) 
+                    )
+                )
+                .SelectMany(t => t.GenericTypeArguments)
                 .Select(t => 
                     t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ConsumeContext<>)
                         ? t.GenericTypeArguments[0]
@@ -141,8 +151,8 @@ public static class MassTransitExtensions
                 handleIl.Emit(OpCodes.Ret); // Return task from previous call from the method        
             }
 
-            var rebusMessageHandlerType = type.CreateType();
-            integrationHandlerTypes.Add(rebusMessageHandlerType);
+            var massTransitMessageHandlerType = type.CreateType();
+            integrationHandlerTypes.Add(massTransitMessageHandlerType);
         }
 
         return integrationHandlerTypes;

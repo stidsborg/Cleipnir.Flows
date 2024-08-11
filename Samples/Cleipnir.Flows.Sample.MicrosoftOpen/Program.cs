@@ -29,7 +29,7 @@ internal static class Program
         
         builder.Services.AddFlows(c => c
             .UsePostgresStore(connectionString)
-            //.WithOptions(new Options(leaseLength: TimeSpan.FromSeconds(5))) //, messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue
+            .WithOptions(new Options(leaseLength: TimeSpan.FromSeconds(5), messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue))
             .RegisterFlowsAutomatically()
         );
 
