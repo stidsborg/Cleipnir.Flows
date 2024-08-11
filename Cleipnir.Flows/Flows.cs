@@ -63,14 +63,14 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
 
     private static Action<TFlow, States> CreateStateSetter()
     {
-        var iHaveStateType = typeof(TFlow)
+        var iExposeStateType = typeof(TFlow)
             .GetInterfaces()
-            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHaveState<>));
+            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IExposeState<>));
 
-        if (iHaveStateType == null)
+        if (iExposeStateType == null)
             return (_, _) => { };
 
-        var stateType = iHaveStateType.GenericTypeArguments[0];
+        var stateType = iExposeStateType.GenericTypeArguments[0];
         
         //fetch state
         var methodInfo = typeof(States)
@@ -78,7 +78,7 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
             .Single(m => m.Name == nameof(States.CreateOrGet) && !m.GetParameters().Any());
 
         var genericMethodInfo = methodInfo.MakeGenericMethod(stateType);
-        var statePropertyInfo = iHaveStateType.GetProperty("State");
+        var statePropertyInfo = iExposeStateType.GetProperty("State");
         
         return (flow, states) =>
         {

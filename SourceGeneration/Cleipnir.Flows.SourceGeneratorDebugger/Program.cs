@@ -32,7 +32,7 @@ public static class Program
 
 public class OuterClass
 {
-    public class FunFlow : Flow // IHaveState<FunFlow.FunFlowState>
+    public class FunFlow : Flow // IExposeState<FunFlow.FunFlowState>
     {
         public required FunFlowState State { get; init; }
     

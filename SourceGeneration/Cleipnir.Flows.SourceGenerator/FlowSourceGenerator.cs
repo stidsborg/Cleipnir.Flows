@@ -14,7 +14,7 @@ namespace Cleipnir.Flows.SourceGenerator
         private const string ParamlessFlowType = "Cleipnir.Flows.Flow";
         private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
-        private const string IHaveStateType = "Cleipnir.Flows.IHaveState`1";
+        private const string IExposeStateType = "Cleipnir.Flows.IExposeState`1";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -52,13 +52,13 @@ namespace Cleipnir.Flows.SourceGenerator
                 return;
             }
             
-            var iHaveStateType = context.Compilation.GetTypeByMetadataName(IHaveStateType);
-            if (iHaveStateType == null)
+            var iExposeStateType = context.Compilation.GetTypeByMetadataName(IExposeStateType);
+            if (iExposeStateType == null)
             {
-                AddSourceGenerationOutput(context, "unable to locate IHaveState type");
+                AddSourceGenerationOutput(context, "unable to locate IExposeState type");
                 return;
             }
-            iHaveStateType = iHaveStateType.ConstructUnboundGenericType();
+            iExposeStateType = iExposeStateType.ConstructUnboundGenericType();
 
             var implementationTypes = new List<FlowInformation>();
             foreach (var classDeclaration in syntaxReceiver.ClassDeclarations)
@@ -84,7 +84,7 @@ namespace Cleipnir.Flows.SourceGenerator
                 foreach (var implementedInterface in flowType.AllInterfaces)
                     if (
                         implementedInterface.IsGenericType && 
-                        SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), iHaveStateType)
+                        SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), iExposeStateType)
                     )
                     {
                         stateTypeSymbol = implementedInterface.TypeArguments[0];
@@ -174,7 +174,6 @@ namespace Cleipnir.Flows.SourceGenerator
             var paramType = flowInformation.ParamTypeSymbol == null 
                 ? null 
                 : GetFullyQualifiedName(flowInformation.ParamTypeSymbol);
-            //var paramName = CamelCase(flowInformation.ParameterName);
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
@@ -252,11 +251,6 @@ $@"namespace {flowsNamespace}
                 flowNames[flowName] = 1;
             
             context.AddSource(fileName, SourceText.From(generatedCode, Encoding.UTF8));
-        }
-
-        private string CamelCase(string str)
-        {
-            return char.ToLower(str[0]) + str.Substring(1);
         }
 
         private class TypeSyntaxReceiver : ISyntaxReceiver

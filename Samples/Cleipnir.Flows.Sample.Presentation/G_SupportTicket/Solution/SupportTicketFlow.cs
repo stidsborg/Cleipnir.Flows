@@ -14,7 +14,7 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
             await Effect.Capture(
                 () => RequestSupportForTicket(supportTicketId, customerSupportAgent, iteration: i)
             );
-
+            
             var option = await Messages
                 .TakeUntilTimeout(timeoutEventId: i.ToString(), expiresIn: TimeSpan.FromMinutes(15))
                 .OfTypes<SupportTicketTaken, SupportTicketRejected>()

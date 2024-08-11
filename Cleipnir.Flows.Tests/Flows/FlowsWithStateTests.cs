@@ -33,7 +33,7 @@ public class FlowsWithStateTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    public class ParamlessFlowWithState : Flow, IHaveState<ParamlessFlowWithState.WorkflowState>
+    public class ParamlessFlowWithState : Flow, IExposeState<ParamlessFlowWithState.WorkflowState>
     {
         public required WorkflowState State { get; init; }
     
@@ -78,7 +78,7 @@ public class FlowsWithStateTests
         flowState.Value.ShouldBe("someParameter");
     }
     
-    public class ActionFlowWithState : Flow<string>, IHaveState<ActionFlowWithState.WorkflowState>
+    public class ActionFlowWithState : Flow<string>, IExposeState<ActionFlowWithState.WorkflowState>
     {
         public required WorkflowState State { get; init; }
     
@@ -124,7 +124,7 @@ public class FlowsWithStateTests
         flowState.Value.ShouldBe("someParameter");
     }
     
-    public class FuncFlowWithState : Flow<string, string>, IHaveState<FuncFlowWithState.WorkflowState>
+    public class FuncFlowWithState : Flow<string, string>, IExposeState<FuncFlowWithState.WorkflowState>
     {
         public required WorkflowState State { get; init; }
     
