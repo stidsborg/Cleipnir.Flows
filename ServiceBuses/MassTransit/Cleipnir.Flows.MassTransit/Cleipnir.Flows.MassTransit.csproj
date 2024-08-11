@@ -45,7 +45,7 @@
     </PropertyGroup>
     <ItemGroup Label="SourceLink">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-        <PackageReference Include="MassTransit" Version="8.2.3" />
+        <PackageReference Include="MassTransit" Version="8.2.4" />
     </ItemGroup>
 
 </Project>
