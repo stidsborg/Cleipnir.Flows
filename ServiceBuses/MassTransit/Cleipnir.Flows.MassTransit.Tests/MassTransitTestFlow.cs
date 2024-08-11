@@ -10,7 +10,7 @@ public class MassTransitTestFlows : Flows<MassTransitTestFlow>
 
 public class MassTransitTestFlow : Flow, ISubscription<MyMessage>
 {
-    public static RoutingInfo Correlate(MyMessage msg) => ResilientFunctions.Domain.Route.To(msg.Value);
+    public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
         
     public static volatile MyMessage? ReceivedMyMessage; 
         

@@ -5,7 +5,7 @@ namespace Cleipnir.Flows.Rebus.RabbitMq.Console;
 
 public class SimpleFlow2 : Flow, ISubscription<MyMessage>
 {
-    public static RoutingInfo Correlate(MyMessage msg) => ResilientFunctions.Domain.Route.To(msg.Value);
+    public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
     
     public override async Task Run()
     {
