@@ -1,5 +1,4 @@
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
-using MassTransit;
 
 namespace Cleipnir.Flows.MassTransit.Console;
 
@@ -10,16 +9,4 @@ public class SimpleFlow : Flow
         var msg = await Messages.FirstOfType<MyMessage>();
         System.Console.WriteLine($"SimpleFlow({msg}) executed");
     }
-}
-
-public class SimpleFlows : Flows<SimpleFlow>
-{
-    public SimpleFlows(FlowsContainer flowsContainer) 
-        : base("SimpleFlow", flowsContainer, options: null) { }
-}
-
-public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IConsumer<MyMessage>
-{
-    public Task Consume(ConsumeContext<MyMessage> context) 
-        => simpleFlows.SendMessage(context.Message.Value, context.Message);
 }

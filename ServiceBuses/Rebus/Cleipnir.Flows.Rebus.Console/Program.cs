@@ -32,7 +32,6 @@ internal static class Program
         }
 
         System.Console.WriteLine("All completed");
-        //await host.WaitForShutdownAsync();
     }
     
     private static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -43,7 +42,8 @@ internal static class Program
                     .UseInMemoryStore()
                     .RegisterFlowsAutomatically()
                 );
-                
+
+                services.AutoRegisterHandlersFromAssembly(typeof(Program).Assembly);
                 services.AddRebus(configure => 
                     configure.Transport(
                         t => t.UseInMemoryTransport(new InMemNetwork(), "who cares")
