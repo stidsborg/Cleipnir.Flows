@@ -42,7 +42,6 @@ internal static class Program
                 services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlowsAutomatically()
-                    .IntegrateWithRebus()
                 );
                 
                 services.AddRebus(configure => 

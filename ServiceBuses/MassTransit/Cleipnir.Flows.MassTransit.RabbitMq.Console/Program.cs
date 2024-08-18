@@ -46,12 +46,12 @@ internal static class Program
                 services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlowsAutomatically()
-                    .IntegrateWithMassTransit()
                 );
                 
                 services.AddMassTransit(x =>
                 {
                     x.SetKebabCaseEndpointNameFormatter();
+                    x.AddConsumers(typeof(Program).Assembly);
                     x.UsingRabbitMq((context, configure) =>
                     {
                         configure.Host(

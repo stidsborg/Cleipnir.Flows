@@ -1,33 +1,10 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
-using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
-using Route = Cleipnir.ResilientFunctions.Domain.Route;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
-public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>,
-    ISubscription<FundsReserved>,
-    ISubscription<FundsReservationFailed>,
-    ISubscription<ProductsShipped>,
-    ISubscription<ProductsShipmentFailed>,
-    ISubscription<FundsCaptured>,
-    ISubscription<FundsCaptureFailed>,
-    ISubscription<OrderConfirmationEmailSent>,
-    ISubscription<OrderConfirmationEmailFailed>
+public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
 {
-    #region Correlations
-
-    public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsReservationFailed msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(ProductsShipmentFailed msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsCaptureFailed msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(OrderConfirmationEmailFailed msg) => Route.To(msg.OrderId);
-
-    #endregion
-    
     public override async Task Run(Order order)
     {
         await Capture(() => Console.WriteLine("MessageDriven-OrderFlow Started"));

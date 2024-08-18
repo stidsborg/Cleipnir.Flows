@@ -12,10 +12,9 @@ public class IntegrationTests
 {
     private class TestHostedService(IBus bus) : IHostedService
     {
-        
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await bus.Publish(new MyMessage("test"));
+            await bus.Publish(new MyMessage("test"), cancellationToken);
         }
         
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -30,11 +29,11 @@ public class IntegrationTests
                 services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlow<MassTransitTestFlow, MassTransitTestFlows>()
-                    .IntegrateWithMassTransit()
                 );
                 
                 services.AddMassTransit(x =>
                 {
+                    x.AddConsumers(GetType().Assembly);
                     x.UsingInMemory((context,cfg) =>
                     {
                         cfg.ConfigureEndpoints(context);

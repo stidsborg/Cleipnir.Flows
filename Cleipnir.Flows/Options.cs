@@ -23,7 +23,6 @@ public class Options
     internal TimeSpan? MessagesPullFrequency { get; }
     internal TimeSpan? MessagesDefaultMaxWaitForCompletion { get; }
     internal ISerializer? Serializer { get; }
-    internal IEnumerable<RoutingInformation>? Routes { get; }
     internal List<MiddlewareInstanceOrType> Middlewares  { get; } = new();
 
     public Options(
@@ -37,8 +36,7 @@ public class Options
         TimeSpan? messagesDefaultMaxWaitForCompletion = null,
         TimeSpan? delayStartup = null, 
         int? maxParallelRetryInvocations = null, 
-        ISerializer? serializer = null,
-        IEnumerable<RoutingInformation>? routes = null
+        ISerializer? serializer = null
     )
     {
         UnhandledExceptionHandler = unhandledExceptionHandler;
@@ -52,7 +50,6 @@ public class Options
         DelayStartup = delayStartup;
         MaxParallelRetryInvocations = maxParallelRetryInvocations;
         Serializer = serializer;
-        Routes = routes;
     }
 
     public Options UseMiddleware<TMiddleware>() where TMiddleware : IMiddleware
@@ -80,8 +77,7 @@ public class Options
             MessagesDefaultMaxWaitForCompletion ?? options.MessagesDefaultMaxWaitForCompletion,
             DelayStartup ?? options.DelayStartup,
             MaxParallelRetryInvocations ?? options.MaxParallelRetryInvocations,
-            Serializer ?? options.Serializer,
-            Routes ?? options.Routes
+            Serializer ?? options.Serializer
         );
         
         if (Middlewares.Any())
@@ -106,7 +102,6 @@ public class Options
             MessagesDefaultMaxWaitForCompletion,
             DelayStartup,
             MaxParallelRetryInvocations,
-            Serializer,
-            Routes
+            Serializer
         );
 }

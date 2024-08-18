@@ -22,7 +22,19 @@ public class Bus(Solution.MessageDrivenOrderFlows flows)
             foreach (var subscriber in subscribers)
                 await subscriber(msg);
 
-            await flows.Postman.RouteMessage(msg, msg.GetType());
+            await (msg switch
+            {
+                FundsCaptured m => flows.SendMessage(m.OrderId, m),
+                FundsCaptureFailed m => flows.SendMessage(m.OrderId, m),
+                FundsReservationCancelled m => flows.SendMessage(m.OrderId, m),
+                FundsReservationFailed m => flows.SendMessage(m.OrderId, m),
+                FundsReserved m => flows.SendMessage(m.OrderId, m),
+                OrderConfirmationEmailFailed m => flows.SendMessage(m.OrderId, m),
+                OrderConfirmationEmailSent m => flows.SendMessage(m.OrderId, m),
+                ProductsShipmentFailed m => flows.SendMessage(m.OrderId, m),
+                ProductsShipped m => flows.SendMessage(m.OrderId, m),
+                _ => Task.CompletedTask
+            });
         });
         
         return Task.CompletedTask;

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
 using Cleipnir.ResilientFunctions;
@@ -17,14 +15,14 @@ namespace Cleipnir.Flows;
 public interface IBaseFlows
 {
     public static abstract Type FlowType { get; }
-    public Postman Postman { get; }
+
+    public Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) where T : notnull;
 }
+
 public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
 {
     public static Type FlowType { get; } = typeof(TFlow);
-    
-    public abstract Postman Postman { get; }
-    
+
     private FlowsContainer FlowsContainer { get; }
     
     protected BaseFlows(FlowsContainer flowsContainer) => FlowsContainer = flowsContainer;
@@ -48,18 +46,6 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
         var setter = lambdaExpr.Compile();
         return setter;
     }
-
-    protected static IReadOnlyList<RoutingInformation> CreateRoutingInformation() =>
-        typeof(TFlow)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => m.Name is nameof(ISubscription<string>.Correlate) && m.GetParameters().Length == 1 && m.ReturnType == typeof(RoutingInfo))
-            .Select(m => new
-            {
-                ParamType = m.GetParameters()[0].ParameterType,
-                Resolver = new RouteResolver(msg => (RoutingInfo)m.Invoke(obj: null, [msg])!)
-            })
-            .Select(a => new RoutingInformation(a.ParamType, a.Resolver))
-            .ToList();
 
     private static Action<TFlow, States> CreateStateSetter()
     {
@@ -107,13 +93,13 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
             }
         );
     }
+
+    public abstract Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) where T : notnull;
 }
 
 public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 {
     private readonly ParamlessRegistration _registration;
-
-    public override Postman Postman => _registration.Postman;
 
     public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
@@ -127,7 +113,6 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
             (options ?? Options.Default)
-                .Merge(new Options(routes: CreateRoutingInformation()))
                 .MapToRFunctionsSettings()
         );
     }
@@ -152,6 +137,11 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     
     public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
     public Task ScheduleIn(string functionInstanceId, TimeSpan delay) => _registration.ScheduleIn(functionInstanceId, delay);
+
+    public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) 
+        => _registration.RouteMessage(message, correlationId, idempotencyKey);
+    public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, bool create = true, string? idempotencyKey = null) where T : notnull 
+        => _registration.SendMessage(flowInstance, message, create, idempotencyKey);
 }
 
 public class Flows<TFlow, TParam> : BaseFlows<TFlow>
@@ -159,8 +149,6 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     where TParam : notnull
 {
     private readonly FuncRegistration<TParam, Unit> _registration;
-    
-    public override Postman Postman => _registration.Postman;
     
     public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
@@ -175,7 +163,6 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
             settings: (options ?? Options.Default)
-                .Merge(new Options(routes: CreateRoutingInformation()))
                 .MapToRFunctionsSettings()
         );
     }
@@ -208,6 +195,11 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         TParam param,
         TimeSpan delay
     ) => _registration.ScheduleIn(functionInstanceId, param, delay);
+
+    public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
+        => _registration.RouteMessage(message, correlationId, idempotencyKey);
+    public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
+        => _registration.SendMessage(flowInstance, message, idempotencyKey);
 }
 
 public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
@@ -215,8 +207,6 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     where TParam : notnull
 {
     private readonly FuncRegistration<TParam, TResult> _registration;
-    
-    public override Postman Postman => _registration.Postman;
     
     public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
@@ -228,7 +218,6 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
             (options ?? Options.Default)
-                .Merge(new Options(routes: CreateRoutingInformation()))
                 .MapToRFunctionsSettings()
         );
     }
@@ -258,4 +247,9 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 
     protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
         => _registration.GetState<TState>(functionInstanceId);
+
+    public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
+        => _registration.RouteMessage(message, correlationId, idempotencyKey);
+    public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
+        => _registration.SendMessage(flowInstance, message, idempotencyKey);
 }

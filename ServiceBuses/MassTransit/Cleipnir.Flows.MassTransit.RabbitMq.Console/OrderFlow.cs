@@ -6,19 +6,8 @@ using MassTransit;
 
 namespace Cleipnir.Flows.MassTransit.RabbitMq.Console;
 
-public class OrderFlow(IBus bus) : Flow<Order>,
-    ISubscription<ConsumeContext<FundsReserved>>,
-    ISubscription<ConsumeContext<ProductsShipped>>,
-    ISubscription<ConsumeContext<FundsCaptured>>,
-    ISubscription<ConsumeContext<OrderConfirmationEmailSent>>
+public class OrderFlow(IBus bus) : Flow<Order>
 {
-    #region Routing
-    public static RoutingInfo Correlate(ConsumeContext<FundsReserved> msg) => Route.To(msg.Message.OrderId);
-    public static RoutingInfo Correlate(ConsumeContext<ProductsShipped> msg) => Route.To(msg.Message.OrderId);
-    public static RoutingInfo Correlate(ConsumeContext<FundsCaptured> msg) => Route.To(msg.Message.OrderId);
-    public static RoutingInfo Correlate(ConsumeContext<OrderConfirmationEmailSent> msg) => Route.To(msg.Message.OrderId);
-    #endregion
-    
     public override async Task Run(Order order)
     {
         var transactionId = await Capture(Guid.NewGuid);

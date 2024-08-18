@@ -1,11 +1,11 @@
 using Cleipnir.Flows.AspNet;
-using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rebus.Bus;
 using Rebus.Config;
+using Rebus.Handlers;
 using Rebus.Transport.InMem;
 using Shouldly;
 
@@ -16,10 +16,8 @@ public class IntegrationTests
 {
     public record MyMessage(string Value);
 
-    public class RebusTestFlow : Flow, ISubscription<MyMessage>
+    public class RebusTestFlow : Flow
     {
-        public static RoutingInfo Correlate(MyMessage msg) => Route.To(msg.Value);
-        
         public static volatile MyMessage? ReceivedMyMessage; 
         
         public override async Task Run()
@@ -31,6 +29,11 @@ public class IntegrationTests
     public class RebusTestFlows : Flows<RebusTestFlow>
     {
         public RebusTestFlows(FlowsContainer flowsContainer) : base(flowName: "RebusTestFlow", flowsContainer) { }
+    }
+
+    public class RebusTestFlowHandler(RebusTestFlows flows) : IHandleMessages<MyMessage>
+    {
+        public Task Handle(MyMessage message) => flows.SendMessage(message.Value, message);
     }
 
     private class TestHostedService : IHostedService
@@ -57,7 +60,6 @@ public class IntegrationTests
                 services.AddFlows(c => c
                     .UseInMemoryStore()
                     .RegisterFlow<RebusTestFlow, RebusTestFlows>()
-                    .IntegrateWithRebus()
                 );
                 
                 services.AddRebus(configure =>
@@ -65,6 +67,7 @@ public class IntegrationTests
                         t.UseInMemoryTransport(new InMemNetwork(), "who cares")
                     )
                 );
+                services.AutoRegisterHandlersFromAssemblyOf<IntegrationTests>();
             });
         var cancellationTokenSource = new CancellationTokenSource();
         _ = Task.Run(() =>

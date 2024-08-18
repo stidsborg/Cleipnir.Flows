@@ -1,20 +1,9 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
-using Cleipnir.ResilientFunctions.Domain;
-using Route = Cleipnir.ResilientFunctions.Domain.Route;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven;
 
-public class MessageDrivenOrderFlow(Bus bus) : 
-    Flow<Order>, 
-    ISubscription<FundsReserved, ProductsShipped, FundsCaptured, OrderConfirmationEmailSent>
+public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
 {
-    #region Routing
-    public static RoutingInfo Correlate(FundsReserved msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(ProductsShipped msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(FundsCaptured msg) => Route.To(msg.OrderId);
-    public static RoutingInfo Correlate(OrderConfirmationEmailSent msg) => Route.To(msg.OrderId);
-    #endregion
-    
     public override async Task Run(Order order)
     {
         await Capture(() => Console.WriteLine("MessageDriven-OrderFlow Started"));

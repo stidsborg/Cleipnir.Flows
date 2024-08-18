@@ -8,12 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="MassTransit" Version="8.2.4" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cleipnir.Flows.MassTransit\Cleipnir.Flows.MassTransit.csproj" />
+      <ProjectReference Include="..\..\..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
     </ItemGroup>
 
 </Project>

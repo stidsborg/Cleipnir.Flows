@@ -42,7 +42,6 @@ internal static class Program
                     .UseInMemoryStore()
                     .RegisterFlow<SimpleFlow, SimpleFlows>()
                     //.RegisterFlowsAutomatically()
-                    .IntegrateWithMassTransit()
                 );
                 
                 services.AddMassTransit(x =>
