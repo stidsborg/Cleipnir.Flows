@@ -21,13 +21,3 @@ public class OrderFlowConsumer(OrderFlows orderFlows) :
    public Task Consume(ConsumeContext<OrderConfirmationEmailSent> context)
       => orderFlows.SendMessage(context.Message.OrderId, context.Message);
 }
-
-
-public static class Thing
-{
-   public static void Do()
-   {
-      System.Console.WriteLine(typeof(OrderFlowConsumer));
-      
-   }
-} 
