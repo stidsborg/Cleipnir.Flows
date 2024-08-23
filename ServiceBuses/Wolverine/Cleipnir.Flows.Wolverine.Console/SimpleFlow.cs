@@ -1,4 +1,3 @@
-using Cleipnir.Flows.MassTransit.Console;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Wolverine.Console;

@@ -1,5 +1,4 @@
 ﻿using Cleipnir.Flows.AspNet;
-using Cleipnir.Flows.MassTransit.Console;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
