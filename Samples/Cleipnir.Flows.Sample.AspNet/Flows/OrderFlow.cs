@@ -1,5 +1,4 @@
 ﻿using Cleipnir.Flows.Sample.Clients;
-using Cleipnir.ResilientFunctions.Domain;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -23,18 +22,16 @@ public class OrderFlow : Flow<Order>
     public override async Task Run(Order order)
     {
         _logger.Information($"ORDER_PROCESSOR: Processing of order '{order.OrderId}' started");
-        var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid);
+        var transactionId = await Capture(Guid.NewGuid);
         await _paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
 
-        await Effect.Capture(
-            id: "ShipProducts",
+        await Capture(
             () => _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds)
         );
 
         await _paymentProviderClient.Capture(transactionId);
 
         await Effect.Capture(
-            "EmailOrderConfirmation",
             () => _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds)
         );
 
