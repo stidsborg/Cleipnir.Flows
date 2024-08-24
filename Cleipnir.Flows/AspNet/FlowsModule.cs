@@ -32,7 +32,7 @@ public static class FlowsModule
 public class FlowsConfigurator
 {
     internal bool EnableGracefulShutdown = false;
-    internal IEnumerable<Type> FlowsTypes = [];
+    internal readonly HashSet<Type> FlowsTypes = new();
 
     internal Func<IServiceProvider, Options>? OptionsFunc;
     public IServiceCollection Services { get; }
@@ -65,18 +65,22 @@ public class FlowsConfigurator
 
     public FlowsConfigurator RegisterFlow<TFlow, TFlows>() where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
     {
+        var added = FlowsTypes.Add(typeof(TFlows));
+        if (!added) return this;
+        
         Services.AddScoped<TFlow>();
         Services.AddTransient<TFlows>();
-        FlowsTypes = FlowsTypes.Append(typeof(TFlows));
-
+        
         return this;
     }
     
     public FlowsConfigurator RegisterFlow<TFlow, TFlows>(Func<IServiceProvider, TFlows> factory) where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
     {
+        var added = FlowsTypes.Add(typeof(TFlows));
+        if (!added) return this;
+        
         Services.AddScoped<TFlow>();
         Services.AddTransient(factory);
-        FlowsTypes = FlowsTypes.Append(typeof(TFlows));
 
         return this;
     }
@@ -96,12 +100,13 @@ public class FlowsConfigurator
 
         foreach (var sourceGeneratedFlowsType in sourceGeneratedFlowsTypes)
         {
+            var added = FlowsTypes.Add(sourceGeneratedFlowsType);
+            if (!added) continue;
+            
             Services.AddTransient(sourceGeneratedFlowsType);
             var flowType = sourceGeneratedFlowsType.BaseType?.GenericTypeArguments[0];
             if (flowType != null)
                 Services.AddScoped(flowType);
-            
-            FlowsTypes = FlowsTypes.Append(sourceGeneratedFlowsType);
         }
 
         return this;
