@@ -1,4 +1,3 @@
-using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Cleipnir.ResilientFunctions.Storage;
@@ -34,7 +33,10 @@ public class CorrelationIdFlowTests
         await BusyWait.Until(() => RouteUsingCorrelationParamlessFlow.ReceivedMessage != null);
         RouteUsingCorrelationParamlessFlow.ReceivedMessage.ShouldBe(msg);
     }
-
+    
+    public class RouteUsingCorrelationParamlessFlows(FlowsContainer flowsContainer)
+        : Flows<RouteUsingCorrelationParamlessFlow>(nameof(RouteUsingCorrelationParamlessFlow), flowsContainer);
+    
     public class RouteUsingCorrelationParamlessFlow : Flow
     {
         public static volatile bool CorrelationRegistered;

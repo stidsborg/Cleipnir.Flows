@@ -12,7 +12,7 @@ public class FlowsWithStateTests
     public async Task ParamlessFlowWithStateCanBeFetchedAfterExecution()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<ParamlessFlowWithState>();
+        serviceCollection.AddTransient<ParamlessWithStateFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -21,7 +21,7 @@ public class FlowsWithStateTests
             Options.Default
         );
 
-        var flows = new ParamlessFlowWithStates(flowsContainer);
+        var flows = new ParamlessWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId");
 
         var state = await flows.GetState("someInstanceId");
@@ -33,27 +33,11 @@ public class FlowsWithStateTests
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
     
-    public class ParamlessFlowWithState : Flow, IExposeState<ParamlessFlowWithState.WorkflowState>
-    {
-        public required WorkflowState State { get; init; }
-    
-        public override Task Run()
-        {
-            State.Boolean = true;
-            return Task.CompletedTask;
-        }
-
-        public class WorkflowState : FlowState
-        {
-            public bool Boolean { get; set; }
-        }
-    }
-    
     [TestMethod]
     public async Task ActionFlowWithStateCanBeFetchedAfterExecution()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<ActionFlowWithState>();
+        serviceCollection.AddTransient<ActionWithStateFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -62,7 +46,7 @@ public class FlowsWithStateTests
             new Options()
         );
 
-        var flows = new ActionFlowWithStates(flowsContainer);
+        var flows = new ActionWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId", "someParameter");
 
         var state = await flows.GetState("someInstanceId");
@@ -73,32 +57,16 @@ public class FlowsWithStateTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncFlowWithState.WorkflowState>();
+        var flowState = controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
-    }
-    
-    public class ActionFlowWithState : Flow<string>, IExposeState<ActionFlowWithState.WorkflowState>
-    {
-        public required WorkflowState State { get; init; }
-    
-        public override Task Run(string param)
-        {
-            State.Value = param;
-            return Task.CompletedTask;
-        }
-
-        public class WorkflowState : FlowState
-        {
-            public string Value { get; set; } = "";
-        }
     }
     
     [TestMethod]
     public async Task FuncFlowWithStateCanBeFetchedAfterExecution()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<FuncFlowWithState>();
+        serviceCollection.AddTransient<FuncWithStateFlow>();
 
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -107,7 +75,7 @@ public class FlowsWithStateTests
             new Options()
         );
 
-        var flows = new FuncFlowWithStates(flowsContainer);
+        var flows = new FuncWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId", "someParameter");
 
         var state = await flows.GetState("someInstanceId");
@@ -119,24 +87,56 @@ public class FlowsWithStateTests
         controlPanel.Result.ShouldBe("someParameter");
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncFlowWithState.WorkflowState>();
+        var flowState = controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
     }
-    
-    public class FuncFlowWithState : Flow<string, string>, IExposeState<FuncFlowWithState.WorkflowState>
-    {
-        public required WorkflowState State { get; init; }
-    
-        public override Task<string> Run(string param)
-        {
-            State.Value = param;
-            return Task.FromResult(param);
-        }
+}
 
-        public class WorkflowState : FlowState
-        {
-            public string Value { get; set; } = "";
-        }
+public class ActionWithStateFlow : Flow<string>, IExposeState<ActionWithStateFlow.WorkflowState>
+{
+    public required WorkflowState State { get; init; }
+    
+    public override Task Run(string param)
+    {
+        State.Value = param;
+        return Task.CompletedTask;
+    }
+
+    public class WorkflowState : FlowState
+    {
+        public string Value { get; set; } = "";
+    }
+}
+
+public class FuncWithStateFlow : Flow<string, string>, IExposeState<FuncWithStateFlow.WorkflowState>
+{
+    public required WorkflowState State { get; init; }
+    
+    public override Task<string> Run(string param)
+    {
+        State.Value = param;
+        return Task.FromResult(param);
+    }
+
+    public class WorkflowState : FlowState
+    {
+        public string Value { get; set; } = "";
+    }
+}
+
+public class ParamlessWithStateFlow : Flow, IExposeState<ParamlessWithStateFlow.WorkflowState>
+{
+    public required WorkflowState State { get; init; }
+    
+    public override Task Run()
+    {
+        State.Boolean = true;
+        return Task.CompletedTask;
+    }
+
+    public class WorkflowState : FlowState
+    {
+        public bool Boolean { get; set; }
     }
 }

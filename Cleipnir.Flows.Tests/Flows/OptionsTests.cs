@@ -49,21 +49,7 @@ public class OptionsTests
         await controlPanel.WaitForCompletion();        
     }
 
-    public class OptionsTestWithOverriddenOptionsFlow : Flow
-    {
-        public override async Task Run()
-        {
-            await Messages.First();
-        }
-    }
-    
-    public class OptionsTestWithDefaultProvidedOptionsFlow : Flow
-    {
-        public override async Task Run()
-        {
-            await Messages.First();
-        }
-    }
+   
     
     [TestMethod]
     public async Task FlowNameCanBeSpecifiedFromTheOutside()
@@ -89,9 +75,25 @@ public class OptionsTests
         sf.ShouldNotBeNull();
         sf.Status.ShouldBe(Status.Succeeded);
     }
-    
-    public class SimpleFlow : Flow
+}
+
+public class OptionsTestWithOverriddenOptionsFlow : Flow
+{
+    public override async Task Run()
     {
-        public override Task Run() => Task.CompletedTask;
+        await Messages.First();
     }
+}
+    
+public class OptionsTestWithDefaultProvidedOptionsFlow : Flow
+{
+    public override async Task Run()
+    {
+        await Messages.First();
+    }
+}
+
+public class SimpleFlow : Flow
+{
+    public override Task Run() => Task.CompletedTask;
 }

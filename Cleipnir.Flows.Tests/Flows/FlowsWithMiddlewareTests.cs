@@ -39,6 +39,9 @@ public class FlowsWithMiddlewareTests
         result.SucceedWithValue.ShouldBe(1);
     }
     
+    public class SimpleMiddlewareFlows(FlowsContainer flowsContainer)
+        : Flows<SimpleMiddlewareFlow, string, int>(nameof(SimpleMiddlewareFlow), flowsContainer);
+    
     public class SimpleMiddlewareFlow : Flow<string, int>
     {
         public override Task<int> Run(string param) => 1.ToTask();

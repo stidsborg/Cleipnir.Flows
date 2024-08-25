@@ -1,5 +1,4 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
-using Cleipnir.ResilientFunctions.Storage;
+﻿using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows.SourceGeneratorDebugger;
@@ -9,7 +8,7 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddScoped<OuterClass.FunFlow>();
+        serviceCollection.AddScoped<SimpleFlow>();
 
         var container = new FlowsContainer(
             new InMemoryFunctionStore(),
@@ -17,33 +16,23 @@ public static class Program
             Options.Default
         );
 
-        var flows = new FunFlows(container);
-        await flows.Run("test");
-
-        await Task.CompletedTask;
-        //var funFlows = new FunFlows(container);
-        //await funFlows.Run("SomeInstance", "SomeParam");
-
-        //var state = await funFlows.GetState("SomeInstance");
-        //Console.WriteLine("Fetched State-value: " + state!.Value);
+        var flows = new SimpleFlows(container);
+        await flows.Run("SomeInstance");
     }
 }
 
-
-public class OuterClass
+public class SimpleFlow : Flow, IExposeState<SimpleFlow.FlowState>
 {
-    public class FunFlow : Flow // IExposeState<FunFlow.FunFlowState>
+    public required FlowState State { get; init; }
+
+    public override Task Run()
     {
-        public required FunFlowState State { get; init; }
-    
-        public override Task Run()
-        {
-            return Task.CompletedTask;
-        }
-        
-        public class FunFlowState : FlowState
-        {
-            public string Value { get; set; } = "";
-        }
+        Console.WriteLine("Executing FunFlow");
+        return Task.CompletedTask;
+    }
+
+    public class FlowState : ResilientFunctions.Domain.FlowState
+    {
+        public string Value { get; set; } = "";
     }
 }
