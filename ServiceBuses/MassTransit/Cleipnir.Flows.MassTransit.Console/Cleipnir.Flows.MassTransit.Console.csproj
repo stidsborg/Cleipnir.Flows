@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
+      <ProjectReference Include="..\..\..\SourceGeneration\Cleipnir.Flows.SourceGenerator\Cleipnir.Flows.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
 </Project>
