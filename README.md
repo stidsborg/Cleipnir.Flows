@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Cleipnir.Flows.svg)](https://www.nuget.org/packages/Cleipnir.Flows)
 
 <p align="center">
-  <img src="./Docs/cleipnir.png" alt="logo" />
+  <img src="https://github.com/stidsborg/Cleipnir.Flows/blob/main/Docs/cleipnir.png" alt="logo" />
   <br>
   Simply making fault-tolerant code simple
   <br>
