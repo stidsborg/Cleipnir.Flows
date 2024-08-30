@@ -11,12 +11,6 @@ public class SimpleFlow : Flow
     }
 }
 
-public class SimpleFlows : Flows<SimpleFlow>
-{
-    public SimpleFlows(FlowsContainer flowsContainer) 
-        : base("SimpleFlow", flowsContainer, options: null) { }
-}
-
 public class SimpleFlowsHandler(SimpleFlows flows) : IHandleMessages<MyMessage>
 {
     public Task Handle(MyMessage message, IMessageHandlerContext context)
