@@ -13,11 +13,13 @@ namespace Cleipnir.Flows.SourceGenerator
         private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
         private const string IExposeStateType = "Cleipnir.Flows.IExposeState`1";
+        private const string IgnoreAttribute = "Cleipnir.Flows.SourceGeneration.Ignore";
         
         private INamedTypeSymbol? _paramlessFlowTypeSymbol;
         private INamedTypeSymbol? _unitFlowTypeSymbol;
         private INamedTypeSymbol? _resultFlowTypeSymbol;
         private INamedTypeSymbol? _exposeStateTypeSymbol;
+        private INamedTypeSymbol? _ignoreAttribute;
         
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -45,6 +47,7 @@ namespace Cleipnir.Flows.SourceGenerator
                 _exposeStateTypeSymbol = complication.GetTypeByMetadataName(IExposeStateType);
                 if (_exposeStateTypeSymbol != null)
                     _exposeStateTypeSymbol = _exposeStateTypeSymbol.ConstructUnboundGenericType();
+                _ignoreAttribute = complication.GetTypeByMetadataName(IgnoreAttribute);
             }
 
             if (_paramlessFlowTypeSymbol == null || _unitFlowTypeSymbol == null || _resultFlowTypeSymbol == null || _exposeStateTypeSymbol == null)
@@ -82,6 +85,12 @@ namespace Cleipnir.Flows.SourceGenerator
                     break;
                 }
 
+            var hasIgnoreAttribute = flowType
+                .GetAttributes()
+                .Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, _ignoreAttribute));
+            if (hasIgnoreAttribute)
+                return null;
+            
             var baseType = flowType.BaseType;
             if (baseType == null)
                 return null;
