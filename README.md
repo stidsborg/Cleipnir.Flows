@@ -16,7 +16,7 @@ It is similar to Azure Durable Functions - but simpler, less restrictive and tai
 
 It works for both RPC and Message-based communication.
 
-## Introduction video
+## Introduction Video
 [![Video link](https://img.youtube.com/vi/XHLes8EZNas/0.jpg)](https://www.youtube.com/watch?v=XHLes8EZNas)
 
 ## Getting Started
@@ -81,6 +81,48 @@ However, the real benefit of the framework comes from:
 * Simplifying how code will be executed after a crash/restart - using the AtMostOnce and AtLeastOnce helper-methods
 * Awaiting external messages declaratively using Reactive Programming
 * Simple testability & versioning
+
+### Service Bus Intergrations
+It is simple to use Cleipnir with all the popular service bus frameworks. In order to do simply implement an event handler, which forwards events for each flow type to the flow:
+
+#### MassTransit
+```csharp
+public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IConsumer<MyMessage>
+{
+    public Task Consume(ConsumeContext<MyMessage> context) 
+        => simpleFlows.SendMessage(context.Message.Value, context.Message);
+}
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/MassTransit/Cleipnir.Flows.MassTransit.Console/SimpleFlow.cs)
+
+#### NServiceBus 
+```csharp
+public class SimpleFlowsHandler(SimpleFlows flows) : IHandleMessages<MyMessage>
+{
+    public Task Handle(MyMessage message, IMessageHandlerContext context)
+        => flows.SendMessage(message.Value, message);
+}
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/NServiceBus/Cleipnir.Flows.NServiceBus.Console/SimpleFlow.cs)
+
+#### Rebus 
+```csharp
+public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IHandleMessages<MyMessage>
+{
+    public Task Handle(MyMessage msg) => simpleFlows.SendMessage(msg.Value, msg);
+}
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/Rebus/Cleipnir.Flows.Rebus.Console/SimpleFlow.cs)
+
+#### Wolverine
+```csharp
+public class SimpleFlowsHandler(SimpleFlows flows)
+{
+    public Task Handle(MyMessage myMessage)
+        => flows.SendMessage(myMessage.Value, myMessage);
+}
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/Wolverine/Cleipnir.Flows.Wolverine.Console/SimpleFlow.cs)
 
 ## Examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
