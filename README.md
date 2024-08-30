@@ -27,7 +27,7 @@ Firstly, install the Cleipnir.Flows nuget package (using either Postgres, SqlSer
 Install-Package Cleipnir.Flows.Postgres
 ```
 
-Secondly, add the following to the setup in `Program.cs`:
+Secondly, add the following to the setup in `Program.cs` ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/4b62448c8ab7bed598f13d5dc4665e6a33565028/Samples/Cleipnir.Flows.Sample.AspNet/Program.cs#L27)):
 ```csharp
 builder.Services.AddFlows(c => c
   .UsePostgresSqlStore(connectionString)  
@@ -35,32 +35,27 @@ builder.Services.AddFlows(c => c
 );
 ```
 
-Finally, implement your flow:
+Finally, implement your flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/Samples/Cleipnir.Flows.Sample.MicrosoftOpen/Flows/Rpc/OrderFlow.cs)):
 ```csharp
-public class OrderFlow : Flow<Order>
+public class OrderFlow(
+    IPaymentProviderClient paymentProviderClient,
+    IEmailClient emailClient,
+    ILogisticsClient logisticsClient
+) : Flow<Order>
 {
-    private readonly IPaymentProviderClient _paymentProviderClient;
-    private readonly IEmailClient _emailClient;
-    private readonly ILogisticsClient _logisticsClient;
-    
-    public OrderFlow(IPaymentProviderClient paymentProviderClient, IEmailClient emailClient, ILogisticsClient logisticsClient)
-    {
-        _paymentProviderClient = paymentProviderClient;
-        _emailClient = emailClient;
-        _logisticsClient = logisticsClient;
-    }
-
     public override async Task Run(Order order)
     {
-        await _paymentProviderClient.Reserve(order.CustomerId, order.TransactionId, order.TotalPrice);
-        await _logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
-        await _paymentProviderClient.Capture(order.TransactionId);
-        await _emailClient.SendOrderConfirmation(order.CustomerId, order.ProductIds);
+        var transactionId = Guid.NewGuid();
+
+        await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
+        var trackAndTrace = await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
+        await paymentProviderClient.Capture(transactionId);
+        await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
     }
 }
 ```
 
-The flow can then be started using the corresponding source generated Flows-type:
+The flow can then be started using the corresponding source generated Flows-type ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/Samples/Cleipnir.Flows.Sample.MicrosoftOpen/Controllers/OrderController.cs)):
 ```csharp
 [ApiController]
 [Route("[controller]")]
