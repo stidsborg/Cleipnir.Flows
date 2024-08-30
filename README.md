@@ -83,9 +83,9 @@ However, the real benefit of the framework comes from:
 * Simple testability & versioning
 
 ### Service Bus Intergrations
-It is simple to use Cleipnir with all the popular service bus frameworks. In order to do simply implement an event handler, which forwards events for each flow type to the flow:
+It is simple to use Cleipnir with all the popular service bus frameworks. In order to do simply implement an event handler - which forwards received events - for each flow type:
 
-#### MassTransit
+#### MassTransit Handler
 ```csharp
 public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IConsumer<MyMessage>
 {
@@ -95,7 +95,7 @@ public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IConsumer<MyMessage>
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/MassTransit/Cleipnir.Flows.MassTransit.Console/SimpleFlow.cs)
 
-#### NServiceBus 
+#### NServiceBus Handler
 ```csharp
 public class SimpleFlowsHandler(SimpleFlows flows) : IHandleMessages<MyMessage>
 {
@@ -105,7 +105,7 @@ public class SimpleFlowsHandler(SimpleFlows flows) : IHandleMessages<MyMessage>
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/NServiceBus/Cleipnir.Flows.NServiceBus.Console/SimpleFlow.cs)
 
-#### Rebus 
+#### Rebus Handler
 ```csharp
 public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IHandleMessages<MyMessage>
 {
@@ -114,7 +114,7 @@ public class SimpleFlowsHandler(SimpleFlows simpleFlows) : IHandleMessages<MyMes
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/Rebus/Cleipnir.Flows.Rebus.Console/SimpleFlow.cs)
 
-#### Wolverine
+#### Wolverine Handler
 ```csharp
 public class SimpleFlowsHandler(SimpleFlows flows)
 {
