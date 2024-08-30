@@ -5,13 +5,13 @@ namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
 public class OrderFlow(
     IPaymentProviderClient paymentProviderClient,
     IEmailClient emailClient,
-    ILogisticsClient logisticsClient)
-    : Flow<Order>
+    ILogisticsClient logisticsClient
+) : Flow<Order>
 {
     public override async Task Run(Order order)
     {
-        var transactionId = Guid.NewGuid(); 
-        
+        var transactionId = Guid.NewGuid();
+
         await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
         var trackAndTrace = await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
         await paymentProviderClient.Capture(transactionId);
