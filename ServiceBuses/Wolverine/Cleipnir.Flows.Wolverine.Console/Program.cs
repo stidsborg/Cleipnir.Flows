@@ -40,8 +40,7 @@ internal static class Program
             {
                 services.AddFlows(c => c
                     .UseInMemoryStore()
-                    .RegisterFlow<SimpleFlow, SimpleFlows>()
-                    //.RegisterFlowsAutomatically()
+                    .RegisterFlowsAutomatically()
                 );
             })
             .UseWolverine();
