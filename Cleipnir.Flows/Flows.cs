@@ -113,7 +113,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
             (options ?? Options.Default)
-                .MapToRFunctionsSettings()
+                .MapToSettings()
         );
     }
 
@@ -163,7 +163,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
             settings: (options ?? Options.Default)
-                .MapToRFunctionsSettings()
+                .MapToSettings()
         );
     }
 
@@ -218,7 +218,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
             (options ?? Options.Default)
-                .MapToRFunctionsSettings()
+                .MapToSettings()
         );
     }
 

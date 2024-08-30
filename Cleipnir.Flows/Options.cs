@@ -90,7 +90,7 @@ public class Options
         return merged;
     }
 
-    internal Settings MapToRFunctionsSettings()
+    internal Settings MapToSettings()
         => new(
             UnhandledExceptionHandler,
             RetentionPeriod,

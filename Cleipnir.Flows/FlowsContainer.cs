@@ -38,7 +38,7 @@ public class FlowsContainer : IDisposable
                 );
         }
              
-        FunctionRegistry = new FunctionsRegistry(flowStore, options.MapToRFunctionsSettings());
+        FunctionRegistry = new FunctionsRegistry(flowStore, options.MapToSettings());
         Middlewares = options.Middlewares
             .Select(m => m switch
             {
