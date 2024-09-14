@@ -18,6 +18,7 @@ It works for both RPC and Message-based communication.
 
 ## Introduction Video
 [![Video link](https://img.youtube.com/vi/XHLes8EZNas/0.jpg)](https://www.youtube.com/watch?v=XHLes8EZNas)
+[![Video link](https://img.youtube.com/vi/AdvpK1B1g-8/0.jpg)](https://www.youtube.com/watch?v=AdvpK1B1g-8)
 
 ## Getting Started
 To get started simply perform the following three steps in an ASP.NET service:
