@@ -14,9 +14,9 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.6.0" />
+        <PackageReference Include="MSTest.TestFramework" Version="3.6.0" />
         <PackageReference Include="Rebus" Version="8.4.4" />
         <PackageReference Include="Rebus.ServiceProvider" Version="10.1.2" />
         <PackageReference Include="Shouldly" Version="4.2.1" />
