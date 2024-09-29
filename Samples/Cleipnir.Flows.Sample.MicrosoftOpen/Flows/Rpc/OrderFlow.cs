@@ -11,8 +11,8 @@ public class OrderFlow(
     public override async Task Run(Order order)
     {
         var transactionId = Guid.NewGuid();
-
-        await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
+        
+        await paymentProviderClient.Reserve(transactionId, order.CustomerId, order.TotalPrice);
         var trackAndTrace = await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
         await paymentProviderClient.Capture(transactionId);
         await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
