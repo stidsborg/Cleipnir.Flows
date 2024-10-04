@@ -6,22 +6,16 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
 {
     public override async Task Run(Order order)
     {
-        await Capture(() => Console.WriteLine("MessageDriven-OrderFlow Started"));
         var transactionId = await Capture(Guid.NewGuid);
 
         await ReserveFunds(order, transactionId);
-        await Message<FundsReserved>();
-
+        
         await ShipProducts(order);
-        var productsShipped = await Message<ProductsShipped>();
         
         await CaptureFunds(order, transactionId);
-        await Message<FundsCaptured>();
 
-        await SendOrderConfirmationEmail(order, productsShipped.TrackAndTraceNumber);
-        await Message<OrderConfirmationEmailSent>();
-        
-        await Capture(() => Console.WriteLine("MessageDriven-OrderFlow Completed"));
+        var trackAndTraceNumber = "";
+        await SendOrderConfirmationEmail(order, trackAndTraceNumber);
     }
 
     #region MessagePublishers
