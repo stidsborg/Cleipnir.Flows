@@ -145,6 +145,8 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) 
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
+    public Task BulkSchedule(IEnumerable<FlowInstance> instanceIds) => _registration.BulkSchedule(instanceIds);
+
     public override Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null) 
         => _registration.GetInstances(status);
 
@@ -212,6 +214,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
+    
+    public Task BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }
 
 public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
@@ -268,4 +272,6 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
+    
+    public Task BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }
