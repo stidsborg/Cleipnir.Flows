@@ -74,13 +74,17 @@ public class FlowsConfigurator
         return this;
     }
     
-    public FlowsConfigurator RegisterFlow<TFlow, TFlows>(Func<IServiceProvider, TFlows> factory) where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
+    public FlowsConfigurator RegisterFlow<TFlow, TFlows>(Func<IServiceProvider, TFlows> flowsFactory, Func<IServiceProvider, TFlow>? flowFactory = null) where TFlow : BaseFlow where TFlows : BaseFlows<TFlow>
     {
         var added = FlowsTypes.Add(typeof(TFlows));
         if (!added) return this;
+
+        if (flowFactory != null)
+            Services.AddScoped(flowFactory);
+        else
+            Services.AddScoped<TFlow>();
         
-        Services.AddScoped<TFlow>();
-        Services.AddTransient(factory);
+        Services.AddTransient(flowsFactory);
 
         return this;
     }
