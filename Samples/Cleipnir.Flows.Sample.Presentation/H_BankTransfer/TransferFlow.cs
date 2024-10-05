@@ -8,6 +8,8 @@ public sealed class TransferFlow : Flow<Transfer>
 
     public override async Task Run(Transfer transfer)
     {
+        var (transactionId, fromAccount, toAccount, amount) = transfer;
+        
         //check available funds
         
         //withdraw funds from sender account
