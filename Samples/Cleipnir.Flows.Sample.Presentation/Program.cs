@@ -11,7 +11,7 @@ internal static class Program
             .Enrich.FromLogContext()
             .CreateLogger();
 
-        await Task.CompletedTask;
+        await C_NewsletterSender.Distributed.Example.Perform();
         
         Console.ReadLine();
     }

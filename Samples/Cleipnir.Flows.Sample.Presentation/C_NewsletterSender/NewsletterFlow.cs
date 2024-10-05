@@ -34,7 +34,7 @@ public class NewsletterFlow : Flow<MailAndRecipients>
 
 public record EmailAddress(string Name, string Address);
 public record MailAndRecipients(
-    List<EmailAddress> Recipients,
+    IReadOnlyList<EmailAddress> Recipients,
     string Subject,
     string Content
 );
