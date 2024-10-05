@@ -20,7 +20,7 @@ public class OptionsTests
             .UseInMemoryStore()
             .WithOptions(new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue))
             .RegisterFlow<OptionsTestWithOverriddenOptionsFlow, OptionsTestWithOverriddenOptionsFlows>(
-                factory: sp => new OptionsTestWithOverriddenOptionsFlows(
+                flowsFactory: sp => new OptionsTestWithOverriddenOptionsFlows(
                     sp.GetRequiredService<FlowsContainer>(),
                     options: new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.Zero)
                 )
@@ -60,7 +60,7 @@ public class OptionsTests
             .UseInMemoryStore()
             .WithOptions(new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue))
             .RegisterFlow<SimpleFlow, SimpleFlows>(
-                factory: sp => new SimpleFlows(
+                flowsFactory: sp => new SimpleFlows(
                     sp.GetRequiredService<FlowsContainer>(),
                     flowName: "SomeOtherFlowName"
                 )
