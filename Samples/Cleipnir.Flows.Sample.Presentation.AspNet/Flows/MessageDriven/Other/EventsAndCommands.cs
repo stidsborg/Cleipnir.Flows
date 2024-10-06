@@ -18,4 +18,5 @@ public record FundsReservationFailed(string OrderId) : EventsAndCommands;
 public record FundsCaptureFailed(string OrderId) : EventsAndCommands;
 public record ProductsShipmentFailed(string OrderId) : EventsAndCommands;
 public record OrderConfirmationEmailFailed(string OrderId) : EventsAndCommands;
-public record CancelProductShipment(string OrderId) : EventsAndCommands;
+public record CancelProductsShipment(string OrderId) : EventsAndCommands;
+public record ReverseTransaction(string OrderId, Guid TransactionId) : EventsAndCommands;

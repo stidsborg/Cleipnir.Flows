@@ -21,7 +21,7 @@ public class SupportTicketFlow : Flow<SupportTicketRequest>
                 .Where(e => e.Match(taken => taken.Iteration, rejected => rejected.Iteration) == i)
                 .FirstOrNone();
 
-            if (!option.HasValue && option.Value.AsObject() is SupportTicketTaken)
+            if (!option.HasNone && option.AsObject() is SupportTicketTaken)
                 return; //ticket was taken in iteration i
         }
     }

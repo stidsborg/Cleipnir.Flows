@@ -59,7 +59,7 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
     private Task SendOrderConfirmationEmail(Order order, ProductsShipped productsShipped)
         => Capture(() => bus.Send(new SendOrderConfirmationEmail(order.OrderId, order.CustomerId, productsShipped.TrackAndTraceNumber)));
     private Task CancelProductsShipment(Order order)
-        => Capture(() => bus.Send(new CancelProductShipment(order.OrderId)));
+        => Capture(() => bus.Send(new CancelProductsShipment(order.OrderId)));
     private Task CancelFundsReservation(Order order, Guid transactionId)
         => Capture(() => bus.Send(new CancelFundsReservation(order.OrderId, transactionId)));
 }
