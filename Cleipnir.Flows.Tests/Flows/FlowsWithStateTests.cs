@@ -93,6 +93,7 @@ public class FlowsWithStateTests
     }
 }
 
+[GenerateFlows]
 public class ActionWithStateFlow : Flow<string>, IExposeState<ActionWithStateFlow.WorkflowState>
 {
     public required WorkflowState State { get; init; }
@@ -109,6 +110,7 @@ public class ActionWithStateFlow : Flow<string>, IExposeState<ActionWithStateFlo
     }
 }
 
+[GenerateFlows]
 public class FuncWithStateFlow : Flow<string, string>, IExposeState<FuncWithStateFlow.WorkflowState>
 {
     public required WorkflowState State { get; init; }
@@ -125,6 +127,7 @@ public class FuncWithStateFlow : Flow<string, string>, IExposeState<FuncWithStat
     }
 }
 
+[GenerateFlows]
 public class ParamlessWithStateFlow : Flow, IExposeState<ParamlessWithStateFlow.WorkflowState>
 {
     public required WorkflowState State { get; init; }

@@ -3,6 +3,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
+[GenerateFlows]
 public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
 {
     public override async Task Run(Order order)

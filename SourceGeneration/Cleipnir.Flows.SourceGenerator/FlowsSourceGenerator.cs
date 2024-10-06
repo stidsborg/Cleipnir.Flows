@@ -24,11 +24,12 @@ namespace Cleipnir.Flows.SourceGenerator
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Initialization logic
-            var provider = context.SyntaxProvider.CreateSyntaxProvider(
-                (node, _) => node is ClassDeclarationSyntax c && c.BaseList != null,
+            var provider = context.SyntaxProvider.ForAttributeWithMetadataName(
+                "Cleipnir.Flows.GenerateFlowsAttribute",
+                (node, ctx) => node is ClassDeclarationSyntax,
                 transform: (ctx, _) => Transform(ctx)
             ).Where(flowInformation => flowInformation is not null);
-
+            
             context.RegisterSourceOutput(
                 provider,
                 (ctx, generatedFlowInformation) =>
@@ -36,9 +37,10 @@ namespace Cleipnir.Flows.SourceGenerator
             );
         }
 
-        public GeneratedFlowInformation? Transform(GeneratorSyntaxContext context)
+        public GeneratedFlowInformation? Transform(GeneratorAttributeSyntaxContext context)
         {
-            if (_paramlessFlowTypeSymbol == null)
+            
+            //if (_paramlessFlowTypeSymbol == null)
             {
                 var complication = context.SemanticModel.Compilation;
                 _paramlessFlowTypeSymbol = complication.GetTypeByMetadataName(ParamlessFlowType);
@@ -53,7 +55,7 @@ namespace Cleipnir.Flows.SourceGenerator
             if (_paramlessFlowTypeSymbol == null || _unitFlowTypeSymbol == null || _resultFlowTypeSymbol == null || _exposeStateTypeSymbol == null)
                 return null;
 
-            var classDeclaration = (ClassDeclarationSyntax) context.Node;
+            var classDeclaration = (ClassDeclarationSyntax) context.TargetNode;
             if (classDeclaration.Modifiers.Any(m => m.Value is "private"))
                 return null;
 

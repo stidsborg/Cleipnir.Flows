@@ -4,6 +4,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Flows;
 
+[GenerateFlows]
 public class OrderFlow : Flow<Order>
 {
     private readonly IPaymentProviderClient _paymentProviderClient;

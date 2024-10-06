@@ -2,6 +2,7 @@ using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.State;
 
+[GenerateFlows]
 public class StateFlow : Flow<string, string>, IExposeState<StateFlow.WorkflowState>
 {
     public required WorkflowState State { get; init; }

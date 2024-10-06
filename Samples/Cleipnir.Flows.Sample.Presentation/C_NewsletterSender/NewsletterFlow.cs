@@ -4,6 +4,7 @@ using MimeKit.Text;
 
 namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender;
 
+[GenerateFlows]
 public class NewsletterFlow : Flow<MailAndRecipients>
 {
     /*

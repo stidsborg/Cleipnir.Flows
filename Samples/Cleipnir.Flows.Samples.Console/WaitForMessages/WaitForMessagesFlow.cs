@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.WaitForMessages;
 
+[GenerateFlows]
 public class WaitForMessagesFlow : Flow<string>
 {
     public override async Task Run(string orderId)

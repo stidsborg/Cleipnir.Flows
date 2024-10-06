@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.Middleware;
 
+[GenerateFlows]
 public class MiddlewareFlow : Flow<string>
 {
     public override Task Run(string param)

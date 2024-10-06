@@ -11,7 +11,8 @@ internal static class Program
             .Enrich.FromLogContext()
             .CreateLogger();
 
-        await C_NewsletterSender.Distributed.Example.Perform();
+        //await C_NewsletterSender.Distributed.Example.Perform();
+        await H_BankTransfer.Example.Perform();
         
         Console.ReadLine();
     }

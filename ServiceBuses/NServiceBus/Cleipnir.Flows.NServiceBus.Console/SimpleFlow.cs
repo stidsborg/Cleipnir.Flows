@@ -2,6 +2,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.NServiceBus.Console;
 
+[GenerateFlows]
 public class SimpleFlow : Flow
 {
     public override async Task Run()

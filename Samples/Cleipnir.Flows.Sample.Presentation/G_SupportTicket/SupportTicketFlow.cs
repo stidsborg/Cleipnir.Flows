@@ -1,5 +1,6 @@
 ﻿namespace Cleipnir.Flows.Sample.Presentation.G_SupportTicket;
 
+[GenerateFlows]
 public class SupportTicketFlow : Flow<SupportTicketRequest>
 {
     public override async Task Run(SupportTicketRequest request)

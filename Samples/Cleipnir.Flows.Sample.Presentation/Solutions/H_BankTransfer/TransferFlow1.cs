@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.Presentation.Solutions.H_BankTransfer;
 
+[GenerateFlows]
 public sealed class TransferFlow1 : Flow<Transfer>
 {
     public TransferFlow1(IBankCentralClient bankCentralClient) => BankCentralClient = bankCentralClient;

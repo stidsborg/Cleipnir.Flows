@@ -4,6 +4,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 
 namespace Cleipnir.Flows.Sample.Presentation.Solutions.B_OrderFlowMessaging;
 
+[GenerateFlows]
 public class OrderFlow(Bus bus) : Flow<Order>
 {
     public override async Task Run(Order order)

@@ -3,6 +3,7 @@ using MassTransit;
 
 namespace Cleipnir.Flows.MassTransit.Console;
 
+[GenerateFlows]
 public class SimpleFlow : Flow
 {
     public override async Task Run()

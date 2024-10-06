@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.Engagement;
 
+[GenerateFlows]
 public class EngagementFlow : Flow<string> 
 {
     public override async Task Run(string candidateEmail)

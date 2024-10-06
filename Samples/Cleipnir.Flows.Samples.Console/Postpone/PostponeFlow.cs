@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.Postpone;
 
+[GenerateFlows]
 public class PostponeFlow : Flow<string>
 {
     private readonly ExternalService _externalService = new();

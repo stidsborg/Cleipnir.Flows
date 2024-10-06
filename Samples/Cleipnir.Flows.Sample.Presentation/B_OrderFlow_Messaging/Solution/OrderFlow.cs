@@ -5,6 +5,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.Presentation.B_OrderFlow_Messaging.Solution;
 
+[GenerateFlows]
 public class OrderFlow(MessageBroker messageBroker) : Flow<Order>
 {
     private ILogger Logger { get; } = Log.Logger.ForContext<OrderFlow>();

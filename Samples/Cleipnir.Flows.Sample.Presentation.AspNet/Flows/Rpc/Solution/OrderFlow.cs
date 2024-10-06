@@ -3,6 +3,7 @@ using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc.Solution;
 
+[GenerateFlows]
 public class OrderFlow(
     IPaymentProviderClient paymentProviderClient,
     IEmailClient emailClient,

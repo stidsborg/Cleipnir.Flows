@@ -3,6 +3,7 @@ using Rebus.Handlers;
 
 namespace Cleipnir.Flows.Rebus.Console;
 
+[GenerateFlows]
 public class SimpleFlow : Flow
 {
     public override async Task Run()

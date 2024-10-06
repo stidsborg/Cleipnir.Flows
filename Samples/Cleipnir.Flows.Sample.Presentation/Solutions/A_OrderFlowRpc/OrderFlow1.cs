@@ -1,5 +1,6 @@
 ﻿namespace Cleipnir.Flows.Sample.Presentation.Solutions.A_OrderFlowRpc;
 
+[GenerateFlows]
 public class OrderFlow1 : Flow<Order>
 {
     private readonly IPaymentProviderClient _paymentProviderClient;

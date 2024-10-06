@@ -2,6 +2,7 @@
 
 namespace Cleipnir.Flows.Sample.ConsoleApp.AtMostOnce;
 
+[GenerateFlows]
 public class AtMostOnceFlow : Flow<string>
 {
     private readonly RocketSender _rocketSender = new();

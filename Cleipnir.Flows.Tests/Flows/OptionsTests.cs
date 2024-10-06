@@ -77,6 +77,7 @@ public class OptionsTests
     }
 }
 
+[GenerateFlows]
 public class OptionsTestWithOverriddenOptionsFlow : Flow
 {
     public override async Task Run()
@@ -85,6 +86,7 @@ public class OptionsTestWithOverriddenOptionsFlow : Flow
     }
 }
     
+[GenerateFlows]
 public class OptionsTestWithDefaultProvidedOptionsFlow : Flow
 {
     public override async Task Run()
@@ -93,6 +95,7 @@ public class OptionsTestWithDefaultProvidedOptionsFlow : Flow
     }
 }
 
+[GenerateFlows]
 public class SimpleFlow : Flow
 {
     public override Task Run() => Task.CompletedTask;
