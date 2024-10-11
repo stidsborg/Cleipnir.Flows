@@ -38,6 +38,7 @@ builder.Services.AddFlows(c => c
 
 Finally, implement your flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/Samples/Cleipnir.Flows.Sample.MicrosoftOpen/Flows/Rpc/OrderFlow.cs)):
 ```csharp
+[GenerateFlows]
 public class OrderFlow(
     IPaymentProviderClient paymentProviderClient,
     IEmailClient emailClient,
@@ -125,6 +126,7 @@ As an example is worth a thousand lines of documentation - various useful exampl
 
 1: Avoid executing already completed code again if a flow is restarted:
 ```csharp
+[GenerateFlows]
 public class AtLeastOnceFlow : Flow<string, string>
 {
   private readonly PuzzleSolverService _puzzleSolverService = new();
@@ -143,6 +145,7 @@ public class AtLeastOnceFlow : Flow<string, string>
 
 2: Ensure a flow step is **executed at-most-once**:
 ```csharp
+[GenerateFlows]
 public class AtMostOnceFlow : Flow<string>
 {
     private readonly RocketSender _rocketSender = new();
@@ -160,6 +163,7 @@ public class AtMostOnceFlow : Flow<string>
 
 3: Wait for 2 external messages before continuing flow ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/WaitForMessages)):
 ```csharp
+[GenerateFlows]
 public class WaitForMessagesFlow : Flow<string>
 {
   public override async Task Run(string param)
@@ -197,6 +201,7 @@ await controlPanel.ReInvoke();
 
 6: Postpone a running flow (without taking in-memory resources) ([source code](https://github.com/stidsborg/Cleipnir.Flows/tree/main/Samples/Cleipnir.Flows.Samples.Console/Postpone)):
 ```csharp
+[GenerateFlows]
 public class PostponeFlow : Flow<string>
 {
   private readonly ExternalService _externalService = new();
@@ -278,6 +283,7 @@ Thus, to rectify the situation we must ensure that the flow is *restarted* if it
 Consider the following Order-flow:
 
 ```csharp
+[GenerateFlows]
 public class OrderFlow : Flow<Order>
 {
   private readonly IPaymentProviderClient _paymentProviderClient;
