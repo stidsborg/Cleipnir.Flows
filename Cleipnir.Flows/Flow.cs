@@ -102,17 +102,20 @@ public abstract class BaseFlow
         .Messages
         .TakeUntilTimeout(timeoutId, timesOutIn)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .First();
+        .FirstOrNone()
+        .ThrowTimeoutExceptionOnNoResult();
     public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(DateTime timesOutAt) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutAt)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .First();
+        .FirstOrNone()
+        .ThrowTimeoutExceptionOnNoResult();
     public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(TimeSpan timesOutIn) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutIn)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .First();
+        .FirstOrNone()
+        .ThrowTimeoutExceptionOnNoResult();
 
     public Task Delay(TimeSpan @for) => Messages
         .TakeUntilTimeout(@for)
