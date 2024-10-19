@@ -6,7 +6,7 @@ using MimeKit.Text;
 namespace Cleipnir.Flows.Sample.Presentation.C_NewsletterSender.Solution;
 
 [GenerateFlows]
-public class NewsletterFlow : Flow<MailAndRecipients>, IExposeState<NewsletterFlow.NewsletterState>
+public class NewsletterFlow : Flow<MailAndRecipients>
 {
     public required NewsletterState State { get; init; }
     

@@ -8,7 +8,6 @@ namespace Cleipnir.Flows.SourceGenerator
         public ITypeSymbol? ParamTypeSymbol { get; }
         public string? ParameterName { get; }
         public ITypeSymbol? ResultTypeSymbol { get; }
-        public ITypeSymbol? StateTypeSymbol { get; }
         public bool Paramless { get; }
         public string AccessibilityModifier { get; }
 
@@ -17,7 +16,6 @@ namespace Cleipnir.Flows.SourceGenerator
             ITypeSymbol? paramType, 
             string? parameterName, 
             ITypeSymbol? resultType, 
-            ITypeSymbol? stateTypeSymbol,
             bool paramless, 
             string accessibilityModifier)
         {
@@ -25,7 +23,6 @@ namespace Cleipnir.Flows.SourceGenerator
             ParamTypeSymbol = paramType;
             ParameterName = parameterName;  
             ResultTypeSymbol = resultType;
-            StateTypeSymbol = stateTypeSymbol;
             Paramless = paramless;
             AccessibilityModifier = accessibilityModifier;
         }

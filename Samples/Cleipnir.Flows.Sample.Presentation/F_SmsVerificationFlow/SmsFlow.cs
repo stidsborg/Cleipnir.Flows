@@ -4,7 +4,7 @@ using Cleipnir.ResilientFunctions.Reactive.Extensions;
 namespace Cleipnir.Flows.Sample.Presentation.F_SmsVerificationFlow;
 
 [GenerateFlows]
-public class SmsFlow : Flow<string>, IExposeState<SmsFlow.SmsState>
+public class SmsFlow : Flow<string>
 {
     public required SmsState State { get; init; }
     

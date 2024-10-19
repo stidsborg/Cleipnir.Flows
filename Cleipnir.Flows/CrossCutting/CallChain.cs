@@ -22,9 +22,9 @@ public static class CallChain
                     var result = await runFlow(p, w);
                     return new Result<TResult>(result);
                 }
-                catch (SuspendInvocationException suspendInvocationException)
+                catch (SuspendInvocationException)
                 {
-                    return new Result<TResult>(Suspend.While(suspendInvocationException.ExpectedInterruptCount.Value));
+                    return new Result<TResult>(Suspend.Invocation);
                 }
                 catch (PostponeInvocationException postponeInvocationException)
                 {

@@ -22,7 +22,7 @@ public static class Program
 }
 
 [GenerateFlows]
-public class SimpleFlow : Flow, IExposeState<SimpleFlow.FlowState>
+public class SimpleFlow : Flow
 {
     public required FlowState State { get; init; }
 

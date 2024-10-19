@@ -24,7 +24,7 @@ public class FlowsWithStateTests
         var flows = new ParamlessWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId");
 
-        var state = await flows.GetState("someInstanceId");
+        var state = await (await flows.ControlPanel("someInstanceId"))!.States.Get<ParamlessWithStateFlow.WorkflowState>();
         state.ShouldNotBeNull();
         state.Boolean.ShouldBeTrue();
         
@@ -49,7 +49,7 @@ public class FlowsWithStateTests
         var flows = new ActionWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId", "someParameter");
 
-        var state = await flows.GetState("someInstanceId");
+        var state = await (await flows.ControlPanel("someInstanceId"))!.States.Get<ActionWithStateFlow.WorkflowState>();
         state.ShouldNotBeNull();
         state.Value.ShouldBe("someParameter");
         
@@ -57,7 +57,7 @@ public class FlowsWithStateTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
+        var flowState = await controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
     }
@@ -78,7 +78,7 @@ public class FlowsWithStateTests
         var flows = new FuncWithStateFlows(flowsContainer);
         await flows.Run("someInstanceId", "someParameter");
 
-        var state = await flows.GetState("someInstanceId");
+        var state = await (await flows.ControlPanel("someInstanceId"))!.States.Get<FuncWithStateFlow.WorkflowState>();
         state.ShouldNotBeNull();
         state.Value.ShouldBe("someParameter");
         
@@ -87,21 +87,20 @@ public class FlowsWithStateTests
         controlPanel.Result.ShouldBe("someParameter");
         controlPanel.Status.ShouldBe(Status.Succeeded);
         
-        var flowState = controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
+        var flowState = await controlPanel.States.Get<FuncWithStateFlow.WorkflowState>();
         flowState.ShouldNotBeNull();
         flowState.Value.ShouldBe("someParameter");
     }
 }
 
 [GenerateFlows]
-public class ActionWithStateFlow : Flow<string>, IExposeState<ActionWithStateFlow.WorkflowState>
+public class ActionWithStateFlow : Flow<string>
 {
-    public required WorkflowState State { get; init; }
-    
-    public override Task Run(string param)
+    public override async Task Run(string param)
     {
-        State.Value = param;
-        return Task.CompletedTask;
+        var state = await Workflow.States.CreateOrGetDefault<WorkflowState>();
+        state.Value = param;
+        await state.Save();
     }
 
     public class WorkflowState : FlowState
@@ -111,14 +110,14 @@ public class ActionWithStateFlow : Flow<string>, IExposeState<ActionWithStateFlo
 }
 
 [GenerateFlows]
-public class FuncWithStateFlow : Flow<string, string>, IExposeState<FuncWithStateFlow.WorkflowState>
+public class FuncWithStateFlow : Flow<string, string>
 {
-    public required WorkflowState State { get; init; }
-    
-    public override Task<string> Run(string param)
+    public override async Task<string> Run(string param)
     {
-        State.Value = param;
-        return Task.FromResult(param);
+        var state = await Workflow.States.CreateOrGetDefault<WorkflowState>();
+        state.Value = param;
+        await state.Save();
+        return param;
     }
 
     public class WorkflowState : FlowState
@@ -128,14 +127,13 @@ public class FuncWithStateFlow : Flow<string, string>, IExposeState<FuncWithStat
 }
 
 [GenerateFlows]
-public class ParamlessWithStateFlow : Flow, IExposeState<ParamlessWithStateFlow.WorkflowState>
+public class ParamlessWithStateFlow : Flow
 {
-    public required WorkflowState State { get; init; }
-    
-    public override Task Run()
+    public override async Task Run()
     {
-        State.Boolean = true;
-        return Task.CompletedTask;
+        var state = await Workflow.States.CreateOrGetDefault<WorkflowState>();
+        state.Boolean = true;
+        await state.Save();
     }
 
     public class WorkflowState : FlowState

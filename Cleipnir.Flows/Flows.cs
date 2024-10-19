@@ -50,38 +50,11 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
         var setter = lambdaExpr.Compile();
         return setter;
     }
-
-    private static Action<TFlow, States> CreateStateSetter()
-    {
-        var iExposeStateType = typeof(TFlow)
-            .GetInterfaces()
-            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IExposeState<>));
-
-        if (iExposeStateType == null)
-            return (_, _) => { };
-
-        var stateType = iExposeStateType.GenericTypeArguments[0];
-        
-        //fetch state
-        var methodInfo = typeof(States)
-            .GetMethods()
-            .Single(m => m.Name == nameof(States.CreateOrGet) && !m.GetParameters().Any());
-
-        var genericMethodInfo = methodInfo.MakeGenericMethod(stateType);
-        var statePropertyInfo = iExposeStateType.GetProperty("State");
-        
-        return (flow, states) =>
-        {
-            var state = genericMethodInfo.Invoke(states, parameters: null);
-            statePropertyInfo!.SetValue(flow, state);
-        };
-    }
     
     protected Next<TFlow, TParam, TResult> CreateMiddlewareCallChain<TParam, TResult>(Func<TFlow, TParam, Task<TResult>> runFlow) where TParam : notnull
     {
         var serviceProvider = FlowsContainer.ServiceProvider;
         var workflowSetter = CreateWorkflowSetter();
-        var stateSetter = CreateStateSetter();
         return CallChain.Create<TFlow, TParam, TResult>(
             FlowsContainer.Middlewares,
             runFlow: async (param, workflow) =>
@@ -90,7 +63,6 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
 
                 var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
                 workflowSetter(flow, workflow);
-                stateSetter(flow, workflow.States);
                 
                 var result = await runFlow(flow, param);
                 return result;

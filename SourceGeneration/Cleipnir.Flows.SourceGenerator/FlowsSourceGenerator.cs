@@ -12,13 +12,11 @@ namespace Cleipnir.Flows.SourceGenerator
         private const string ParamlessFlowType = "Cleipnir.Flows.Flow";
         private const string UnitFlowType = "Cleipnir.Flows.Flow`1";
         private const string ResultFlowType = "Cleipnir.Flows.Flow`2";
-        private const string IExposeStateType = "Cleipnir.Flows.IExposeState`1";
         private const string IgnoreAttribute = "Cleipnir.Flows.SourceGeneration.Ignore";
         
         private INamedTypeSymbol? _paramlessFlowTypeSymbol;
         private INamedTypeSymbol? _unitFlowTypeSymbol;
         private INamedTypeSymbol? _resultFlowTypeSymbol;
-        private INamedTypeSymbol? _exposeStateTypeSymbol;
         private INamedTypeSymbol? _ignoreAttribute;
         
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -46,13 +44,10 @@ namespace Cleipnir.Flows.SourceGenerator
                 _paramlessFlowTypeSymbol = complication.GetTypeByMetadataName(ParamlessFlowType);
                 _unitFlowTypeSymbol = complication.GetTypeByMetadataName(UnitFlowType);
                 _resultFlowTypeSymbol = complication.GetTypeByMetadataName(ResultFlowType);
-                _exposeStateTypeSymbol = complication.GetTypeByMetadataName(IExposeStateType);
-                if (_exposeStateTypeSymbol != null)
-                    _exposeStateTypeSymbol = _exposeStateTypeSymbol.ConstructUnboundGenericType();
                 _ignoreAttribute = complication.GetTypeByMetadataName(IgnoreAttribute);
             }
 
-            if (_paramlessFlowTypeSymbol == null || _unitFlowTypeSymbol == null || _resultFlowTypeSymbol == null || _exposeStateTypeSymbol == null)
+            if (_paramlessFlowTypeSymbol == null || _unitFlowTypeSymbol == null || _resultFlowTypeSymbol == null)
                 return null;
 
             var classDeclaration = (ClassDeclarationSyntax) context.TargetNode;
@@ -75,17 +70,6 @@ namespace Cleipnir.Flows.SourceGenerator
 
             if (flowType.ContainingType != null || flowType.IsFileLocal)
                 return null;
-            
-            ITypeSymbol? stateTypeSymbol = null;
-            foreach (var implementedInterface in flowType.AllInterfaces)
-                if (
-                    implementedInterface.IsGenericType &&
-                    SymbolEqualityComparer.Default.Equals(implementedInterface.ConstructUnboundGenericType(), _exposeStateTypeSymbol)
-                )
-                {
-                    stateTypeSymbol = implementedInterface.TypeArguments[0];
-                    break;
-                }
 
             var hasIgnoreAttribute = flowType
                 .GetAttributes()
@@ -104,7 +88,6 @@ namespace Cleipnir.Flows.SourceGenerator
                         paramType: null,
                         parameterName: null,
                         resultType: null,
-                        stateTypeSymbol,
                         paramless: true,
                         accessibilityModifier
                     )
@@ -126,7 +109,6 @@ namespace Cleipnir.Flows.SourceGenerator
                         paramType,
                         parameterName,
                         resultType,
-                        stateTypeSymbol,
                         paramless: false,
                         accessibilityModifier
                     )
@@ -145,9 +127,6 @@ namespace Cleipnir.Flows.SourceGenerator
             var resultType = flowInformation.ResultTypeSymbol != null 
                 ? GetFullyQualifiedName(flowInformation.ResultTypeSymbol)
                 : null;
-            var stateType = flowInformation.StateTypeSymbol == null
-                ? null
-                : GetFullyQualifiedName(flowInformation.StateTypeSymbol);
 
             var accessibilityModifier = flowInformation.AccessibilityModifier;
             
@@ -196,16 +175,6 @@ $@"namespace {flowsNamespace}
     }}
     #nullable disable
 }}";
-            }
-
-            if (flowInformation.StateTypeSymbol != null)
-            {   
-                var getStateStr = $@"
-
-        public Task<{stateType}?> GetState(string instanceId) 
-            => GetState<{stateType}>(instanceId);";
-                var constructorEndPosition = generatedCode.IndexOf("{ }", StringComparison.Ordinal);
-                generatedCode = generatedCode.Insert(constructorEndPosition + 3, getStateStr);
             }
             
             return new GeneratedFlowInformation(generatedCode, GetFileName(flowInformation));
