@@ -55,9 +55,11 @@ public class OptionsTests
     public async Task FlowNameCanBeSpecifiedFromTheOutside()
     {
         var serviceCollection = new ServiceCollection();
-
+        var store = new InMemoryFunctionStore();
+        var storedType = await store.TypeStore.InsertOrGetStoredType("SomeOtherFlowName");
+        
         serviceCollection.AddFlows(c => c
-            .UseInMemoryStore()
+            .UseInMemoryStore(store)
             .WithOptions(new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.MaxValue))
             .RegisterFlow<SimpleFlow, SimpleFlows>(
                 flowsFactory: sp => new SimpleFlows(
@@ -70,8 +72,7 @@ public class OptionsTests
         var sp = serviceCollection.BuildServiceProvider();
         var flows = sp.GetRequiredService<SimpleFlows>();
         await flows.Run("Id");
-        var store = sp.GetRequiredService<IFunctionStore>();
-        var sf = await store.GetFunction(new FlowId("SomeOtherFlowName", "Id"));
+        var sf = await store.GetFunction(new StoredId(storedType, Instance: "Id"));
         sf.ShouldNotBeNull();
         sf.Status.ShouldBe(Status.Succeeded);
     }

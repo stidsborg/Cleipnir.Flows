@@ -9,6 +9,7 @@ using Cleipnir.ResilientFunctions.CoreRuntime.Invocation;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Messaging;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cleipnir.Flows;
@@ -18,7 +19,7 @@ public interface IBaseFlows
     public static abstract Type FlowType { get; }
 
     public Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) where T : notnull;
-    public Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null);
+    public Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null);
 }
 
 public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
@@ -29,7 +30,7 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
     
     protected BaseFlows(FlowsContainer flowsContainer) => FlowsContainer = flowsContainer;
     
-    public abstract Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null);
+    public abstract Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null);
     
     private static Action<TFlow, Workflow> CreateWorkflowSetter()
     {
@@ -103,7 +104,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         => _registration.GetState<TState>(functionInstanceId);
     
     public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId);
+        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
     public Task Run(string instanceId) 
         => _registration.Invoke(instanceId);
@@ -119,7 +120,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 
     public Task BulkSchedule(IEnumerable<FlowInstance> instanceIds) => _registration.BulkSchedule(instanceIds);
 
-    public override Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null) 
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
         => _registration.GetInstances(status);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, bool create = true, string? idempotencyKey = null) where T : notnull 
@@ -159,7 +160,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         => _registration.GetState<TState>(functionInstanceId);
     
     public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId);
+        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
     public Task Run(string instanceId, TParam param) 
         => _registration.Invoke(instanceId, param);
@@ -181,7 +182,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
-    public override Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null) 
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
         => _registration.GetInstances(status);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
@@ -214,7 +215,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
         => _registration.ControlPanel(instanceId);
 
     public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId);
+        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
     public Task<TResult> Run(string instanceId, TParam param) 
         => _registration.Invoke(instanceId, param);
@@ -239,7 +240,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
-    public override Task<IReadOnlyList<FlowInstance>> GetInstances(Status? status = null) 
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
         => _registration.GetInstances(status);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 

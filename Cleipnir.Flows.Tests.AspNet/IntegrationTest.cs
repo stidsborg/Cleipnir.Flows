@@ -40,7 +40,7 @@ public class IntegrationTest
     [TestMethod]
     public async Task SunshineScenarioMySql()
     {
-        var store = await MySqlHelper.CreateAndInitializeMySqlStore();
+        var store = await MariaDbHelper.CreateAndInitializeMySqlStore();
         const string hostUrl = "http://localhost:5003";
         var startFlowUrl = $"{hostUrl}/startFlow";
         await SunshineScenario(hostUrl, startFlowUrl, store);

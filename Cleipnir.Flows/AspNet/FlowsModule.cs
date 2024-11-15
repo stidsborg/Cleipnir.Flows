@@ -42,9 +42,9 @@ public class FlowsConfigurator
         Services = services;
     }
 
-    public FlowsConfigurator UseInMemoryStore()
+    public FlowsConfigurator UseInMemoryStore(InMemoryFunctionStore? store = null)
     {
-        Services.AddSingleton<IFunctionStore>(new InMemoryFunctionStore());
+        Services.AddSingleton<IFunctionStore>(store ?? new InMemoryFunctionStore());
         return this;
     }
     

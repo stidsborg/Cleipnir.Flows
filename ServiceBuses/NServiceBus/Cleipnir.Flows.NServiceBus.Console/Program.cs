@@ -14,6 +14,8 @@ internal static class Program
         var bus = host.Services.GetRequiredService<IMessageSession>();
         var store = host.Services.GetRequiredService<IFunctionStore>();
         
+        var simpleFlowStoredType = await store.TypeStore.InsertOrGetStoredType(nameof(SimpleFlow));
+        
         var testSize = 1_000;
         for (var i = 0; i < testSize; i++)
             await bus.Publish(new MyMessage(i.ToString()));
@@ -21,7 +23,7 @@ internal static class Program
         while (true)
         {
             var succeeded = await store.GetSucceededFunctions(
-                nameof(SimpleFlow),
+                simpleFlowStoredType,
                 DateTime.UtcNow.Ticks + 1_000_000
             ).SelectAsync(f => f.Count);
             if (succeeded == testSize)

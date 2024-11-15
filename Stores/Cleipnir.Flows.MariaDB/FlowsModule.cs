@@ -1,14 +1,14 @@
 ﻿using System;
 using Cleipnir.Flows.AspNet;
-using Cleipnir.ResilientFunctions.MySQL;
+using Cleipnir.ResilientFunctions.MariaDb;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cleipnir.Flows.MySQL;
+namespace Cleipnir.Flows.MariaDB;
 
 public static class FlowsModule
 {
-    public static FlowsConfigurator UseMySqlStore(
+    public static FlowsConfigurator UseMariaSqlStore(
         this FlowsConfigurator configurator, 
         Func<IServiceProvider, string> connectionStringFunc, 
         bool initializeDatabase = true,
@@ -19,7 +19,7 @@ public static class FlowsModule
             sp =>
             {
                 var connectionString = connectionStringFunc(sp);
-                var store = new MySqlFunctionStore(connectionString, tablePrefix);
+                var store = new MariaDbFunctionStore(connectionString, tablePrefix);
                 if (initializeDatabase)
                     store.Initialize().GetAwaiter().GetResult();
 
@@ -29,10 +29,10 @@ public static class FlowsModule
         return configurator;
     }
 
-    public static FlowsConfigurator UseMySqlStore(
+    public static FlowsConfigurator UseMariaSqlStore(
         this FlowsConfigurator configurator,
         string connectionString,
         bool initializeDatabase = true,
         string tablePrefix = "flows"
-    ) => UseMySqlStore(configurator, _ => connectionString, initializeDatabase, tablePrefix);
+    ) => UseMariaSqlStore(configurator, _ => connectionString, initializeDatabase, tablePrefix);
 }

@@ -1,14 +1,14 @@
-﻿using Cleipnir.ResilientFunctions.MySQL;
+﻿using Cleipnir.ResilientFunctions.MariaDb;
 using MySqlConnector;
 
 namespace Cleipnir.Flows.Tests.AspNet
 {
-    public static class MySqlHelper
+    public static class MariaDbHelper
     {
         public static string ConnectionString { get; }
         public static Func<Task<MySqlConnection>> ConnFunc { get; set; }
         
-        static MySqlHelper()
+        static MariaDbHelper()
         {
             ConnectionString = 
                 Environment.GetEnvironmentVariable("Cleipnir.RFunctions.MySQL.Tests.ConnectionString")
@@ -40,11 +40,11 @@ namespace Cleipnir.Flows.Tests.AspNet
             }
         }
 
-        public static async Task<MySqlFunctionStore> CreateAndInitializeMySqlStore()
+        public static async Task<MariaDbFunctionStore> CreateAndInitializeMySqlStore()
         {
             CreateDatabase();
             
-            var store = new MySqlFunctionStore(ConnectionString, tablePrefix: "MySqlFlows");
+            var store = new MariaDbFunctionStore(ConnectionString, tablePrefix: "MySqlFlows");
             await store.Initialize();
             await store.TruncateTables();
             return store;

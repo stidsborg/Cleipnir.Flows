@@ -23,7 +23,7 @@ It works for both RPC and Message-based communication.
 ## Getting Started
 To get started simply perform the following three steps in an ASP.NET service:
 
-Firstly, install the Cleipnir.Flows nuget package (using either Postgres, SqlServer or MySQL as persistence layer). I.e.
+Firstly, install the Cleipnir.Flows nuget package (using either Postgres, SqlServer or MariaDB as persistence layer). I.e.
 ```powershell
 Install-Package Cleipnir.Flows.Postgres
 ```

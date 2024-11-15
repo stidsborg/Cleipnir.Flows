@@ -37,11 +37,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stores", "Stores", "{9A4E176B-52F2-4375-87DB-AB66F0C37646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.MySQL", "Cleipnir.ResilientFunctions\Stores\MySQL\Cleipnir.ResilientFunctions.MySQL\Cleipnir.ResilientFunctions.MySQL.csproj", "{B6C02093-1375-48B1-A4D7-E6F4A0581506}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.SqlServer", "Cleipnir.ResilientFunctions\Stores\SqlServer\Cleipnir.ResilientFunctions.SqlServer\Cleipnir.ResilientFunctions.SqlServer.csproj", "{BC926BA5-072D-4098-9792-712C21C61189}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.MySQL", "Stores\Cleipnir.Flows.MySQL\Cleipnir.Flows.MySQL.csproj", "{4C623459-7BB1-4FF6-8812-85371EA0DE04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.MariaDB", "Stores\Cleipnir.Flows.MariaDB\Cleipnir.Flows.MariaDB.csproj", "{4C623459-7BB1-4FF6-8812-85371EA0DE04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.PostgresSql", "Stores\Cleipnir.Flows.PostgresSql\Cleipnir.Flows.PostgresSql.csproj", "{EE5A28B6-AD40-4462-8008-8B54F21E82E0}"
 EndProject
@@ -76,6 +74,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.NServiceBus.Console", "ServiceBuses\NServiceBus\Cleipnir.Flows.NServiceBus.Console\Cleipnir.Flows.NServiceBus.Console.csproj", "{0280F37A-575B-4F08-9699-D8BECFCA0A3C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.NServiceBus.Tests", "ServiceBuses\NServiceBus\Cleipnir.Flows.NServiceBus.Tests\Cleipnir.Flows.NServiceBus.Tests.csproj", "{7A7ABDAB-3EFD-4532-B794-64C999B77C72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.MariaDB", "Cleipnir.ResilientFunctions\Stores\MariaDB\Cleipnir.ResilientFunctions.MariaDB\Cleipnir.ResilientFunctions.MariaDB.csproj", "{027072F7-E753-4CF4-8156-C1B502377FF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,10 +130,6 @@ Global
 		{785F156E-024C-4D30-83D0-C077B3CCC0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{785F156E-024C-4D30-83D0-C077B3CCC0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{785F156E-024C-4D30-83D0-C077B3CCC0CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6C02093-1375-48B1-A4D7-E6F4A0581506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6C02093-1375-48B1-A4D7-E6F4A0581506}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6C02093-1375-48B1-A4D7-E6F4A0581506}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6C02093-1375-48B1-A4D7-E6F4A0581506}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC926BA5-072D-4098-9792-712C21C61189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BC926BA5-072D-4098-9792-712C21C61189}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC926BA5-072D-4098-9792-712C21C61189}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -190,6 +186,10 @@ Global
 		{7A7ABDAB-3EFD-4532-B794-64C999B77C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A7ABDAB-3EFD-4532-B794-64C999B77C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A7ABDAB-3EFD-4532-B794-64C999B77C72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{027072F7-E753-4CF4-8156-C1B502377FF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027072F7-E753-4CF4-8156-C1B502377FF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027072F7-E753-4CF4-8156-C1B502377FF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027072F7-E753-4CF4-8156-C1B502377FF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC470FDE-839E-4B2C-8C56-8B20DEEF2CCD} = {EAD350F1-8EF2-48AC-98EE-A5E739F15787}
@@ -202,7 +202,6 @@ Global
 		{19BAF8B6-41E4-45F5-B2E2-97B60A9B6372} = {5E8A4831-5FF4-4BEC-9334-847943DA9517}
 		{9A4E176B-52F2-4375-87DB-AB66F0C37646} = {7204001F-410C-41DB-9892-696E06D0703D}
 		{785F156E-024C-4D30-83D0-C077B3CCC0CE} = {9A4E176B-52F2-4375-87DB-AB66F0C37646}
-		{B6C02093-1375-48B1-A4D7-E6F4A0581506} = {9A4E176B-52F2-4375-87DB-AB66F0C37646}
 		{BC926BA5-072D-4098-9792-712C21C61189} = {9A4E176B-52F2-4375-87DB-AB66F0C37646}
 		{4C623459-7BB1-4FF6-8812-85371EA0DE04} = {8D89DB84-E378-40AF-8CA3-16673868D494}
 		{EE5A28B6-AD40-4462-8008-8B54F21E82E0} = {8D89DB84-E378-40AF-8CA3-16673868D494}
@@ -221,5 +220,6 @@ Global
 		{AF7E47FD-B1C2-4B90-A3A3-1D24ED9668E3} = {0872461B-3FC1-4659-AE2D-80109CDA3F5E}
 		{0280F37A-575B-4F08-9699-D8BECFCA0A3C} = {AF7E47FD-B1C2-4B90-A3A3-1D24ED9668E3}
 		{7A7ABDAB-3EFD-4532-B794-64C999B77C72} = {AF7E47FD-B1C2-4B90-A3A3-1D24ED9668E3}
+		{027072F7-E753-4CF4-8156-C1B502377FF7} = {9A4E176B-52F2-4375-87DB-AB66F0C37646}
 	EndGlobalSection
 EndGlobal
