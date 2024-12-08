@@ -38,7 +38,7 @@ public class IntegrationTest
     }
     
     [TestMethod]
-    public async Task SunshineScenarioMySql()
+    public async Task SunshineScenarioMariaDb()
     {
         var store = await MariaDbHelper.CreateAndInitializeMySqlStore();
         const string hostUrl = "http://localhost:5003";

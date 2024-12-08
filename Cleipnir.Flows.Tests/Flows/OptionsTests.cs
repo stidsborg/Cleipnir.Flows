@@ -72,7 +72,7 @@ public class OptionsTests
         var sp = serviceCollection.BuildServiceProvider();
         var flows = sp.GetRequiredService<SimpleFlows>();
         await flows.Run("Id");
-        var sf = await store.GetFunction(new StoredId(storedType, Instance: "Id"));
+        var sf = await store.GetFunction(new StoredId(storedType, Instance: "Id".ToStoredInstance()));
         sf.ShouldNotBeNull();
         sf.Status.ShouldBe(Status.Succeeded);
     }
