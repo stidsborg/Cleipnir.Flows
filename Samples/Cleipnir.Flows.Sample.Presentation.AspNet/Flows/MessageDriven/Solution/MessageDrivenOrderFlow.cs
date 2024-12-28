@@ -1,6 +1,4 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Other;
-using Cleipnir.ResilientFunctions.Reactive.Extensions;
-using Cleipnir.ResilientFunctions.Reactive.Utilities;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
@@ -12,31 +10,25 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         var transactionId = await Effect.Capture(Guid.NewGuid);
 
         await ReserveFunds(order, transactionId);
-        var reservation = await MessageOrTimeout<FundsReserved, FundsReservationFailed>(TimeSpan.FromSeconds(10));
+        var reservation = await Message<FundsReserved, FundsReservationFailed>(TimeSpan.FromSeconds(10));
         if (!reservation.HasFirst)
             await CleanUp(FailedAt.FundsReserved, order, transactionId);
 
         await ShipProducts(order);
-        var productsShipped = await MessageOrTimeout<ProductsShipped, ProductsShipmentFailed>(TimeSpan.FromMinutes(5));
+        var productsShipped = await Message<ProductsShipped, ProductsShipmentFailed>(TimeSpan.FromMinutes(5));
         if (!productsShipped.HasFirst)
             await CleanUp(FailedAt.ProductsShipped, order, transactionId);
         var trackAndTraceNumber = productsShipped.First.TrackAndTraceNumber;
         
         await CaptureFunds(order, transactionId);
-        var capture = await MessageOrTimeout<FundsCaptured, FundsCaptureFailed>(TimeSpan.FromSeconds(10));
+        var capture = await Message<FundsCaptured, FundsCaptureFailed>(TimeSpan.FromSeconds(10));
         if (!capture.HasFirst)
             await CleanUp(FailedAt.FundsCaptured, order, transactionId);
         
         await SendOrderConfirmationEmail(order, trackAndTraceNumber);
-        await MessageOrTimeout<OrderConfirmationEmailSent, OrderConfirmationEmailFailed>(TimeSpan.FromSeconds(10));
+        await Message<OrderConfirmationEmailSent, OrderConfirmationEmailFailed>(TimeSpan.FromSeconds(10));
     }
-    
-    private Task<EitherOrNone<T1, T2>> MessageOrTimeout<T1, T2>(TimeSpan timeout) =>
-        Messages
-            .TakeUntilTimeout(timeout)
-            .OfTypes<T1, T2>()
-            .FirstOrNone();
-
+   
     private async Task CleanUp(FailedAt failedAt, Order order, Guid transactionId)
     {
         switch (failedAt) 

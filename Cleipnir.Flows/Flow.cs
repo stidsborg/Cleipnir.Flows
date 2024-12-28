@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Cleipnir.Flows.Helpers;
 using Cleipnir.ResilientFunctions.CoreRuntime.Invocation;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Messaging;
@@ -38,84 +37,72 @@ public abstract class BaseFlow
     public void Postpone(DateTime until) => Workflow.Postpone(until);
 
     public Task<TMessage> Message<TMessage>() => Workflow.Messages.FirstOfType<TMessage>();
-    public Task<TMessage> Message<TMessage>(string timeoutId, DateTime timesOutAt) => Workflow
-        .Messages
-        .TakeUntilTimeout(timeoutId, timesOutAt)
-        .OfType<TMessage>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<TMessage> Message<TMessage>(string timeoutId, TimeSpan timesOutIn) => Workflow
-        .Messages
-        .TakeUntilTimeout(timeoutId, timesOutIn)
-        .OfType<TMessage>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<TMessage> Message<TMessage>(DateTime timesOutAt) => Workflow
-        .Messages
-        .TakeUntilTimeout(timesOutAt)
-        .OfType<TMessage>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<TMessage> Message<TMessage>(TimeSpan timesOutIn) => Workflow
-        .Messages
-        .TakeUntilTimeout(timesOutIn)
-        .OfType<TMessage>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
+    public Task<Option<TMessage>> Message<TMessage>(string timeoutId, DateTime timesOutAt) => Workflow
+            .Messages
+            .TakeUntilTimeout(timeoutId, timesOutAt)
+            .OfType<TMessage>()
+            .FirstOrNone();
+    public Task<Option<TMessage>> Message<TMessage>(string timeoutId, TimeSpan timesOutIn) => Workflow
+            .Messages
+            .TakeUntilTimeout(timeoutId, timesOutIn)
+            .OfType<TMessage>()
+            .FirstOrNone();
+    public Task<Option<TMessage>> Message<TMessage>(DateTime timesOutAt) => Workflow
+            .Messages
+            .TakeUntilTimeout(timesOutAt)
+            .OfType<TMessage>()
+            .FirstOrNone();
+    public Task<Option<TMessage>> Message<TMessage>(TimeSpan timesOutIn) => Workflow
+            .Messages
+            .TakeUntilTimeout(timesOutIn)
+            .OfType<TMessage>()
+            .FirstOrNone();
     
-    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>() 
+    public Task<Either<TMessage1, TMessage2>> Message<TMessage1, TMessage2>() 
         => Workflow.Messages.OfTypes<TMessage1, TMessage2>().First();
-    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(string timeoutId, DateTime timesOutAt) => Workflow
+    public Task<EitherOrNone<TMessage1, TMessage2>> Message<TMessage1, TMessage2>(string timeoutId,
+        DateTime timesOutAt) => Workflow
         .Messages
         .TakeUntilTimeout(timeoutId, timesOutAt)
         .OfTypes<TMessage1, TMessage2>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    
-    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(string timeoutId, TimeSpan timesOutIn) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2>> Message<TMessage1, TMessage2>(string timeoutId, TimeSpan timesOutIn) => Workflow
         .Messages
         .TakeUntilTimeout(timeoutId, timesOutIn)
         .OfTypes<TMessage1, TMessage2>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(DateTime timesOutAt) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2>> Message<TMessage1, TMessage2>(DateTime timesOutAt) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutAt)
         .OfTypes<TMessage1, TMessage2>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2>> EitherMessage<TMessage1, TMessage2>(TimeSpan timesOutIn) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2>> Message<TMessage1, TMessage2>(TimeSpan timesOutIn) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutIn)
         .OfTypes<TMessage1, TMessage2>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>() 
+        .FirstOrNone();
+    public Task<Either<TMessage1, TMessage2, TMessage3>> Message<TMessage1, TMessage2, TMessage3>() 
         => Workflow.Messages.OfTypes<TMessage1, TMessage2, TMessage3>().First();
-    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(string timeoutId, DateTime timesOutAt) => Workflow
+    public Task<EitherOrNone<TMessage1, TMessage2, TMessage3>> Message<TMessage1, TMessage2, TMessage3>(string timeoutId, DateTime timesOutAt) => Workflow
         .Messages
         .TakeUntilTimeout(timeoutId, timesOutAt)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(string timeoutId, TimeSpan timesOutIn) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2, TMessage3>> Message<TMessage1, TMessage2, TMessage3>(string timeoutId, TimeSpan timesOutIn) => Workflow
         .Messages
         .TakeUntilTimeout(timeoutId, timesOutIn)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(DateTime timesOutAt) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2, TMessage3>> Message<TMessage1, TMessage2, TMessage3>(DateTime timesOutAt) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutAt)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
-    public Task<Either<TMessage1, TMessage2, TMessage3>> EitherMessage<TMessage1, TMessage2, TMessage3>(TimeSpan timesOutIn) => Workflow
+        .FirstOrNone();
+    public Task<EitherOrNone<TMessage1, TMessage2, TMessage3>> Message<TMessage1, TMessage2, TMessage3>(TimeSpan timesOutIn) => Workflow
         .Messages
         .TakeUntilTimeout(timesOutIn)
         .OfTypes<TMessage1, TMessage2, TMessage3>()
-        .FirstOrNone()
-        .ThrowTimeoutExceptionOnNoResult();
+        .FirstOrNone();
 
     public Task Delay(TimeSpan @for) => Messages
         .TakeUntilTimeout(@for)
