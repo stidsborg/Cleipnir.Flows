@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Cleipnir.Flows.SourceGenerator;
@@ -13,6 +14,17 @@ internal static class Utils
     public static string GetNamespace(ITypeSymbol typeSymbol)
     {
         return typeSymbol.ContainingNamespace.ToString();
+    }
+    
+    public static string GetFullyQualifiedName(INamedTypeSymbol typeSymbol)
+    {
+        if (!typeSymbol.IsGenericType)
+            return GetFullyQualifiedName((ITypeSymbol) typeSymbol);
+
+        var baseType = GetFullyQualifiedName((ITypeSymbol) typeSymbol);
+        var genericArguments = typeSymbol.TypeArguments.Select(GetFullyQualifiedName);
+        var comma = ",";
+        return $"{baseType}<{string.Join(comma, genericArguments)}>";
     }
     
     public static string GetFullyQualifiedName(ITypeSymbol typeSymbol)

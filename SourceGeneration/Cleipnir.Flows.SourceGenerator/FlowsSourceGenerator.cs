@@ -94,8 +94,8 @@ namespace Cleipnir.Flows.SourceGenerator
                 );
 
             var baseTypeTypeArguments = baseType.TypeArguments;
-            var paramType = baseTypeTypeArguments.Length > 0 ? baseTypeTypeArguments[0] : null;
-            var resultType = baseTypeTypeArguments.Length == 2 ? baseTypeTypeArguments[1] : null;
+            var paramType = (INamedTypeSymbol?) (baseTypeTypeArguments.Length > 0 ? baseTypeTypeArguments[0] : null);
+            var resultType = (INamedTypeSymbol?) (baseTypeTypeArguments.Length == 2 ? baseTypeTypeArguments[1] : null);
 
             var runMethod = flowType.GetMembers()
                 .OfType<IMethodSymbol>()
