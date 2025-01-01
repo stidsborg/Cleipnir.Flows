@@ -32,10 +32,7 @@ public abstract class BaseFlow
         => Effect.Capture(work, resiliencyLevel);
     public Task Capture(Action work, ResiliencyLevel resiliencyLevel = ResiliencyLevel.AtLeastOnce) 
         => Effect.Capture(work, resiliencyLevel);
-
-    public void Postpone(TimeSpan @for) => Workflow.Postpone(@for);
-    public void Postpone(DateTime until) => Workflow.Postpone(until);
-
+    
     public Task<TMessage> Message<TMessage>() => Workflow.Messages.FirstOfType<TMessage>();
     public Task<Option<TMessage>> Message<TMessage>(string timeoutId, DateTime timesOutAt) => Workflow
             .Messages
