@@ -101,18 +101,8 @@ public abstract class BaseFlow
         .OfTypes<TMessage1, TMessage2, TMessage3>()
         .FirstOrNone();
 
-    public Task Delay(TimeSpan @for) => Messages
-        .TakeUntilTimeout(@for)
-        .Completion(maxWait: TimeSpan.Zero);
-    public Task Delay(string timeoutId, TimeSpan @for) => Messages
-        .TakeUntilTimeout(timeoutId, @for)
-        .Completion(maxWait: TimeSpan.Zero);
-    public Task Delay(DateTime until) => Messages
-        .TakeUntilTimeout(until)
-        .Completion(maxWait: TimeSpan.Zero);
-    public Task Delay(string timeoutId, DateTime until) => Messages
-        .TakeUntilTimeout(timeoutId, until)
-        .Completion(maxWait: TimeSpan.Zero);
+    public Task Delay(TimeSpan @for) => Workflow.Delay(@for);
+    public Task Delay(DateTime until) => Workflow.Delay(until);
 }
 
 public abstract class Flow : BaseFlow
