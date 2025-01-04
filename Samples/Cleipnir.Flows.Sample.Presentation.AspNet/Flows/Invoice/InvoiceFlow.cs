@@ -8,7 +8,7 @@ public class InvoiceFlow(ILogger<InvoiceFlow> logger) : Flow<CustomerNumber>
     public override async Task Run(CustomerNumber customerNumber)
     {
         logger.LogInformation($"CUSTOMER_{customerNumber}: (Re)started flow");
-        var invoiceDate = await Effect.Capture(
+        var invoiceDate = await Capture(
             () => DateTime.UtcNow.ToFirstOfMonth().AddMonths(1) //.AddSeconds(5)
         );
         
@@ -40,8 +40,6 @@ public class InvoiceFlow(ILogger<InvoiceFlow> logger) : Flow<CustomerNumber>
 
 internal static class DateTimeExtensions 
 {
-    public static DateTime ToFirstOfMonth(this DateTime date)
-    {
-        return new DateTime(date.Year, date.Month, day: 1, hour: 0, minute: 0, second: 0, kind: date.Kind);
-    }
+    public static DateTime ToFirstOfMonth(this DateTime date) 
+        => new(date.Year, date.Month, day: 1, hour: 0, minute: 0, second: 0, kind: date.Kind);
 }
