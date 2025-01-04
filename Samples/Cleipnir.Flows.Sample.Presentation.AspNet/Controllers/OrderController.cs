@@ -1,6 +1,5 @@
-using System.Text;
+using Cleipnir.Flows.Sample.MicrosoftOpen.Clients;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Flows;
-using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Rpc;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -9,7 +8,7 @@ namespace Cleipnir.Flows.Sample.MicrosoftOpen.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OrderController(OrderFlows orderFlows) : ControllerBase
+public class OrderController(Flows.Rpc.OrderFlows orderFlows) : ControllerBase
 {
     private readonly ILogger _logger = Log.Logger.ForContext<OrderController>();
 
@@ -19,20 +18,22 @@ public class OrderController(OrderFlows orderFlows) : ControllerBase
         _logger.Information("Started processing {OrderId}", order.OrderId);
         await orderFlows.Run(order.OrderId, order);
         _logger.Information("Completed processing {OrderId}", order.OrderId);
-        
         return Ok();
     }
-    
+
     [HttpPost("RetryShipProducts")]
-    public async Task<ActionResult> Post(string orderNumber)
+    public async Task<ActionResult> Post(string orderNumber, string? trackAndTraceNumber)
     {
         var controlPanel = await orderFlows.ControlPanel(orderNumber);
         if (controlPanel is null)
             return NotFound();
 
-        await controlPanel.Effects.Remove("ShipProducts");
-        await controlPanel.Restart();
+        if (trackAndTraceNumber == null)
+            await controlPanel.Effects.Remove("ShipProducts");
+        else
+            await controlPanel.Effects.SetSucceeded("ShipProducts", new TrackAndTrace(trackAndTraceNumber));
         
+        await controlPanel.Restart();
         return Ok();
     }
     
@@ -43,13 +44,7 @@ public class OrderController(OrderFlows orderFlows) : ControllerBase
         if (controlPanel is null)
             return NotFound();
 
-        var effects = controlPanel.Effects;
-        var effectIds = await effects.AllIds;
-
-        var stringBuilder = new StringBuilder();
-        foreach (var effectId in effectIds)
-            stringBuilder.AppendLine(new { Id = effectId, Status = await effects.GetStatus(effectId) }.ToString());
-
-        return Ok(stringBuilder.ToString());    
+        var str = await controlPanel.ToPrettyString();
+        return Ok(str);
     }
 }

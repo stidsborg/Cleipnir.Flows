@@ -101,8 +101,8 @@ public abstract class BaseFlow
         .OfTypes<TMessage1, TMessage2, TMessage3>()
         .FirstOrNone();
 
-    public Task Delay(TimeSpan @for) => Workflow.Delay(@for);
-    public Task Delay(DateTime until) => Workflow.Delay(until);
+    public Task Delay(TimeSpan @for, bool suspend = true) => Workflow.Delay(@for, suspend);
+    public Task Delay(DateTime until, bool suspend = true) => Workflow.Delay(until, suspend);
 }
 
 public abstract class Flow : BaseFlow

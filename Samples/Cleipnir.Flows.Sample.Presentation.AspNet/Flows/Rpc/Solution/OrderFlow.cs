@@ -12,10 +12,10 @@ public class OrderFlow(
 {
     public override async Task Run(Order order)
     {
-        var transactionId = await Effect.Capture("TransactionId", Guid.NewGuid); 
+        var transactionId = await Capture(Guid.NewGuid); 
         
         await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
-        var trackAndTrace = await Effect.Capture(
+        var trackAndTrace = await Capture(
             "ShipProducts",
             () => logisticsClient.ShipProducts(order.CustomerId, order.ProductIds),
             ResiliencyLevel.AtMostOnce

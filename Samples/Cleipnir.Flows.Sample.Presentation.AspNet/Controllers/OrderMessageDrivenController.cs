@@ -1,17 +1,14 @@
-using System.Text;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Flows;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven;
-using Cleipnir.ResilientFunctions.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using static System.Environment;
 using ILogger = Serilog.ILogger;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MessageDrivenOrderController(MessageDrivenOrderFlows orderFlows) : ControllerBase
+public class OrderMessageDrivenController(MessageDrivenOrderFlows orderFlows) : ControllerBase
 {
     private readonly ILogger _logger = Log.Logger.ForContext<OrderController>();
 
@@ -32,24 +29,7 @@ public class MessageDrivenOrderController(MessageDrivenOrderFlows orderFlows) : 
         if (controlPanel is null)
             return NotFound();
 
-        var effectIds = await controlPanel.Effects.AllIds;
-        var effectsBuilder = new StringBuilder();
-        foreach (var effectId in effectIds)
-            effectsBuilder.AppendLine(
-                new { Id = effectId, Status = await controlPanel.Effects.GetStatus(effectId) }.ToString()
-            );
-        
-        var messages = string.Join(
-            NewLine,
-            await controlPanel
-                .Messages
-                .AsObjects
-                .SelectAsync(msg => msg.ToString())
-        );
-        
-        return Ok(
-            "Effects: " + NewLine + effectsBuilder + NewLine + NewLine +
-            "Messages: " + NewLine + messages + NewLine
-        );
+
+        return Ok(controlPanel.ToPrettyString());
     }
 }

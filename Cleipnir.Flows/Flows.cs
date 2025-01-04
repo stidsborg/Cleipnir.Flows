@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
@@ -90,8 +89,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         _registration = flowsContainer.FunctionRegistry.RegisterParamless(
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
-            (options ?? Options.Default)
-                .MapToSettings()
+            (options ?? Options.Default).MapToSettings()
         );
     }
 
@@ -119,7 +117,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) 
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
-    public Task BulkSchedule(IEnumerable<FlowInstance> instanceIds) => _registration.BulkSchedule(instanceIds);
+    public Task<BulkScheduled> BulkSchedule(IEnumerable<FlowInstance> instanceIds) => _registration.BulkSchedule(instanceIds);
 
     public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) => _registration.GetInstances(status);
     public override Task Interrupt(IEnumerable<StoredInstance> instances) => _registration.Interrupt(instances);
@@ -132,7 +130,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     where TFlow : Flow<TParam>
     where TParam : notnull
 {
-    private readonly FuncRegistration<TParam, Unit> _registration;
+    private readonly ActionRegistration<TParam> _registration;
     
     public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
     {
@@ -143,15 +141,14 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
                 return Unit.Instance;
             });
         
-        _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, Unit>(
+        _registration = flowsContainer.FunctionRegistry.RegisterAction<TParam>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
-            settings: (options ?? Options.Default)
-                .MapToSettings()
+            settings: (options ?? Options.Default).MapToSettings()
         );
     }
 
-    public async Task<ControlPanel<TParam, Unit>?> ControlPanel(string instanceId)
+    public async Task<ControlPanel<TParam>?> ControlPanel(string instanceId)
     {
         var controlPanel = await _registration.ControlPanel(instanceId);
         return controlPanel;
@@ -188,8 +185,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
-    
-    public Task BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
+
+    public Task<BulkScheduled> BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }
 
 public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
@@ -247,5 +244,5 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
     
-    public Task BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
+    public Task<BulkScheduled<TResult>> BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }

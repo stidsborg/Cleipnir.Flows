@@ -12,7 +12,7 @@ public interface IEmailClient
 public class EmailClientStub : IEmailClient
 {
     public Task SendOrderConfirmation(Guid customerId, TrackAndTrace trackAndTrace, IEnumerable<Guid> productIds)
-        => Task.Delay(100).ContinueWith(_ => 
+        => Task.Delay(ClientSettings.Delay).ContinueWith(_ => 
             Log.Logger.ForContext<IEmailClient>().Information("EMAIL_SERVER: Order confirmation emailed")
         );
 

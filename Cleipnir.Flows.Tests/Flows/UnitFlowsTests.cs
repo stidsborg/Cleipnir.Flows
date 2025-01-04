@@ -1,4 +1,5 @@
 ﻿using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,10 +100,10 @@ public class UnitFlowsTests
     }
     
     [TestMethod]
-    public async Task FailingFlowCompletesWithError()
+    public async Task FailingActionFlowCompletesWithError()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddTransient<FailingUnitFlow>();
+        serviceCollection.AddTransient<FailingUnitActionFlow>();
         
         var flowStore = new InMemoryFunctionStore();
         var flowsContainer = new FlowsContainer(
@@ -111,9 +112,9 @@ public class UnitFlowsTests
             new Options()
         );
 
-        var flows = new FallingUnitFlows(flowsContainer);
+        var flows = new FallingUnitActionFlows(flowsContainer);
 
-        FailingUnitFlow.ShouldThrow = true;
+        FailingUnitActionFlow.ShouldThrow = true;
         
         await Should.ThrowAsync<TimeoutException>(() =>
             flows.Run("someInstanceId", "someParameter")
@@ -123,20 +124,20 @@ public class UnitFlowsTests
         controlPanel.ShouldNotBeNull();
         controlPanel.Status.ShouldBe(Status.Failed);
 
-        FailingUnitFlow.ShouldThrow = false;
+        FailingUnitActionFlow.ShouldThrow = false;
         await controlPanel.Restart();
 
         await controlPanel.Refresh();
         controlPanel.Status.ShouldBe(Status.Succeeded);
     }
 
-    private class FallingUnitFlows : Flows<FailingUnitFlow, string>
+    private class FallingUnitActionFlows : Flows<FailingUnitActionFlow, string>
     {
-        public FallingUnitFlows(FlowsContainer flowsContainer) 
-            : base(nameof(FailingUnitFlow), flowsContainer, options: null) { }
+        public FallingUnitActionFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingUnitActionFlow), flowsContainer, options: null) { }
     }
     
-    public class FailingUnitFlow : Flow<string>
+    public class FailingUnitActionFlow : Flow<string>
     {
         public static bool ShouldThrow = true;
         
@@ -144,6 +145,106 @@ public class UnitFlowsTests
         {
             return ShouldThrow 
                 ? Task.FromException<TimeoutException>(new TimeoutException()) 
+                : Task.CompletedTask;
+        }
+    }
+    
+    [TestMethod]
+    public async Task FailingFuncFlowCompletesWithError()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<FailingUnitFuncFlow>();
+        
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider(),
+            new Options()
+        );
+
+        var flows = new FallingUnitFuncFlows(flowsContainer);
+
+        FailingUnitFuncFlow.ShouldThrow = true;
+        
+        await Should.ThrowAsync<TimeoutException>(() =>
+            flows.Run("someInstanceId", "someParameter")
+        );
+        
+        var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Failed);
+
+        FailingUnitFuncFlow.ShouldThrow = false;
+        await controlPanel.Restart();
+
+        await controlPanel.Refresh();
+        controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+
+    private class FallingUnitFuncFlows : Flows<FailingUnitFuncFlow, string, string>
+    {
+        public FallingUnitFuncFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingUnitFuncFlow), flowsContainer, options: null) { }
+    }
+    
+    public class FailingUnitFuncFlow : Flow<string, string>
+    {
+        public static bool ShouldThrow = true;
+        
+        public override Task<string> Run(string param)
+        {
+            return ShouldThrow 
+                ? Task.FromException<string>(new TimeoutException()) 
+                : param.ToTask();
+        }
+    }
+    
+    [TestMethod]
+    public async Task FailingParamlessFlowCompletesWithError()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<FailingUnitParamlessFlow>();
+        
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider(),
+            new Options()
+        );
+
+        var flows = new FailingUnitParamlessFlows(flowsContainer);
+
+        FailingUnitParamlessFlow.ShouldThrow = true;
+        
+        await Should.ThrowAsync<TimeoutException>(() =>
+            flows.Run("someInstanceId")
+        );
+        
+        var controlPanel = await flows.ControlPanel(instanceId: "someInstanceId");
+        controlPanel.ShouldNotBeNull();
+        controlPanel.Status.ShouldBe(Status.Failed);
+
+        FailingUnitParamlessFlow.ShouldThrow = false;
+        await controlPanel.Restart();
+
+        await controlPanel.Refresh();
+        controlPanel.Status.ShouldBe(Status.Succeeded);
+    }
+
+    private class FailingUnitParamlessFlows : Flows<FailingUnitParamlessFlow>
+    {
+        public FailingUnitParamlessFlows(FlowsContainer flowsContainer) 
+            : base(nameof(FailingUnitParamlessFlow), flowsContainer, options: null) { }
+    }
+    
+    public class FailingUnitParamlessFlow : Flow
+    {
+        public static bool ShouldThrow = true;
+        
+        public override Task Run()
+        {
+            return ShouldThrow 
+                ? Task.FromException<string>(new TimeoutException()) 
                 : Task.CompletedTask;
         }
     }
