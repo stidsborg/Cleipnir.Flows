@@ -31,6 +31,7 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
     protected BaseFlows(FlowsContainer flowsContainer) => FlowsContainer = flowsContainer;
     
     public abstract Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null);
+    public abstract Task Interrupt(IEnumerable<StoredInstance> instances);
     
     private static Action<TFlow, Workflow> CreateWorkflowSetter()
     {
@@ -120,8 +121,8 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 
     public Task BulkSchedule(IEnumerable<FlowInstance> instanceIds) => _registration.BulkSchedule(instanceIds);
 
-    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
-        => _registration.GetInstances(status);
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) => _registration.GetInstances(status);
+    public override Task Interrupt(IEnumerable<StoredInstance> instances) => _registration.Interrupt(instances);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, bool create = true, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, create, idempotencyKey);
@@ -182,8 +183,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
-    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
-        => _registration.GetInstances(status);
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) => _registration.GetInstances(status);
+    public override Task Interrupt(IEnumerable<StoredInstance> instances) => _registration.Interrupt(instances);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
@@ -240,8 +241,8 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
 
-    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) 
-        => _registration.GetInstances(status);
+    public override Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null) => _registration.GetInstances(status);
+    public override Task Interrupt(IEnumerable<StoredInstance> instances) => _registration.Interrupt(instances);
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
