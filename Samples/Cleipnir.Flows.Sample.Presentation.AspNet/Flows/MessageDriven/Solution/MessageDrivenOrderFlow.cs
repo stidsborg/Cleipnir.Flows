@@ -11,7 +11,7 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         await ReserveFunds(order, transactionId);
         var reservation = await Message<FundsReserved, FundsReservationFailed>(TimeSpan.FromSeconds(10));
         if (!reservation.HasFirst)
-            await CleanUp(FailedAt.FundsReserved, order, transactionId);
+            return;
 
         await ShipProducts(order);
         var productsShipped = await Message<ProductsShipped, ProductsShipmentFailed>(TimeSpan.FromMinutes(5));
@@ -42,8 +42,8 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
                 await CancelProductsShipment(order);
                 break;
             case FailedAt.OrderConfirmationEmailSent:
-                await ReversePayment(order, transactionId);
                 await CancelProductsShipment(order);
+                await ReversePayment(order, transactionId);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(failedAt), failedAt, null);

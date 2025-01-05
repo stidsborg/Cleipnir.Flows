@@ -18,6 +18,32 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         
         await SendOrderConfirmationEmail(order, trackAndTraceNumber);
     }
+
+    #region CleanUp
+
+    private async Task CleanUp(FailedAt failedAt, Order order, Guid transactionId)
+    {
+        switch (failedAt) 
+        {
+            case FailedAt.FundsReserved:
+                break;
+            case FailedAt.ProductsShipped:
+                await CancelFundsReservation(order, transactionId);
+                break;
+            case FailedAt.FundsCaptured:
+                await CancelFundsReservation(order, transactionId);
+                await CancelProductsShipment(order);
+                break;
+            case FailedAt.OrderConfirmationEmailSent:
+                await ReversePayment(order, transactionId);
+                await CancelProductsShipment(order);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(failedAt), failedAt, null);
+        }
+
+        throw new OrderProcessingException($"Order processing failed at: '{failedAt}'");
+    }
     
     private enum FailedAt
     {
@@ -26,6 +52,8 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         FundsCaptured,
         OrderConfirmationEmailSent,
     }
+
+    #endregion
     
     #region MessagePublishers
     private Task ReserveFunds(Order order, Guid transactionId) 
@@ -40,5 +68,7 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         => Capture(() => bus.Send(new CancelProductsShipment(order.OrderId)));
     private Task CancelFundsReservation(Order order, Guid transactionId)
         => Capture(() => bus.Send(new CancelFundsReservation(order.OrderId, transactionId)));
+    private Task ReversePayment(Order order, Guid transactionId)
+        => Capture(() => bus.Send(new ReverseTransaction(order.OrderId, transactionId)));
     #endregion
 }
