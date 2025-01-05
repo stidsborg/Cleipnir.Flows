@@ -6,7 +6,7 @@ public static class Setup
     {
         services.AddSingleton<Bus>(p =>
         {
-            var orderFlows = p.GetRequiredService<Solution.MessageDrivenOrderFlows>();
+            var orderFlows = p.GetRequiredService<MessageDrivenOrderFlows>();
             var bus = new Bus(orderFlows);
             
             var emailService = new EmailServiceStub(bus);

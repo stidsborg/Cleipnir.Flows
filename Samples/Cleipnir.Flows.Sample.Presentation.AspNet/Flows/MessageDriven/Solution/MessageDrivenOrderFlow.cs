@@ -2,12 +2,11 @@
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven.Solution;
 
-[GenerateFlows]
 public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
 {
    public override async Task Run(Order order)
     {
-        var transactionId = await Effect.Capture(Guid.NewGuid);
+        var transactionId = await Capture(Guid.NewGuid);
 
         await ReserveFunds(order, transactionId);
         var reservation = await Message<FundsReserved, FundsReservationFailed>(TimeSpan.FromSeconds(10));
@@ -34,17 +33,17 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         switch (failedAt) 
         {
             case FailedAt.FundsReserved:
-                await CancelFundsReservation(order, transactionId);
                 break;
             case FailedAt.ProductsShipped:
                 await CancelFundsReservation(order, transactionId);
-                await CancelProductsShipment(order);
                 break;
             case FailedAt.FundsCaptured:
+                await CancelFundsReservation(order, transactionId);
                 await CancelProductsShipment(order);
                 break;
             case FailedAt.OrderConfirmationEmailSent:
-                //we accept this failure without cleaning up
+                await ReversePayment(order, transactionId);
+                await CancelProductsShipment(order);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(failedAt), failedAt, null);
@@ -73,4 +72,6 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         => Capture(() => bus.Send(new CancelProductsShipment(order.OrderId)));
     private Task CancelFundsReservation(Order order, Guid transactionId)
         => Capture(() => bus.Send(new CancelFundsReservation(order.OrderId, transactionId)));
+    private Task ReversePayment(Order order, Guid transactionId)
+        => Capture(() => bus.Send(new ReverseTransaction(order.OrderId, transactionId)));
 }

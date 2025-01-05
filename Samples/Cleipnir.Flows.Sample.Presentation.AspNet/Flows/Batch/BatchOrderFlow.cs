@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Clients;
-using Cleipnir.ResilientFunctions;
-using Cleipnir.ResilientFunctions.Domain;
 
 namespace Cleipnir.Flows.Sample.MicrosoftOpen.Flows.Batch;
 
