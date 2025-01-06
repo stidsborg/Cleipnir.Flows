@@ -18,9 +18,7 @@ public class MessageDrivenOrderFlow(Bus bus) : Flow<Order>
         
         await SendOrderConfirmationEmail(order, trackAndTraceNumber);
     }
-
-    private record DeferedMessage();
-
+    
     #region CleanUp
 
     private async Task CleanUp(FailedAt failedAt, Order order, Guid transactionId)
