@@ -1,6 +1,5 @@
 ﻿using Cleipnir.Flows.Sample.MicrosoftOpen.Clients;
 using Cleipnir.Flows.Sample.MicrosoftOpen.Flows.MessageDriven;
-using Cleipnir.ResilientFunctions.Domain;
 using Polly;
 using Polly.Retry;
 
@@ -15,13 +14,10 @@ public class OrderFlow(
 {
     public override async Task Run(Order order)
     {
-        var transactionId = await Effect.Capture(Guid.NewGuid);
+        var transactionId = Guid.NewGuid();
 
         await paymentProviderClient.Reserve(transactionId, order.CustomerId, order.TotalPrice);
-        var trackAndTrace = await Effect.Capture(
-            () => logisticsClient.ShipProducts(order.CustomerId, order.ProductIds),
-            ResiliencyLevel.AtMostOnce
-        );
+        var trackAndTrace = await logisticsClient.ShipProducts(order.CustomerId, order.ProductIds);
         await paymentProviderClient.Capture(transactionId);
         await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
     }
