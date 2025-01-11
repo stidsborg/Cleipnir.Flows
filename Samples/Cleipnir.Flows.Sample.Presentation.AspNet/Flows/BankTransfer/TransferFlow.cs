@@ -24,8 +24,8 @@ public class TransferFlow : Flow<Transfer>
         );
     }
 
-    private DistributedSemaphore DistributedLock(string account)
-        => Workflow.Semaphores.Create("BankTransfer", account, maximumCount: 1);
+    private Task<DistributedSemaphore.Lock> DistributedLock(string account)
+        => Workflow.Synchronization.AcquireLock("BankTransfer", instance: account);
 
     private readonly IBankCentralClient _bankCentralClient = new BankCentralClient();
 }

@@ -108,7 +108,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     public Task Run(string instanceId) 
         => _registration.Invoke(instanceId);
 
-    public Task Schedule(string instanceId)
+    public Task<Scheduled> Schedule(string instanceId)
         => _registration.Schedule(instanceId);
     
     public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
@@ -163,7 +163,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     public Task Run(string instanceId, TParam param) 
         => _registration.Invoke(instanceId, param);
 
-    public Task Schedule(string instanceId, TParam param)
+    public Task<Scheduled> Schedule(string instanceId, TParam param)
         => _registration.Schedule(instanceId, param);
     
     public Task ScheduleAt(
@@ -218,7 +218,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public Task<TResult> Run(string instanceId, TParam param) 
         => _registration.Invoke(instanceId, param);
 
-    public Task Schedule(string instanceId, TParam param)
+    public Task<Scheduled<TResult>> Schedule(string instanceId, TParam param)
         => _registration.Schedule(instanceId, param);
 
     public Task ScheduleAt(

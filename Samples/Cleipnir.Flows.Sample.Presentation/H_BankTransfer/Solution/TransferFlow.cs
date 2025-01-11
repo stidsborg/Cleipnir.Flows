@@ -9,8 +9,8 @@ public sealed class TransferFlow : Flow<Transfer>
 
     public override async Task Run(Transfer transfer)
     {
-        await using var @lock = await Utilities.Monitor.Acquire(
-            group: "BankTransfer", name: transfer.FromAccount, lockId: transfer.TransactionId.ToString()
+        await using var @lock = await Workflow.Synchronization.AcquireLock(
+            group: "BankTransfer", instance: transfer.FromAccount
         );
         
         var availableFunds = await BankCentralClient.GetAvailableFunds(transfer.FromAccount);

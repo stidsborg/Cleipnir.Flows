@@ -1,4 +1,5 @@
-﻿using Cleipnir.ResilientFunctions.Domain;
+﻿using Cleipnir.ResilientFunctions;
+using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Cleipnir.ResilientFunctions.Storage;
@@ -53,6 +54,42 @@ public class FlowsWithResultTests
             ExecutedWithParameter = param;
             InstanceId = Workflow.FlowId.Instance.ToString();
 
+            return 1;
+        }
+    }
+
+    [TestMethod]
+    public async Task CompletionOfScheduledFlowCanBeAwaited()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<SimpledDelayedFlow>();
+
+        var flowStore = new InMemoryFunctionStore();
+        var flowsContainer = new FlowsContainer(
+            flowStore,
+            serviceCollection.BuildServiceProvider(),
+            Options.Default
+        );
+
+        var flows = new SimpledDelayedFlows(flowsContainer);
+        var scheduled = await flows.Schedule("someInstanceId", "someParameter");
+
+        await Task.Delay(1000);
+        var result = await scheduled.Completion();
+        result.ShouldBe(1);
+    }
+    
+    private class SimpledDelayedFlows : Flows<SimpledDelayedFlow, string, int>
+    {
+        public SimpledDelayedFlows(FlowsContainer flowsContainer) 
+            : base(nameof(SimpledDelayedFlow), flowsContainer, options: null) { }
+    }
+    
+    public class SimpledDelayedFlow : Flow<string, int>
+    {
+        public override async Task<int> Run(string param)
+        {
+            await Delay(TimeSpan.FromSeconds(1));
             return 1;
         }
     }
