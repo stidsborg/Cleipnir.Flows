@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
 using Cleipnir.ResilientFunctions;
@@ -15,6 +16,8 @@ public class FlowsContainer : IDisposable
     internal readonly IServiceProvider ServiceProvider;
     internal readonly FunctionsRegistry FunctionRegistry;
     internal readonly List<IMiddleware> Middlewares;
+    private readonly Dictionary<string, Type> _registeredFlows = new();
+    private readonly Lock _lock = new();
 
     public FlowsContainer(IFunctionStore flowStore, IServiceProvider serviceProvider, Options options)
     {
@@ -47,6 +50,15 @@ public class FlowsContainer : IDisposable
                 _ => throw new ArgumentOutOfRangeException(nameof(m))
             })
             .ToList();
+    }
+
+    internal void EnsureNoExistingRegistration(string flowName, Type flowType)
+    {
+        lock (_lock)
+            if (_registeredFlows.TryGetValue(flowName, out var existingFlowType) && flowType != existingFlowType)
+                throw new InvalidOperationException($"Flow with name '{flowName}' for type '{flowType}' has already been registered for different type: '{existingFlowType}'");
+            else
+                _registeredFlows[flowName] = flowType;
     }
     
     public void Dispose() => FunctionRegistry.Dispose();

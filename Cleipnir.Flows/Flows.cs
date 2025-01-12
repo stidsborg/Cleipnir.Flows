@@ -86,6 +86,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
             return Unit.Instance;
         });
         
+        flowsContainer.EnsureNoExistingRegistration(flowName, typeof(TFlow));
         _registration = flowsContainer.FunctionRegistry.RegisterParamless(
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
@@ -141,6 +142,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
                 return Unit.Instance;
             });
         
+        flowsContainer.EnsureNoExistingRegistration(flowName, typeof(TFlow));
         _registration = flowsContainer.FunctionRegistry.RegisterAction<TParam>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
@@ -201,6 +203,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
             runFlow: (flow, param) => flow.Run(param)
         );
         
+        flowsContainer.EnsureNoExistingRegistration(flowName, typeof(TFlow));
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
