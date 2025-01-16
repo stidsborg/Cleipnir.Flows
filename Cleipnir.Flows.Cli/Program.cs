@@ -93,7 +93,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet";
+        p.StartInfo.FileName = "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = projectPath;
         p.StartInfo.Arguments = $"dotnet pack -c Release /p:ContinuousIntegrationBuild=true -o {outputPath}";
         p.Start();
@@ -112,7 +112,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet";
+        p.StartInfo.FileName = "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = sourceGeneratorProjectPath;
         p.StartInfo.Arguments = $"dotnet publish -c Release -o {outputPath}";
         p.Start();
