@@ -14,6 +14,8 @@ public class BatchOrderFlow(
 {
     public override async Task Run(List<Order> orders)
     {
+        _ = orderFlows;
+        
         var stopWatch = Stopwatch.StartNew();
         // APPROACH_1: sequential (in-process)
         
