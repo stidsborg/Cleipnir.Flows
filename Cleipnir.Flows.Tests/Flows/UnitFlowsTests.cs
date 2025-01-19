@@ -116,7 +116,7 @@ public class UnitFlowsTests
 
         FailingUnitActionFlow.ShouldThrow = true;
         
-        await Should.ThrowAsync<TimeoutException>(() =>
+        await Should.ThrowAsync<FatalWorkflowException<TimeoutException>>(() =>
             flows.Run("someInstanceId", "someParameter")
         );
         
@@ -166,7 +166,7 @@ public class UnitFlowsTests
 
         FailingUnitFuncFlow.ShouldThrow = true;
         
-        await Should.ThrowAsync<TimeoutException>(() =>
+        await Should.ThrowAsync<FatalWorkflowException<TimeoutException>>(() =>
             flows.Run("someInstanceId", "someParameter")
         );
         
@@ -216,7 +216,7 @@ public class UnitFlowsTests
 
         FailingUnitParamlessFlow.ShouldThrow = true;
         
-        await Should.ThrowAsync<TimeoutException>(() =>
+        await Should.ThrowAsync<FatalWorkflowException<TimeoutException>>(() =>
             flows.Run("someInstanceId")
         );
         

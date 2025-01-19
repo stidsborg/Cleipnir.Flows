@@ -30,9 +30,14 @@ public static class CallChain
                 {
                     return new Result<TResult>(Postpone.Until(postponeInvocationException.PostponeUntil));
                 }
+                catch (FatalWorkflowException exception)
+                {
+                    exception.FlowId = w.FlowId;
+                    return new Result<TResult>(exception);
+                }
                 catch (Exception exception)
                 {
-                    return new Result<TResult>(exception);
+                    return new Result<TResult>(FatalWorkflowException.CreateNonGeneric(w.FlowId, exception));
                 }
             };
         

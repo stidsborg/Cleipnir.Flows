@@ -157,7 +157,7 @@ public class FlowsWithResultTests
         var flows = new FailingFuncFlows(flowsContainer);
         FailingFuncFlow.ShouldThrow = true;
         
-        await Should.ThrowAsync<ArgumentException>(() =>
+        await Should.ThrowAsync<FatalWorkflowException<ArgumentException>>(() =>
             flows.Run("someInstanceId", "someParameter")
         );
         

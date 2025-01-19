@@ -110,7 +110,7 @@ public class ParamlessFlowsTests
         var flows = new FailingParamlessFlows(flowsContainer);
         FailingParamlessFlow.ShouldThrow = true;
         
-        await Should.ThrowAsync<TimeoutException>(() =>
+        await Should.ThrowAsync<FatalWorkflowException<TimeoutException>>(() =>
             flows.Run("someInstanceId")
         );
         

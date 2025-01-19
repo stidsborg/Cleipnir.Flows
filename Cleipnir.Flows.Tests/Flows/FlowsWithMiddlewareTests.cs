@@ -29,7 +29,7 @@ public class FlowsWithMiddlewareTests
 
         var flows = new SimpleMiddlewareFlows(flowsContainer);
 
-        await Should.ThrowAsync<TimeoutException>(
+        await Should.ThrowAsync<FatalWorkflowException<TimeoutException>>(
             flows.Run("someInstanceId", "someParameter")
         );
 
@@ -62,7 +62,7 @@ public class FlowsWithMiddlewareTests
             var result = await next(param, workflow);
             Result = result;
 
-            return new Result<TResult>(failWith: new TimeoutException());
+            return new Result<TResult>(failWith: FatalWorkflowException.Create<TimeoutException>(workflow.FlowId, new TimeoutException("Timeout occured!")));
         }
     }
 }
