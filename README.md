@@ -1,6 +1,7 @@
 [![.NET](https://github.com/stidsborg/Cleipnir.Flows/actions/workflows/dotnet.yml/badge.svg?no-cache)](https://github.com/stidsborg/Cleipnir.Flows/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/dt/Cleipnir.Flows.svg)](https://www.nuget.org/packages/Cleipnir.Flows)
 [![NuGet](https://img.shields.io/nuget/vpre/Cleipnir.Flows.svg)](https://www.nuget.org/packages/Cleipnir.Flows)
+[![alt Join the conversation](https://img.shields.io/discord/1330489830299402360.svg?no-cache "Discord")](https://discord.gg/JzSzaNfus2)
 
 <p align="center">
   <img src="https://github.com/stidsborg/Cleipnir.Flows/blob/main/Docs/cleipnir.png" alt="logo" />
