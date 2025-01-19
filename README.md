@@ -19,6 +19,11 @@ It works for both RPC and Message-based communication.
 ## Introduction Video
 [![Video link](https://img.youtube.com/vi/ID-bz6PUWF8/0.jpg)](https://www.youtube.com/watch?v=ID-bz6PUWF8)
 
+## Discord
+Get live help at the Discord channel:
+
+[![alt Join the conversation](https://img.shields.io/discord/1330489830299402360.svg?no-cache "Discord")](https://discord.gg/JzSzaNfus2)
+
 ## Getting Started
 To get started simply perform the following three steps in an ASP.NET service:
 
