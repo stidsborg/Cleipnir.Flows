@@ -1,5 +1,14 @@
 services:
 
+  sql-server-db:
+    container_name: sql-server-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Pa55word!"
+      ACCEPT_EULA: "Y"
+
   postgresql-db:
     container_name: postgres-db
     command: postgres -c 'max_connections=200'
@@ -8,3 +17,11 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: "Pa55word!"
+
+  maria-db:
+    container_name: maria-db
+    image: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: "Pa55word!"
