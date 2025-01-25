@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cleipnir.Flows.CrossCutting;
-using Cleipnir.ResilientFunctions.CoreRuntime.ParameterSerialization;
+using Cleipnir.ResilientFunctions.CoreRuntime.Serialization;
 using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Domain.Exceptions;
 
