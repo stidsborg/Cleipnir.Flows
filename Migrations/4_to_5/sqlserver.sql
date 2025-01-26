@@ -1,0 +1,6 @@
+ALTER TABLE Effects ADD Position INT NOT NULL DEFAULT 0;
+UPDATE Effects SET Position = floor(RAND() * 1000) + 1;
+ALTER TABLE Effects DROP CONSTRAINT PK__tickerin__73074D81249A394E;
+ALTER TABLE Effects ADD CONSTRAINT PK_Flow PRIMARY KEY CLUSTERED (FlowType, FlowInstance, Position);
+ALTER TABLE Effects DROP COLUMN EffectId;
+UPDATE Schema SET version = 5;
