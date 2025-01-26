@@ -19,7 +19,7 @@
         <PackageReference Include="MSTest.TestFramework" Version="3.7.2" />
         <PackageReference Include="Shouldly" Version="4.3.0" />
         <PackageReference Include="NServiceBus" Version="9.2.4" />
-        <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.0" />
+        <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.1" />
     </ItemGroup>
 
     <ItemGroup>
