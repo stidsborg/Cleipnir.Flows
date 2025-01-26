@@ -19,7 +19,7 @@
         <PackageReference Include="MSTest.TestFramework" Version="3.7.1" />
         <PackageReference Include="Rebus" Version="8.7.1" />
         <PackageReference Include="Rebus.ServiceProvider" Version="10.3.0" />
-        <PackageReference Include="Shouldly" Version="4.2.1" />
+        <PackageReference Include="Shouldly" Version="4.3.0" />
     </ItemGroup>
 
     <ItemGroup>
