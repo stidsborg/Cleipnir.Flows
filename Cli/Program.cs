@@ -8,7 +8,7 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
-        var root = @"C:\Repos\Cleipnir.Flows"; //mac_os $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/Repos/Cleipnir.ResilientFunctions";
+        var root = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/Repos/Cleipnir.Flows";
         var output = Path.GetFullPath("./nugets");
 
         if (Directory.Exists(output))
@@ -97,7 +97,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = @"C:\Program Files\dotnet\dotnet.exe"; //macos "/usr/bin/dotnet";
+        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet"; //windows: "@"C:\Program Files\dotnet\dotnet.exe"; //linux "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = projectPath;
         p.StartInfo.Arguments = $"dotnet pack -c Release /p:ContinuousIntegrationBuild=true -o {outputPath}";
         p.Start();
@@ -116,7 +116,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = @"C:\Program Files\dotnet\dotnet.exe"; //macos "/usr/bin/dotnet";
+        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet"; //windows: "@"C:\Program Files\dotnet\dotnet.exe"; //linux "/usr/bin/dotnet";
         p.StartInfo.WorkingDirectory = sourceGeneratorProjectPath;
         p.StartInfo.Arguments = $"dotnet publish -c Release -o {outputPath}";
         p.Start();
