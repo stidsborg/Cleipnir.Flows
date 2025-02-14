@@ -10,7 +10,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
-      <PackageReference Include="NServiceBus" Version="9.2.4" />
+      <PackageReference Include="NServiceBus" Version="9.2.6" />
       <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.1" />
     </ItemGroup>
 
