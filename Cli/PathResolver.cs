@@ -1,6 +1,6 @@
 namespace Cleipnir.Flows.Cli;
 
-public class PathResolver
+public static class PathResolver
 {
     public static RepoAndDotnetPaths ResolvePaths(OperatingSystem operatingSystem)
     {
@@ -8,7 +8,7 @@ public class PathResolver
         {
             OperatingSystem.Windows => 
                 new RepoAndDotnetPaths(
-                    RepoPath: @"C:\Repos\Cleipnir.Flows",
+                    RepoPath: "../",
                     DotnetPath: @"C:\Program Files\dotnet\dotnet.exe"
                 ),
             OperatingSystem.Linux => 
