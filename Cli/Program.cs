@@ -8,7 +8,8 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
-        var root = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/Repos/Cleipnir.Flows";
+        var (repoPath, dotnetPath) = PathResolver.ResolvePaths(OperatingSystem.Windows);
+        var root = repoPath;
         var output = Path.GetFullPath("./nugets");
 
         if (Directory.Exists(output))
@@ -30,14 +31,14 @@ internal static class Program
         }
 
         //compile & publish source generator
-        PublishSourceGenerator($"{root}/SourceGeneration/Cleipnir.Flows.SourceGenerator", output);
+        PublishSourceGenerator($"{root}/SourceGeneration/Cleipnir.Flows.SourceGenerator", output, dotnetPath);
         
         //pack
         foreach (var projectPath in FindAllProjects(root).Where(IsPackageProject))
         {
             Console.WriteLine("Packing nuget package: " + LeafFolderName(projectPath));
             Console.WriteLine("Project path: " + Path.GetDirectoryName(projectPath)!);
-            PackProject(Path.GetDirectoryName(projectPath)!, output);
+            PackProject(Path.GetDirectoryName(projectPath)!, output, dotnetPath);
         }
 
         //add source generator to core flow nuget packages
@@ -90,14 +91,14 @@ internal static class Program
         return newProjectFileContent;
     }
 
-    private static void PackProject(string projectPath, string outputPath)
+    private static void PackProject(string projectPath, string outputPath, string dotnetPath)
     {
         var p = new Process();
         p.StartInfo.RedirectStandardInput = true;
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet"; //windows: "@"C:\Program Files\dotnet\dotnet.exe"; //linux "/usr/bin/dotnet";
+        p.StartInfo.FileName = dotnetPath;
         p.StartInfo.WorkingDirectory = projectPath;
         p.StartInfo.Arguments = $"dotnet pack -c Release /p:ContinuousIntegrationBuild=true -o {outputPath}";
         p.Start();
@@ -108,7 +109,7 @@ internal static class Program
         p.WaitForExit();
     }
     
-    private static void PublishSourceGenerator(string sourceGeneratorProjectPath, string outputPath)
+    private static void PublishSourceGenerator(string sourceGeneratorProjectPath, string outputPath, string dotnetPath)
     {
         //dotnet publish -c Release -o Output
         var p = new Process();
@@ -116,7 +117,7 @@ internal static class Program
         p.StartInfo.RedirectStandardOutput = true;
         p.StartInfo.RedirectStandardError = true;
         p.StartInfo.UseShellExecute = false;
-        p.StartInfo.FileName = "/usr/local/share/dotnet/dotnet"; //windows: "@"C:\Program Files\dotnet\dotnet.exe"; //linux "/usr/bin/dotnet";
+        p.StartInfo.FileName = dotnetPath;
         p.StartInfo.WorkingDirectory = sourceGeneratorProjectPath;
         p.StartInfo.Arguments = $"dotnet publish -c Release -o {outputPath}";
         p.Start();
@@ -129,12 +130,6 @@ internal static class Program
 
     private static string LeafFolderName(string path)
         => Path.GetDirectoryName(path)!.Split('/').Last();
-
-    private static void Unzip(string zipFilePath, string unzipPath) 
-        => ZipFile.ExtractToDirectory(zipFilePath, unzipPath);
-
-    private static void Zip(string folderPath, string zipPath) 
-        => ZipFile.CreateFromDirectory(folderPath, zipPath);
 
     private static void AddSourceGeneratorToNugetPackage(string nugetPath, string sourceGeneratorDllPath)
     {
