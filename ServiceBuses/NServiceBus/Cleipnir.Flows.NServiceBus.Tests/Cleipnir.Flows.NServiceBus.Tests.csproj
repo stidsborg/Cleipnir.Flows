@@ -15,8 +15,8 @@
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.8.0" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.8.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.8.2" />
+        <PackageReference Include="MSTest.TestFramework" Version="3.8.2" />
         <PackageReference Include="Shouldly" Version="4.3.0" />
         <PackageReference Include="NServiceBus" Version="9.2.6" />
         <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.1" />

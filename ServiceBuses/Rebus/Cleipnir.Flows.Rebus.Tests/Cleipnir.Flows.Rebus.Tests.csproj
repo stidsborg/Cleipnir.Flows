@@ -15,8 +15,8 @@
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.8.0" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.8.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.8.2" />
+        <PackageReference Include="MSTest.TestFramework" Version="3.8.2" />
         <PackageReference Include="Rebus" Version="8.7.1" />
         <PackageReference Include="Rebus.ServiceProvider" Version="10.3.0" />
         <PackageReference Include="Shouldly" Version="4.3.0" />
