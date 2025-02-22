@@ -125,6 +125,8 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, bool create = true, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, create, idempotencyKey);
+    public Task SendMessages(IReadOnlyList<BatchedMessage> messages, bool interrupt = true) 
+        => _registration.SendMessages(messages, interrupt);
 }
 
 public class Flows<TFlow, TParam> : BaseFlows<TFlow>
@@ -187,6 +189,8 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
+    public Task SendMessages(IReadOnlyList<BatchedMessage> messages, bool interrupt = true) 
+        => _registration.SendMessages(messages, interrupt);
 
     public Task<BulkScheduled> BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }
@@ -246,6 +250,8 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 
     public Task<Finding> SendMessage<T>(FlowInstance flowInstance, T message, string? idempotencyKey = null) where T : notnull 
         => _registration.SendMessage(flowInstance, message, idempotencyKey);
+    public Task SendMessages(IReadOnlyList<BatchedMessage> messages, bool interrupt = true) 
+        => _registration.SendMessages(messages, interrupt);
     
     public Task<BulkScheduled<TResult>> BulkSchedule(IEnumerable<BulkWork<TParam>> bulkWork) => _registration.BulkSchedule(bulkWork);
 }
