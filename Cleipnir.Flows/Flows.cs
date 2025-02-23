@@ -78,7 +78,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 {
     private readonly ParamlessRegistration _registration;
 
-    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<Unit, Unit>(runFlow: async (flow, _) =>
         {
@@ -90,7 +90,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         _registration = flowsContainer.FunctionRegistry.RegisterParamless(
             flowName,
             inner: workflow => callChain(Unit.Instance, workflow),
-            (options ?? Options.Default).MapToSettings()
+            (options ?? FlowOptions.Default).MapToLocalSettings()
         );
     }
 
@@ -135,7 +135,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 {
     private readonly ActionRegistration<TParam> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<TParam, Unit>(
             runFlow: async (flow, param) =>
@@ -148,7 +148,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         _registration = flowsContainer.FunctionRegistry.RegisterAction<TParam>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
-            settings: (options ?? Options.Default).MapToSettings()
+            settings: (options ?? FlowOptions.Default).MapToLocalSettings()
         );
     }
 
@@ -201,7 +201,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 {
     private readonly FuncRegistration<TParam, TResult> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer, Options? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
     {
         var callChain = CreateMiddlewareCallChain<TParam, TResult>(
             runFlow: (flow, param) => flow.Run(param)
@@ -211,8 +211,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
         _registration = flowsContainer.FunctionRegistry.RegisterFunc<TParam, TResult>(
             flowName,
             inner: (param, workflow) => callChain(param, workflow),
-            (options ?? Options.Default)
-                .MapToSettings()
+            (options ?? FlowOptions.Default).MapToLocalSettings()
         );
     }
 

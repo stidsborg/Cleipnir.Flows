@@ -22,7 +22,7 @@ public class OptionsTests
             .RegisterFlow<OptionsTestWithOverriddenOptionsFlow, OptionsTestWithOverriddenOptionsFlows>(
                 flowsFactory: sp => new OptionsTestWithOverriddenOptionsFlows(
                     sp.GetRequiredService<FlowsContainer>(),
-                    options: new Options(messagesDefaultMaxWaitForCompletion: TimeSpan.Zero)
+                    options: new FlowOptions(messagesDefaultMaxWaitForCompletion: TimeSpan.Zero)
                 )
             )
             .RegisterFlow<OptionsTestWithDefaultProvidedOptionsFlow, OptionsTestWithDefaultProvidedOptionsFlows>()

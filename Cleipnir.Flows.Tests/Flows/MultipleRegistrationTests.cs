@@ -36,7 +36,7 @@ public class MultipleRegistrationTests
     
     private class TestFlowType1s : Flows<TestFlowType1>
     {
-        public TestFlowType1s(FlowsContainer flowsContainer, Options? options = null) 
+        public TestFlowType1s(FlowsContainer flowsContainer, FlowOptions? options = null) 
             : base("TestFlow", flowsContainer, options) { }
     }
     
@@ -47,7 +47,7 @@ public class MultipleRegistrationTests
     
     private class TestFlowType2s : Flows<TestFlowType2>
     {
-        public TestFlowType2s(FlowsContainer flowsContainer, Options? options = null) 
+        public TestFlowType2s(FlowsContainer flowsContainer, FlowOptions? options = null) 
             : base("TestFlow", flowsContainer, options) { }
     }
 }

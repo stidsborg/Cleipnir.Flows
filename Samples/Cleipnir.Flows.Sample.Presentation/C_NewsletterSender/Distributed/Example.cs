@@ -26,7 +26,7 @@ public static class Example
                             flowsFactory: sp => 
                                 new NewsletterChildFlows(
                                     sp.GetRequiredService<FlowsContainer>(),
-                                    options: new Options(maxParallelRetryInvocations: 1)
+                                    options: new FlowOptions(maxParallelRetryInvocations: 1)
                             ),
                             flowFactory: sp => new NewsletterChildFlow(sp.GetRequiredService<NewsletterParentFlows>(), child)
                         )

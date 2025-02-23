@@ -140,7 +140,7 @@ $@"namespace {flowsNamespace}
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}>
     {{        
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.Options? options = null)
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.FlowOptions? options = null)
             : base(flowName, flowsContainer, options) {{ }}             
     }}
     #nullable disable   
@@ -155,7 +155,7 @@ $@"namespace {flowsNamespace}
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}>
     {{
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.Options? options = null)
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.FlowOptions? options = null)
             : base(flowName, flowsContainer, options) {{ }}      
     }}
     #nullable disable
@@ -170,7 +170,7 @@ $@"namespace {flowsNamespace}
     [Cleipnir.Flows.SourceGeneration.SourceGeneratedFlowsAttribute]
     {accessibilityModifier} class {flowsName} : Cleipnir.Flows.Flows<{flowType}, {paramType}, {resultType}>
     {{
-        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.Options? options = null)
+        public {flowsName}(Cleipnir.Flows.FlowsContainer flowsContainer, string flowName = ""{flowName}"", Cleipnir.Flows.FlowOptions? options = null)
             : base(flowName, flowsContainer, options) {{ }}
     }}
     #nullable disable
