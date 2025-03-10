@@ -19,6 +19,8 @@ public class FlowsContainer : IDisposable
     private readonly Dictionary<string, Type> _registeredFlows = new();
     private readonly Lock _lock = new();
 
+    public FunctionsRegistry Functions => FunctionRegistry;
+    
     public FlowsContainer(IFunctionStore flowStore, IServiceProvider serviceProvider, Options options)
     {
         ServiceProvider = serviceProvider;
@@ -63,4 +65,14 @@ public class FlowsContainer : IDisposable
     
     public void Dispose() => FunctionRegistry.Dispose();
     public Task ShutdownGracefully(TimeSpan? maxWait = null) => FunctionRegistry.ShutdownGracefully(maxWait);
+    
+    public static FlowsContainer Create(
+        IServiceProvider? serviceProvider = null,
+        IFunctionStore? functionStore = null, 
+        Options? options = null) 
+        => new(
+            functionStore ?? new InMemoryFunctionStore(),
+            serviceProvider ?? new ServiceCollection().BuildServiceProvider(),
+            options ?? Options.Default
+        );
 }
