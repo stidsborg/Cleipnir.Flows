@@ -65,6 +65,24 @@ public class FlowsContainer : IDisposable
     
     public void Dispose() => FunctionRegistry.Dispose();
     public Task ShutdownGracefully(TimeSpan? maxWait = null) => FunctionRegistry.ShutdownGracefully(maxWait);
+
+    public Flows<TFlow> RegisterAnonymousFlow<TFlow>(Func<TFlow>? flowFactory = null, string? flowName = null, FlowOptions? options = null) where TFlow : Flow
+    {
+        flowName ??= typeof(TFlow).Name;
+        return new Flows<TFlow>(flowName, flowsContainer: this, options ?? new FlowOptions(), flowFactory);
+    }
+    
+    public Flows<TFlow, TParam> RegisterAnonymousFlow<TFlow, TParam>(Func<TFlow>? flowFactory = null, string? flowName = null, FlowOptions? options = null) where TFlow : Flow<TParam> where TParam : notnull
+    {
+        flowName ??= typeof(TFlow).Name;
+        return new Flows<TFlow, TParam>(flowName, flowsContainer: this, options ?? new FlowOptions(), flowFactory);
+    }
+    
+    public Flows<TFlow, TParam, TResult> RegisterAnonymousFlow<TFlow, TParam, TResult>(Func<TFlow>? flowFactory = null, string? flowName = null, FlowOptions? options = null) where TFlow : Flow<TParam, TResult> where TResult : notnull where TParam : notnull
+    {
+        flowName ??= typeof(TFlow).Name;
+        return new Flows<TFlow, TParam, TResult>(flowName, flowsContainer: this, options ?? new FlowOptions(), flowFactory);
+    }
     
     public static FlowsContainer Create(
         IServiceProvider? serviceProvider = null,

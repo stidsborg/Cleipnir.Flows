@@ -26,8 +26,13 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
     public static Type FlowType { get; } = typeof(TFlow);
 
     private FlowsContainer FlowsContainer { get; }
-    
-    protected BaseFlows(FlowsContainer flowsContainer) => FlowsContainer = flowsContainer;
+    private readonly Func<TFlow>? _flowFactory;
+
+    protected BaseFlows(FlowsContainer flowsContainer, Func<TFlow>? flowFactory)
+    {
+        FlowsContainer = flowsContainer;
+        _flowFactory = flowFactory;
+    } 
     
     public abstract Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null);
     public abstract Task Interrupt(IEnumerable<StoredInstance> instances);
@@ -62,7 +67,10 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
             {
                 await using var scope = serviceProvider.CreateAsyncScope();
 
-                var flow = scope.ServiceProvider.GetRequiredService<TFlow>();
+                var flow = _flowFactory == null
+                    ? scope.ServiceProvider.GetRequiredService<TFlow>()
+                    : _flowFactory();
+                
                 workflowSetter(flow, workflow);
                 
                 var result = await runFlow(flow, param);
@@ -78,7 +86,7 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
 {
     private readonly ParamlessRegistration _registration;
 
-    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null, Func<TFlow>? flowFactory = null) : base(flowsContainer, flowFactory)
     {
         var callChain = CreateMiddlewareCallChain<Unit, Unit>(runFlow: async (flow, _) =>
         {
@@ -135,7 +143,7 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
 {
     private readonly ActionRegistration<TParam> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null, Func<TFlow>? flowFactory = null) : base(flowsContainer, flowFactory)
     {
         var callChain = CreateMiddlewareCallChain<TParam, Unit>(
             runFlow: async (flow, param) =>
@@ -201,7 +209,7 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
 {
     private readonly FuncRegistration<TParam, TResult> _registration;
     
-    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null) : base(flowsContainer)
+    public Flows(string flowName, FlowsContainer flowsContainer, FlowOptions? options = null, Func<TFlow>? flowFactory = null) : base(flowsContainer, flowFactory)
     {
         var callChain = CreateMiddlewareCallChain<TParam, TResult>(
             runFlow: (flow, param) => flow.Run(param)
