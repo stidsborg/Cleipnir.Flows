@@ -26,7 +26,7 @@ Essentially, durable execution is about adding user-defined checkpoint-points in
 Furthermore, the Cleipnir.NET framework extends this capability with the ability to (1) wait for external messages and (2) programmatically suspend the invocation of user-code. Thus, giving rise to a unique and very powerful programming model.
 
 ## Why durable execution?
-Currently, implementing resilient business flows either entails (1) sagas (MassTransit, NServiceBus) or (2) job-schedulers (such as HangFire).
+Currently, implementing resilient business flows either entails (1) sagas (i.e. MassTransit, NServiceBus) or (2) job-schedulers (i.e. HangFire).
 
 Both approaches have a unique set of challenges:
 * Saga - becomes difficult to implement for real-world scenarios as they are either realized by declaratively constructing a state-machine or implementing a distinct message handler per message type.
@@ -34,9 +34,8 @@ Both approaches have a unique set of challenges:
 
 Cleipnir.NET addresses all of these concerns using a unified programming-model with the following abstractions:
 1. Capture - remembers the result of previously executed code: `await Capture("TransactionId", () => Guid.NewGuid())`
-2. Messages - wait for external message: `await Messages<FundsReserved>`
+2. Messages - wait for external message: `await Messages<FundsReserved>()`
 3. Suspension - suspends the current execution at-will, and resuming either after some duration or when an external message has been received: `await Delay(TimeSpan.FromMinutes(5));`
-
 
 ## Getting Started
 To get started simply perform the following three steps in an ASP.NET or generic-hosted service (or visit: [sample repo](https://github.com/stidsborg/Cleipnir.Flows.Sample/)):
