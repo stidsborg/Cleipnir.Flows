@@ -6,24 +6,73 @@
 <p align="center">
   <img src="https://github.com/stidsborg/Cleipnir.Flows/blob/main/Docs/cleipnir.png" alt="logo" />
   <br>
-  Simply making fault-tolerant code simple
+  Simply making <strong>crash-resilient</strong> code <strong>simple</strong>
   <br>
 </p>
 
-# Cleipnir Flows
-Cleipnir Flows is a simple, lightweight and intuitive **workflow-as-code/durable** execution .NET framework.
-It allows writing ordinary C#-code which completes despite: failures, restarts or deployments.
+# Cleipnir.NET
+Cleipnir Flows is a powerful **durable execution** .NET framework.
+* Makes C#-code crash/restart resilient 
+* Requires only a database 
+* Use with ASP.NET / generic host service
+* Integrates easily with all message-brokers and service-buses
+* Suspend code execution for minutes, hours, weeks or longer
 
-It is similar to other existing durable execution frameworks (Azure Durable Functions and temporal.io) - but has a unique set of abstractions and only requires a database connection to operate.
-Furthermore, it has been tailored for ASP.NET / generic host services and works for both RPC and message-brokered communication.
+## Examples
+### Message-brokered:
+```csharp
+[GenerateFlows]
+public class OrderFlow(IBus bus) : Flow<Order>
+{
+    public override async Task Run(Order order)
+    {
+        var transactionId = await Capture(Guid.NewGuid); //generated transaction id is fixed after this statement
+
+        await PublishReserveFunds(order, transactionId);
+        await Message<FundsReserved>(); //execution is suspended until a funds reserved message is received
+        
+        await PublishShipProducts(order);
+        var trackAndTraceNumber = (await Message<ProductsShipped>()).TrackAndTraceNumber; 
+        
+        await PublishCaptureFunds(order, transactionId);
+        await Message<FundsCaptured>();
+        
+        await PublishSendOrderConfirmationEmail(order, trackAndTraceNumber);
+        await Message<OrderConfirmationEmailSent>();
+    }
+```
+
+### RPC:
+```csharp
+[GenerateFlows]
+public class OrderFlow(
+    IPaymentProviderClient paymentProviderClient,
+    IEmailClient emailClient,
+    ILogisticsClient logisticsClient
+) : Flow<Order>
+{
+    public override async Task Run(Order order)
+    {
+        var transactionId = Capture(() => Guid.NewGuid); //generated transaction id is fixed after this statement
+
+        await paymentProviderClient.Reserve(order.CustomerId, transactionId, order.TotalPrice);
+        var trackAndTrace = await Capture( 
+            () => paymentProviderClient.Capture(transactionId),
+            ResiliencyLevel.AtMostOnce
+        ); //external calls can also be captured - will never be called multiple times
+
+        await emailClient.SendOrderConfirmation(order.CustomerId, trackAndTrace, order.ProductIds);
+    }
+}
+```
 
 ## What is durable execution?
-Durable execution is an emerging paradigm for simplifying the implementation of resilient code which can safely resume execution after a process crash or restart (i.e. after a production deployment).
-The overall goal is to allow the developer to implement resilient code using ordinary C#-code with loops and conditionals.
+Durable execution is an emerging paradigm for simplifying the implementation of code which can safely resume execution after a process crash or restart (i.e. after a production deployment).
+It allows the developer to implement such code using ordinary C#-code with loops, conditionals and more.
 
-Essentially, durable execution is about adding user-defined checkpoint-points in code, thereby allowing the framework to skip already executed parts of the code when/if the code is re-executed.
+Furthermore, durable execution allows suspending code execution for an arbitraty amount of time - thereby saving resources.
 
-Furthermore, the Cleipnir.NET framework extends this capability with the ability to (1) wait for external messages and (2) programmatically suspend the invocation of user-code. Thus, giving rise to a unique and very powerful programming model.
+Essentially, durable execution works by saving state during the invocation of code at user-defined points, thereby allowing the framework to skip previously executed parts of the code when/if the code is re-executed. This occurs both after a crash and suspension.
 
 ## Why durable execution?
 Currently, implementing resilient business flows either entails (1) sagas (i.e. MassTransit, NServiceBus) or (2) job-schedulers (i.e. HangFire).
@@ -168,7 +217,7 @@ public class SimpleFlowsHandler(SimpleFlows flows)
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/Wolverine/Cleipnir.Flows.Wolverine.Console/SimpleFlow.cs)
 
-## Examples
+## More examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
 
 ### Avoid re-executing already completed code:
