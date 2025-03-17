@@ -11,12 +11,14 @@
 </p>
 
 # Cleipnir.NET
-Cleipnir Flows is a powerful **durable execution** .NET framework.
+Cleipnir Flows is a powerful **durable execution** .NET framework - ensuring your code will always execute to completetion **correctly**.
 * Makes C#-code crash/restart resilient 
 * Requires only a database 
 * Use with ASP.NET / generic host service
 * Integrates easily with all message-brokers and service-buses
 * Suspend code execution for minutes, hours, weeks or longer
+* Removes need for **saga-pattern** and **outbox-pattern**
+* Powerful alterrnative to job-schedulers (HangFire, Quartz)
 
 ## Examples
 ### Message-brokered:
@@ -40,6 +42,10 @@ public class OrderFlow(IBus bus) : Flow<Order>
         await PublishSendOrderConfirmationEmail(order, trackAndTraceNumber);
         await Message<OrderConfirmationEmailSent>();
     }
+
+    private Task PublishReserveFunds(Order order, Guid transactionId) 
+        => Capture(async () => await bus.Publish(new ReserveFunds(order.OrderId, order.TotalPrice, transactionId, order.CustomerId)));
+}
 ```
 
 ### RPC:
