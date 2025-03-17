@@ -12,16 +12,36 @@
 
 # Cleipnir.NET
 Cleipnir Flows is a powerful **durable execution** .NET framework - ensuring your code will always execute to completetion **correctly**.
-* Makes C#-code crash/restart resilient 
+* Makes C#-code behave correctly after a crash, restart or suspension
+* Wait for external events inside your method
+* Suspend code execution for minutes, hours, weeks or longer
 * Requires only a database 
 * Use with ASP.NET / generic host service
 * Integrates easily with all message-brokers and service-buses
-* Suspend code execution for minutes, hours, weeks or longer
 * Removes need for **saga-pattern** and **outbox-pattern**
 * Powerful alterrnative to job-schedulers (HangFire, Quartz)
 
+## Abstractions
+Cleipnir.NET provides the following 3 abstractions:
+### Capture
+Remembers the result of arbitary code:
+```csharp
+var transactionId = await Capture("TransactionId", () => Guid.NewGuid());
+//or simply
+var transactionId = await Capture(Guid.NewGuid);
+```
+### Messages
+Wait for retrival of external message - without taking up resources: 
+```csharp
+var fundsReserved = await Messages<FundsReserved>(timesOutIn: TimeSpan.FromMinutes(5));
+```
+### Suspension 
+Suspends the current execution at-will, resuming either after some duration or when an external message has been received: 
+```csharp
+await Delay(TimeSpan.FromMinutes(5));
+```
 ## Examples
-### Message-brokered:
+### Message-brokered ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(IBus bus) : Flow<Order>
@@ -48,7 +68,7 @@ public class OrderFlow(IBus bus) : Flow<Order>
 }
 ```
 
-### RPC:
+### RPC ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(
@@ -74,11 +94,11 @@ public class OrderFlow(
 
 ## What is durable execution?
 Durable execution is an emerging paradigm for simplifying the implementation of code which can safely resume execution after a process crash or restart (i.e. after a production deployment).
-It allows the developer to implement such code using ordinary C#-code with loops, conditionals and more.
+It allows the developer to implement such code using ordinary C#-code with loops, conditionals and so on.
 
-Furthermore, durable execution allows suspending code execution for an arbitraty amount of time - thereby saving resources.
+Furthermore, durable execution allows suspending code execution for an arbitraty amount of time - thereby saving process resources.
 
-Essentially, durable execution works by saving state during the invocation of code at user-defined points, thereby allowing the framework to skip previously executed parts of the code when/if the code is re-executed. This occurs both after a crash and suspension.
+Essentially, durable execution works by saving state at explicitly defined points during the invocation of code, thereby allowing the framework to skip over previously executed parts of the code when/if the code is re-executed. This occurs both after a crash and suspension.
 
 ## Why durable execution?
 Currently, implementing resilient business flows either entails (1) sagas (i.e. MassTransit, NServiceBus) or (2) job-schedulers (i.e. HangFire).
@@ -87,13 +107,8 @@ Both approaches have a unique set of challenges:
 * Saga - becomes difficult to implement for real-world scenarios as they are either realized by declaratively constructing a state-machine or implementing a distinct message handler per message type.
 * Job-scheduler - requires one to implement idempotent code by hand (in case of failure). Moreover, it cannot be integrated with message-brokers and does not support programmatically suspending a job in the middle of its execution.
 
-Cleipnir.NET addresses all of these concerns using a unified programming-model with the following abstractions:
-1. Capture - remembers the result of previously executed code: `await Capture("TransactionId", () => Guid.NewGuid())`
-2. Messages - wait for external message: `await Messages<FundsReserved>()`
-3. Suspension - suspends the current execution at-will, and resuming either after some duration or when an external message has been received: `await Delay(TimeSpan.FromMinutes(5));`
-
 ## Getting Started
-To get started simply perform the following three steps in an ASP.NET or generic-hosted service (or visit: [sample repo](https://github.com/stidsborg/Cleipnir.Flows.Sample/)):
+To get started simply perform the following three steps in an ASP.NET or generic-hosted service ([sample repo](https://github.com/stidsborg/Cleipnir.Flows.Sample/)):
 
 Firstly, install the Cleipnir.Flows nuget package (using either Postgres, SqlServer or MariaDB as persistence layer). I.e.
 ```powershell
@@ -179,7 +194,6 @@ public class OrderController : ControllerBase
 Get live help at the Discord channel:
 
 [![alt Join the conversation](https://img.shields.io/discord/1330489830299402360.svg?no-cache "Discord")](https://discord.gg/JzSzaNfus2)
-
 
 ## Service Bus Integrations
 It is simple to use Cleipnir with all the popular service bus frameworks. In order to do simply implement an event handler - which forwards received events - for each flow type:
