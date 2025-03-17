@@ -41,7 +41,7 @@ Suspends the current execution at-will, resuming either after some duration or w
 await Delay(TimeSpan.FromMinutes(5));
 ```
 ## Examples
-### Message-brokered ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderFlow.cs)):
+### Message-brokered ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(IBus bus) : Flow<Order>
@@ -68,7 +68,7 @@ public class OrderFlow(IBus bus) : Flow<Order>
 }
 ```
 
-### RPC ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
+### RPC ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(
