@@ -114,11 +114,11 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
     public MessageWriter MessageWriter(string instanceId) 
         => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
-    public Task Run(string instanceId) 
-        => _registration.Invoke(instanceId);
+    public Task Run(string instanceId, InitialState? initialState = null) 
+        => _registration.Invoke(instanceId, initialState);
 
-    public Task<Scheduled> Schedule(string instanceId)
-        => _registration.Schedule(instanceId);
+    public Task<Scheduled> Schedule(string instanceId, InitialState? initialState = null)
+        => _registration.Schedule(instanceId, initialState: initialState);
     
     public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
     public Task ScheduleIn(string functionInstanceId, TimeSpan delay) => _registration.ScheduleIn(functionInstanceId, delay);
@@ -172,11 +172,11 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
     public MessageWriter MessageWriter(string instanceId) 
         => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
-    public Task Run(string instanceId, TParam param) 
-        => _registration.Invoke(instanceId, param);
+    public Task Run(string instanceId, TParam param, InitialState? initialState = null) 
+        => _registration.Invoke(instanceId, param, initialState);
 
-    public Task<Scheduled> Schedule(string instanceId, TParam param)
-        => _registration.Schedule(instanceId, param);
+    public Task<Scheduled> Schedule(string instanceId, TParam param, InitialState? initialState = null)
+        => _registration.Schedule(instanceId, param, initialState: initialState);
     
     public Task ScheduleAt(
         string instanceId,
@@ -229,11 +229,11 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public MessageWriter MessageWriter(string instanceId) 
         => _registration.MessageWriters.For(instanceId.ToFlowInstance());
 
-    public Task<TResult> Run(string instanceId, TParam param) 
-        => _registration.Invoke(instanceId, param);
+    public Task<TResult> Run(string instanceId, TParam param, InitialState? initialState = null) 
+        => _registration.Invoke(instanceId, param, initialState);
 
-    public Task<Scheduled<TResult>> Schedule(string instanceId, TParam param)
-        => _registration.Schedule(instanceId, param);
+    public Task<Scheduled<TResult>> Schedule(string instanceId, TParam param, InitialState? initialState = null)
+        => _registration.Schedule(instanceId, param, initialState: initialState);
 
     public Task ScheduleAt(
         string instanceId,

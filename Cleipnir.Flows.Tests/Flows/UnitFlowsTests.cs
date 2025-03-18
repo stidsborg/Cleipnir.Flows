@@ -1,5 +1,6 @@
 ﻿using Cleipnir.ResilientFunctions.Domain;
 using Cleipnir.ResilientFunctions.Helpers;
+using Cleipnir.ResilientFunctions.Messaging;
 using Cleipnir.ResilientFunctions.Reactive.Extensions;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -246,6 +247,40 @@ public class UnitFlowsTests
             return ShouldThrow 
                 ? Task.FromException<string>(new TimeoutException()) 
                 : Task.CompletedTask;
+        }
+    }
+    
+    [TestMethod]
+    public async Task FlowCanBeCreatedWithInitialState()
+    {
+        var flowsContainer = FlowsContainer.Create();
+        var flow = new InitialStateFlow();
+        var flows = flowsContainer.RegisterAnonymousFlow<InitialStateFlow, string>(
+            flowFactory: () => flow
+        );
+
+        await flows.Run(
+            "SomeInstanceId",
+            param: "SomeParam",
+            new InitialState(
+                [new MessageAndIdempotencyKey("InitialMessageValue")],
+                [new InitialEffect("InitialEffectId", "InitialEffectValue")]
+            )
+        );
+        
+        flow.InitialEffectValue.ShouldBe("InitialEffectValue");
+        flow.InitialMessageValue.ShouldBe("InitialMessageValue");
+    }
+
+    private class InitialStateFlow : Flow<string>
+    {
+        public string? InitialEffectValue { get; set; }
+        public string? InitialMessageValue { get; set; }
+        
+        public override async Task Run(string _)
+        {
+            InitialEffectValue = await Effect.Get<string>("InitialEffectId");
+            InitialMessageValue = await Messages.OfType<string>().First();
         }
     }
 }
