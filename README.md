@@ -36,7 +36,7 @@ Wait for retrival of external message - without taking up resources:
 var fundsReserved = await Messages<FundsReserved>(timesOutIn: TimeSpan.FromMinutes(5));
 ```
 ### Suspension 
-Suspends the current execution at-will, resuming either after some duration or when an external message has been received: 
+Suspends the current execution at-will, resuming after some duration: 
 ```csharp
 await Delay(TimeSpan.FromMinutes(5));
 ```
