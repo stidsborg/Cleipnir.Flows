@@ -7,6 +7,7 @@ namespace Cleipnir.Flows.Tests.AspNet
     public static class PostgresSqlHelper
     {
         private static volatile bool _isInitialized = false;
+        private static readonly Lock Lock = new();
         
         public static string ConnectionString { get; }
 
@@ -19,21 +20,24 @@ namespace Cleipnir.Flows.Tests.AspNet
         
         public static void CreateDatabase()
         {
-            if (!_isInitialized) return;
-            _isInitialized = true;
-            
-            var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
-            var databaseName = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
-            
-            using var conn = new NpgsqlConnection(connectionStringWithoutDatabase);
-            conn.Open();
+            lock (Lock)
             {
-                using var command = new NpgsqlCommand($"DROP DATABASE IF EXISTS {databaseName}", conn);
-                command.ExecuteNonQuery();    
-            }
-            {
-                using var command = new NpgsqlCommand($"CREATE DATABASE {databaseName}", conn);
-                command.ExecuteNonQuery();    
+                if (!_isInitialized) return;
+                _isInitialized = true;
+            
+                var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
+                var databaseName = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
+            
+                using var conn = new NpgsqlConnection(connectionStringWithoutDatabase);
+                conn.Open();
+                {
+                    using var command = new NpgsqlCommand($"DROP DATABASE IF EXISTS {databaseName}", conn);
+                    command.ExecuteNonQuery();    
+                }
+                {
+                    using var command = new NpgsqlCommand($"CREATE DATABASE {databaseName}", conn);
+                    command.ExecuteNonQuery();    
+                }   
             }
         }
 
@@ -41,7 +45,7 @@ namespace Cleipnir.Flows.Tests.AspNet
         {
             CreateDatabase();
             
-            var store = new PostgreSqlFunctionStore(ConnectionString, tablePrefix: "PostgresSqlFlows"); 
+            var store = new PostgreSqlFunctionStore(ConnectionString, tablePrefix: "PostgresSqlFlows" + Random.Shared.Next(10_000)); 
             await store.Initialize();
             await store.TruncateTables();
             return store;

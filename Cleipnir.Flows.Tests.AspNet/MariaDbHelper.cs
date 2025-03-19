@@ -7,15 +7,17 @@ namespace Cleipnir.Flows.Tests.AspNet
     public static class MariaDbHelper
     {
         private static volatile bool _isInitialized = false;
-        
+        private static readonly Lock Lock = new();
+
         public static string ConnectionString { get; }
         public static Func<Task<MySqlConnection>> ConnFunc { get; set; }
-        
+
         static MariaDbHelper()
         {
-            ConnectionString = 
+            ConnectionString =
                 Environment.GetEnvironmentVariable("Cleipnir.RFunctions.MySQL.Tests.ConnectionString")
-                ?? "server=localhost;userid=root;password=Pa55word!;AllowPublicKeyRetrieval=True;;database=rfunctions_tests;";
+                ??
+                "server=localhost;userid=root;password=Pa55word!;AllowPublicKeyRetrieval=True;;database=rfunctions_tests;";
             ConnFunc = async () =>
             {
                 var conn = new MySqlConnection(ConnectionString);
@@ -23,26 +25,30 @@ namespace Cleipnir.Flows.Tests.AspNet
                 return conn;
             };
         }
-        
+
         public static void CreateDatabase()
         {
-            if (_isInitialized) return;
-            _isInitialized = true;
-            
-            // DROP test database if exists and create it again
-            var database = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
-
-            var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
-
-            using var conn = new MySqlConnection(connectionStringWithoutDatabase);
-            conn.Open();
+            lock (Lock)
             {
-                using var command = new MySqlCommand($"DROP DATABASE IF EXISTS {database}", conn);
-                command.ExecuteNonQuery();    
-            }
-            {
-                using var command = new MySqlCommand($"CREATE DATABASE {database}", conn);
-                command.ExecuteNonQuery();    
+                if (_isInitialized) return;
+                _isInitialized = true;
+
+                // DROP test database if exists and create it again
+                var database = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
+
+                var connectionStringWithoutDatabase =
+                    ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
+
+                using var conn = new MySqlConnection(connectionStringWithoutDatabase);
+                conn.Open();
+                {
+                    using var command = new MySqlCommand($"DROP DATABASE IF EXISTS {database}", conn);
+                    command.ExecuteNonQuery();
+                }
+                {
+                    using var command = new MySqlCommand($"CREATE DATABASE {database}", conn);
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -50,7 +56,7 @@ namespace Cleipnir.Flows.Tests.AspNet
         {
             CreateDatabase();
             
-            var store = new MariaDbFunctionStore(ConnectionString, tablePrefix: "MySqlFlows");
+            var store = new MariaDbFunctionStore(ConnectionString, tablePrefix: "MySqlFlows" + Random.Shared.Next(10_000));
             await store.Initialize();
             await store.TruncateTables();
             return store;

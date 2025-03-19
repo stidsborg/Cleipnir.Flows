@@ -8,6 +8,8 @@ namespace Cleipnir.Flows.Tests.AspNet
     public static class SqlServerHelper
     {
         private static volatile bool _isInitialized = false;
+        private static readonly Lock Lock = new();
+        
         public static string ConnectionString { get; }
 
         static SqlServerHelper()
@@ -19,24 +21,27 @@ namespace Cleipnir.Flows.Tests.AspNet
         
         public static void CreateDatabase()
         {
-            if (_isInitialized) return;
-            _isInitialized = true;
+            lock (Lock)
+            {
+                if (_isInitialized) return;
+                _isInitialized = true;
             
-            var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
-            var databaseName = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
+                var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
+                var databaseName = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
 
-            using var conn = new SqlConnection(connectionStringWithoutDatabase);
-            conn.Open();
+                using var conn = new SqlConnection(connectionStringWithoutDatabase);
+                conn.Open();
             
-            Execute($"DROP DATABASE IF EXISTS {databaseName}", conn);
-            Execute($"CREATE DATABASE {databaseName}", conn);
+                Execute($"DROP DATABASE IF EXISTS {databaseName}", conn);
+                Execute($"CREATE DATABASE {databaseName}", conn);                
+            }
         }
 
         public static async Task<IFunctionStore> CreateAndInitializeStore()
         {
             CreateDatabase();
             
-            var store = new SqlServerFunctionStore(ConnectionString, tablePrefix: "SqlServerFlows");
+            var store = new SqlServerFunctionStore(ConnectionString, tablePrefix: "SqlServerFlows" + Random.Shared.Next(10_000));
             await store.Initialize();
             await store.TruncateTables();
             return store;
