@@ -22,7 +22,7 @@ namespace Cleipnir.Flows.Tests.AspNet
         {
             lock (Lock)
             {
-                if (!_isInitialized) return;
+                if (_isInitialized) return;
                 _isInitialized = true;
             
                 var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
