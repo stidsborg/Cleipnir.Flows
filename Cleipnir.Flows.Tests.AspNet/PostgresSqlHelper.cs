@@ -1,4 +1,5 @@
 ﻿using Cleipnir.ResilientFunctions.PostgreSQL;
+using Cleipnir.ResilientFunctions.Storage;
 using Npgsql;
 
 namespace Cleipnir.Flows.Tests.AspNet
@@ -31,7 +32,7 @@ namespace Cleipnir.Flows.Tests.AspNet
             }
         }
 
-        public static async Task<PostgreSqlFunctionStore> CreateAndInitializeStore()
+        public static async Task<IFunctionStore> CreateAndInitializeStore()
         {
             CreateDatabase();
             

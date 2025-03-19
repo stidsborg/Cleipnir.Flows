@@ -1,4 +1,5 @@
 ﻿using Cleipnir.ResilientFunctions.MariaDb;
+using Cleipnir.ResilientFunctions.Storage;
 using MySqlConnector;
 
 namespace Cleipnir.Flows.Tests.AspNet
@@ -40,7 +41,7 @@ namespace Cleipnir.Flows.Tests.AspNet
             }
         }
 
-        public static async Task<MariaDbFunctionStore> CreateAndInitializeMySqlStore()
+        public static async Task<IFunctionStore> CreateAndInitializeMySqlStore()
         {
             CreateDatabase();
             

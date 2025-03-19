@@ -1,4 +1,5 @@
 ﻿using Cleipnir.ResilientFunctions.SqlServer;
+using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Data.SqlClient;
 
 namespace Cleipnir.Flows.Tests.AspNet
@@ -27,7 +28,7 @@ namespace Cleipnir.Flows.Tests.AspNet
             Execute($"CREATE DATABASE {databaseName}", conn);
         }
 
-        public static async Task<SqlServerFunctionStore> CreateAndInitializeStore()
+        public static async Task<IFunctionStore> CreateAndInitializeStore()
         {
             CreateDatabase();
             
