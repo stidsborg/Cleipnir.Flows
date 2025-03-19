@@ -7,6 +7,7 @@ namespace Cleipnir.Flows.Tests.AspNet
     [TestClass]
     public static class SqlServerHelper
     {
+        private static volatile bool _isInitialized = false;
         public static string ConnectionString { get; }
 
         static SqlServerHelper()
@@ -18,6 +19,9 @@ namespace Cleipnir.Flows.Tests.AspNet
         
         public static void CreateDatabase()
         {
+            if (_isInitialized) return;
+            _isInitialized = true;
+            
             var connectionStringWithoutDatabase = ResilientFunctions.Storage.DatabaseHelper.GetConnectionStringWithoutDatabase(ConnectionString);
             var databaseName = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
 

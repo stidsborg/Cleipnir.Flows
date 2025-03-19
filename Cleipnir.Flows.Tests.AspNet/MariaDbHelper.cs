@@ -6,6 +6,8 @@ namespace Cleipnir.Flows.Tests.AspNet
 {
     public static class MariaDbHelper
     {
+        private static volatile bool _isInitialized = false;
+        
         public static string ConnectionString { get; }
         public static Func<Task<MySqlConnection>> ConnFunc { get; set; }
         
@@ -24,6 +26,9 @@ namespace Cleipnir.Flows.Tests.AspNet
         
         public static void CreateDatabase()
         {
+            if (_isInitialized) return;
+            _isInitialized = true;
+            
             // DROP test database if exists and create it again
             var database = ResilientFunctions.Storage.DatabaseHelper.GetDatabaseName(ConnectionString);
 
