@@ -237,6 +237,13 @@ public class SimpleFlowsHandler(SimpleFlows flows)
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/main/ServiceBuses/Wolverine/Cleipnir.Flows.Wolverine.Console/SimpleFlow.cs)
 
+### Publish multiple messages in batch
+
+```csharp
+await flows.SendMessages(batchedMessages);
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/340c4b2830a047523b95ef443b39ea9f3ce9c97f/Cleipnir.Flows.Tests.AspNet/BulkPublishTests.cs#L37)
+
 ## More examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
 
