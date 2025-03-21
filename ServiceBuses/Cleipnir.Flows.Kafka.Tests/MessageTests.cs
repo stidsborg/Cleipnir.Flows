@@ -49,7 +49,8 @@ public sealed class MessageTests
     {
         var config = new ProducerConfig
         {
-            BootstrapServers = "localhost:9092" // Kafka broker address
+            BootstrapServers = "localhost:9092", // Kafka broker address
+            SecurityProtocol = SecurityProtocol.Plaintext 
         };
 
         var producer = new ProducerBuilder<Null, string>(config).Build();
