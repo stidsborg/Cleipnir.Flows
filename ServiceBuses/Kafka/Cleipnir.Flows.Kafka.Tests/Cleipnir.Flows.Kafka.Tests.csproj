@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
+      <ProjectReference Include="..\..\..\Cleipnir.Flows\Cleipnir.Flows.csproj" />
     </ItemGroup>
 
 </Project>

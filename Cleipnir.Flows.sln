@@ -75,7 +75,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.NServiceBus.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.ResilientFunctions.MariaDB", "Cleipnir.ResilientFunctions\Stores\MariaDB\Cleipnir.ResilientFunctions.MariaDB\Cleipnir.ResilientFunctions.MariaDB.csproj", "{027072F7-E753-4CF4-8156-C1B502377FF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.Kafka.Tests", "ServiceBuses\Cleipnir.Flows.Kafka.Tests\Cleipnir.Flows.Kafka.Tests.csproj", "{FBD183C6-4474-406E-A798-CC8ECF8FFF42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleipnir.Flows.Kafka.Tests", "ServiceBuses\Kafka\Cleipnir.Flows.Kafka.Tests\Cleipnir.Flows.Kafka.Tests.csproj", "{FBD183C6-4474-406E-A798-CC8ECF8FFF42}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kafka", "Kafka", "{C16C3EC4-AE49-4FFF-B9FF-B1107F73CACB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +222,7 @@ Global
 		{0280F37A-575B-4F08-9699-D8BECFCA0A3C} = {AF7E47FD-B1C2-4B90-A3A3-1D24ED9668E3}
 		{7A7ABDAB-3EFD-4532-B794-64C999B77C72} = {AF7E47FD-B1C2-4B90-A3A3-1D24ED9668E3}
 		{027072F7-E753-4CF4-8156-C1B502377FF7} = {9A4E176B-52F2-4375-87DB-AB66F0C37646}
-		{FBD183C6-4474-406E-A798-CC8ECF8FFF42} = {0872461B-3FC1-4659-AE2D-80109CDA3F5E}
+		{C16C3EC4-AE49-4FFF-B9FF-B1107F73CACB} = {0872461B-3FC1-4659-AE2D-80109CDA3F5E}
+		{FBD183C6-4474-406E-A798-CC8ECF8FFF42} = {C16C3EC4-AE49-4FFF-B9FF-B1107F73CACB}
 	EndGlobalSection
 EndGlobal
