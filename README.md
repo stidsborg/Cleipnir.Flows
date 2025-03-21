@@ -124,7 +124,7 @@ builder.Services.AddFlows(c => c
 ```
 
 ### RPC Flows
-Finally, implement your flow ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderFlow.cs)):
+Finally, implement your flow ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Source/Flows/Ordering/Rpc/OrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(
