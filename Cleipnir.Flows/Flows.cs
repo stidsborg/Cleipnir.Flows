@@ -102,26 +102,26 @@ public class Flows<TFlow> : BaseFlows<TFlow> where TFlow : Flow
         );
     }
 
-    public async Task<ControlPanel?> ControlPanel(string instanceId)
+    public async Task<ControlPanel?> ControlPanel(FlowInstance instanceId)
     {
         var controlPanel = await _registration.ControlPanel(instanceId);
         return controlPanel;
     }
     
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
-        => _registration.GetState<TState>(functionInstanceId);
+    protected Task<TState?> GetState<TState>(FlowInstance instanceId) where TState : FlowState, new() 
+        => _registration.GetState<TState>(instanceId);
     
-    public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
+    public MessageWriter MessageWriter(FlowInstance instanceId) 
+        => _registration.MessageWriters.For(instanceId);
 
-    public Task Run(string instanceId, InitialState? initialState = null) 
+    public Task Run(FlowInstance instanceId, InitialState? initialState = null) 
         => _registration.Invoke(instanceId, initialState);
 
-    public Task<Scheduled> Schedule(string instanceId, InitialState? initialState = null)
+    public Task<Scheduled> Schedule(FlowInstance instanceId, InitialState? initialState = null)
         => _registration.Schedule(instanceId, initialState: initialState);
     
-    public Task ScheduleAt(string instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
-    public Task ScheduleIn(string functionInstanceId, TimeSpan delay) => _registration.ScheduleIn(functionInstanceId, delay);
+    public Task ScheduleAt(FlowInstance instanceId, DateTime delayUntil) => _registration.ScheduleAt(instanceId, delayUntil);
+    public Task ScheduleIn(FlowInstance instanceId, TimeSpan delay) => _registration.ScheduleIn(instanceId.Value, delay);
 
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null) 
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
@@ -160,34 +160,35 @@ public class Flows<TFlow, TParam> : BaseFlows<TFlow>
         );
     }
 
-    public async Task<ControlPanel<TParam>?> ControlPanel(string instanceId)
+    public async Task<ControlPanel<TParam>?> ControlPanel(FlowInstance instanceId)
     {
         var controlPanel = await _registration.ControlPanel(instanceId);
         return controlPanel;
     }
     
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
-        => _registration.GetState<TState>(functionInstanceId);
+    protected Task<TState?> GetState<TState>(FlowInstance instanceId) where TState : FlowState, new() 
+        => _registration.GetState<TState>(instanceId);
     
-    public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
+    public MessageWriter MessageWriter(FlowInstance instanceId) 
+        => _registration.MessageWriters.For(instanceId);
 
-    public Task Run(string instanceId, TParam param, InitialState? initialState = null) 
+    public Task Run(FlowInstance instanceId, TParam param, InitialState? initialState = null) 
         => _registration.Invoke(instanceId, param, initialState);
 
-    public Task<Scheduled> Schedule(string instanceId, TParam param, InitialState? initialState = null)
+    public Task<Scheduled> Schedule(FlowInstance instanceId, TParam param, InitialState? initialState = null)
         => _registration.Schedule(instanceId, param, initialState: initialState);
     
     public Task ScheduleAt(
-        string instanceId,
+        FlowInstance instanceId,
         TParam param,
         DateTime delayUntil
     ) => _registration.ScheduleAt(instanceId, param, delayUntil);
 
-    public Task ScheduleIn(string functionInstanceId,
+    public Task ScheduleIn(
+        FlowInstance instanceId,
         TParam param,
         TimeSpan delay
-    ) => _registration.ScheduleIn(functionInstanceId, param, delay);
+    ) => _registration.ScheduleIn(instanceId.Value, param, delay);
 
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
@@ -226,28 +227,29 @@ public class Flows<TFlow, TParam, TResult> : BaseFlows<TFlow>
     public Task<ControlPanel<TParam, TResult>?> ControlPanel(string instanceId) 
         => _registration.ControlPanel(instanceId);
 
-    public MessageWriter MessageWriter(string instanceId) 
-        => _registration.MessageWriters.For(instanceId.ToFlowInstance());
+    public MessageWriter MessageWriter(FlowInstance instanceId) 
+        => _registration.MessageWriters.For(instanceId);
 
-    public Task<TResult> Run(string instanceId, TParam param, InitialState? initialState = null) 
+    public Task<TResult> Run(FlowInstance instanceId, TParam param, InitialState? initialState = null) 
         => _registration.Invoke(instanceId, param, initialState);
 
-    public Task<Scheduled<TResult>> Schedule(string instanceId, TParam param, InitialState? initialState = null)
+    public Task<Scheduled<TResult>> Schedule(FlowInstance instanceId, TParam param, InitialState? initialState = null)
         => _registration.Schedule(instanceId, param, initialState: initialState);
 
     public Task ScheduleAt(
-        string instanceId,
+        FlowInstance instanceId,
         TParam param,
         DateTime delayUntil
     ) => _registration.ScheduleAt(instanceId, param, delayUntil);
 
-    public Task ScheduleIn(string functionInstanceId,
+    public Task ScheduleIn(
+        FlowInstance instanceId,
         TParam param,
         TimeSpan delay
-    ) => _registration.ScheduleIn(functionInstanceId, param, delay);
+    ) => _registration.ScheduleIn(instanceId.Value, param, delay);
 
-    protected Task<TState?> GetState<TState>(string functionInstanceId) where TState : FlowState, new() 
-        => _registration.GetState<TState>(functionInstanceId);
+    protected Task<TState?> GetState<TState>(FlowInstance instanceId) where TState : FlowState, new() 
+        => _registration.GetState<TState>(instanceId);
 
     public override Task RouteMessage<T>(T message, string correlationId, string? idempotencyKey = null)
         => _registration.RouteMessage(message, correlationId, idempotencyKey);
