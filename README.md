@@ -41,7 +41,7 @@ Suspends the current execution at-will, resuming after some duration:
 await Delay(TimeSpan.FromMinutes(5));
 ```
 ## Examples
-### Message-brokered ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
+### Message-brokered ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Source/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(IBus bus) : Flow<Order>
@@ -68,7 +68,7 @@ public class OrderFlow(IBus bus) : Flow<Order>
 }
 ```
 
-### RPC ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderFlow.cs)):
+### RPC ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Source/Flows/Ordering/Rpc/OrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(
@@ -149,7 +149,7 @@ public class OrderFlow(
 ```
 
 ### Message-brokered Flows
-Or, if the flow is using a message-broker ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
+Or, if the flow is using a message-broker ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Source/Flows/Ordering/MessageDriven/MessageDrivenOrderFlow.cs)):
 ```csharp
 [GenerateFlows]
 public class OrderFlow(IBus bus) : Flow<Order>
@@ -172,7 +172,7 @@ public class OrderFlow(IBus bus) : Flow<Order>
     }
 ```
 
-The implemented flow can then be started using the corresponding source generated Flows-type ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Flows/Ordering/Rpc/OrderController.cs)):
+The implemented flow can then be started using the corresponding source generated Flows-type ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/main/Source/Flows/Ordering/Rpc/OrderController.cs)):
 ```csharp
 [ApiController]
 [Route("[controller]")]
