@@ -244,6 +244,19 @@ await flows.SendMessages(batchedMessages);
 ```
 [Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/340c4b2830a047523b95ef443b39ea9f3ce9c97f/Cleipnir.Flows.Tests.AspNet/BulkPublishTests.cs#L37)
 
+### Kafka Handler
+
+```csharp
+ConsumeMessages(
+  batchSize: 10,
+  topic,
+  handler: messages =>
+    flows.SendMessages(
+      messages.Select(msg => new BatchedMessage(msg.Instance, msg)).ToList()
+));
+```
+[Source code](https://github.com/stidsborg/Cleipnir.Flows/blob/76d65bf5ff66275b949bdd32c4797d45dbe7396a/ServiceBuses/Kafka/Cleipnir.Flows.Kafka.Tests/MessageTests.cs#L24)
+
 ## More examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
 
