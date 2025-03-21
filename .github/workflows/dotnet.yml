@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: '9.0.x' # SDK Version to use; x will use the latest version of the 3.1 channel
     - name: Start containers
-      run: docker compose -f "./Cleipnir.ResilientFunctions/docker-compose.yml" up -d --build           
+      run: docker compose -f "./docker-compose.yml" up -d --build           
     - name: Build
       run: dotnet build
     - name: Test
