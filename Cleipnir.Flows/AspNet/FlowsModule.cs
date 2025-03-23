@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Cleipnir.Flows.SourceGeneration;
+using Cleipnir.ResilientFunctions.CoreRuntime;
+using Cleipnir.ResilientFunctions.CoreRuntime.Invocation;
+using Cleipnir.ResilientFunctions.Domain;
+using Cleipnir.ResilientFunctions.Messaging;
 using Cleipnir.ResilientFunctions.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +25,10 @@ public static class FlowsModule
             services.AddSingleton(configurator.OptionsFunc);
         
         services.AddSingleton<FlowsContainer>();
-
+        services.AddTransient<Workflow>(_ => CurrentFlow.Workflow ?? throw new InvalidOperationException("Workflow is not present outside Flow"));
+        services.AddTransient<Effect>(_ => CurrentFlow.Workflow?.Effect ?? throw new InvalidOperationException("Effect is not present outside Flow"));
+        services.AddTransient<Messages>(_ => CurrentFlow.Workflow?.Messages ?? throw new InvalidOperationException("Messages is not present outside Flow"));
+        
         services.AddHostedService(
             s => new FlowsHostedService(s, configurator.FlowsTypes, configurator.EnableGracefulShutdown)
         );
