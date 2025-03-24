@@ -260,6 +260,33 @@ ConsumeMessages(
 ## More examples
 As an example is worth a thousand lines of documentation - various useful examples are presented in the following section:
 
+### Integration-test ([source code](https://github.com/stidsborg/Cleipnir.Flows.Sample/blob/48eceea40402590303d5a269aeec9912117c634c/Tests/Cleipnir.Flows.Sample.Tests/RpcOrderFlowTests.cs#L16)):
+```csharp
+var transactionId = Guid.NewGuid();
+var usedTransactionId = default(Guid?);
+        
+var serviceProvider = new ServiceCollection()
+  .AddSingleton(new OrderFlow(
+    PaymentProviderClientTestStub.Create(reserve: (id, _, _) => { usedTransactionId = id; return Task.CompletedTask; }),
+    EmailClientStub.Instance, 
+    LogisticsClientStub.Instance)
+  ).BuildServiceProvider();
+
+using var container = FlowsContainer.Create(serviceProvider);
+var flows = new OrderFlows(container);
+        
+var testOrder = new Order("MK-54321", CustomerId: Guid.NewGuid(), ProductIds: [Guid.NewGuid()], TotalPrice: 120);
+          
+await flows.Run(
+  instanceId: testOrder.OrderId,
+  testOrder,
+  new InitialState(Messages: [], Effects: [new InitialEffect("TransactionId", transactionId)])
+);
+
+Assert.AreEqual(transactionId, usedTransactionId);
+```
+
+
 ### Avoid re-executing already completed code:
 ```csharp
 [GenerateFlows]
