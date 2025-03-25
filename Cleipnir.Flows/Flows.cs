@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Cleipnir.Flows.CrossCutting;
@@ -36,6 +37,15 @@ public abstract class BaseFlows<TFlow> : IBaseFlows where TFlow : notnull
     
     public abstract Task<IReadOnlyList<StoredInstance>> GetInstances(Status? status = null);
     public abstract Task Interrupt(IEnumerable<StoredInstance> instances);
+    
+    /// <summary>
+    /// Emit interrupt signal to flows
+    /// Execution of suspended flows will be resumed. Already executing flows will be restarted on suspension. 
+    /// </summary>
+    /// <param name="instances">Instance ids for flows</param>
+    /// <returns>A task which will complete when the interrupt-signal has been persisted</returns>
+    public Task Interrupt(IEnumerable<FlowInstance> instances)
+        => Interrupt(instances.Select(id => id.ToStoredInstance()));
     
     private static Action<TFlow, Workflow> CreateWorkflowSetter()
     {
